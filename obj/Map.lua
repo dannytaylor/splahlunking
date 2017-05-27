@@ -8,12 +8,17 @@ function Map:new()
 	self.w, self.h = 0,0
 	self.state = {}
 	self.caveState = {}
+	self.tileState = {}
 
+ 	-- build random map
 	self:init()
 	self:buildCave()
 	self:drill()
 
+	-- assign hitboxes and quad images
 	self:bumpBuild()
+	self:drill()
+	self:setQuads()
 
 end
 
@@ -25,7 +30,9 @@ function Map:init()
 	-- init state grid to empty
 	for i=1, self.w do -- initialize map as empty first
 		self.state[i] = {}
+		self.tileState[i] = {}
 		for j=1, self.h do
+			self.tileState[i][j] = 0
 			if (255 == mapImg:getPixel( i - 1, j - 1 )) then
 				self.state[i][j] = 'floor'
 			elseif (0 == mapImg:getPixel( i - 1, j - 1 )) then
@@ -51,23 +58,32 @@ end
 function Map:draw()
 	for i=1, self.w do -- initialize map as empty first
 		for j=1, self.h do
-			if self.state[i][j] == 'floor' then
-				if j < waterLevel then -- above water line
-					love.graphics.setColor(178, 220, 239)
-				else
-					love.graphics.setColor(49, 162, 242)
-				end
-			elseif self.state[i][j] == 'wall' then
-				love.graphics.setColor(0, 0, 0)
-			elseif self.state[i][j] == 'empty' then
-				love.graphics.setColor(128, 128, 128)
-			else
-				love.graphics.setColor(255, 255, 255)
-			end
+			self:setColor(i,j)
 			love.graphics.rectangle('fill', (i-1)*tileSize, (j-1)*tileSize, tileSize, tileSize)
+			love.graphics.setColor(255, 255, 255)
+			if self.tileState[i][j] == 0 then do end
+			else love.graphics.draw(tileSheet,self.tileState[i][j],(i-1)*tileSize, (j-1)*tileSize)
+			end
+
+			
 		end
 	end
-	love.graphics.setColor(255, 255, 255)
+end
+
+function Map:setColor(x,y)
+	if self.state[x][y] == 'floor' then
+		if y < waterLevel then -- above water line
+			love.graphics.setColor(178, 220, 239)
+		else
+			love.graphics.setColor(49, 162, 242)
+		end
+	elseif self.state[x][y] == 'wall' then
+		love.graphics.setColor(0, 0, 0)
+	elseif self.state[x][y] == 'empty' then
+		love.graphics.setColor(128, 128, 128)
+	else
+		love.graphics.setColor(255, 255, 255)
+	end
 end
 
 -- http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels
@@ -144,7 +160,6 @@ end
 
 function Map:checkNeighbors(x,y)
 	local num = 0
-	local check
 	for i = x - 1, x + 1 do
 		for j = y - 1, y + 1 do
 			if self.caveState[i][j] == 1 then
@@ -171,6 +186,8 @@ function Map:checkNeighbors(x,y)
 
 	return false
 end
+
+
 
 function Map:floodFill()
 	numFlood = 0
@@ -222,5 +239,79 @@ function Map:bumpBuild()
 				world:add('wall'..i..'x'..j, (i - 1)*tileSize, (j - 1)*tileSize, tileSize,tileSize)
 			end
 		end
+	end
+end
+
+function Map:setQuads()
+	for i = 1, self.w do
+		for j = 1, self.h do
+			if self.state[i][j] == 'wall' then
+				self:numNeighbors(i,j)
+			else
+				self.tileState[i][j] = 0
+			end
+		end
+	end
+end
+
+function Map:numNeighbors(x,y) -- no diagonals
+	local num = 0
+	local dir = {0,0,0,0}
+	if x == 1 or y == 1 or x == self.w or y == self.h then 
+		self.tileState[x][y] =0 
+		return
+	end
+	if self.state[x][y-1] == 'wall' then 
+		num = num + 1 
+		dir[1] = 1
+	end
+	if self.state[x+1][y] == 'wall' then 
+		num = num + 1 
+		dir[2] = 1
+	end
+	if self.state[x][y+1] == 'wall' then 
+		num = num + 1 
+		dir[3] = 1
+	end
+	if self.state[x-1][y] == 'wall' then 
+		num = num + 1 
+		dir[4] = 1
+	end
+
+	if 	num == 0 then self.tileState[x][y] = tq.o
+	elseif 	num == 3 then 
+		if y < waterLevel then
+			if dir[2]     == 1 and dir[3] == 1 and dir[4] == 1  then self.tileState[x][y] = tq.gi0
+			elseif dir[3] == 1 and dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.gi90
+			else self.tileState[x][y] = tq.gi270
+			end
+		else
+			if dir[2]     == 1 and dir[3] == 1 and dir[4] == 1 then self.tileState[x][y] = tq.i0
+			elseif dir[3] == 1 and dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.i90
+			elseif dir[4] == 1 and dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = tq.i180
+			elseif dir[1] == 1 and dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.i270
+			end
+		end
+	elseif 	num == 2 then
+		if y < waterLevel then
+			if dir[3]     == 1 and dir[4] == 1 then self.tileState[x][y] = tq.gt0
+			else self.tileState[x][y] = tq.gt180
+			end
+		else 
+			if dir[3]     == 1 and dir[4] == 1 then self.tileState[x][y] = tq.l0
+			elseif dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.l90
+			elseif dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = tq.l180
+			elseif dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l270
+			elseif dir[1] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l0b
+			else self.tileState[x][y] = tq.l90b
+			end
+		end
+	elseif 	num == 1 then 
+		if dir[3]     == 1 then self.tileState[x][y] = tq.t0
+		elseif dir[4] == 1 then self.tileState[x][y] = tq.t90
+		elseif dir[1] == 1 then self.tileState[x][y] = tq.t180
+		elseif dir[2] == 1 then self.tileState[x][y] = tq.t270
+		end
+	else 	self.tileState[x][y] = 0
 	end
 end

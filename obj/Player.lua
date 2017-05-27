@@ -10,9 +10,9 @@ function Player:new(x,y)
 	self.bumpName = 'player'
 	world:add(self.bumpName, self.x,self.y,tileSize,tileSize)
 
-	self.gamestate = nil
 	self.right = true 	-- == not left
 	self.up = true 		-- == not down
+	self.move = false
 
 	self.frame = 0
 
@@ -20,37 +20,56 @@ function Player:new(x,y)
 	self.sprite = nil
 	self.gamestate = 'dry'
 	self:spriteInit()
+
+	self.currentAnim = nil
 end
 
 function Player:draw()
-	love.graphics.setColor(255, 0, 255)
-	love.graphics.rectangle('fill', self.x, self.y, tileSize, tileSize)
-	love.graphics.setColor(255, 255, 255)
+	-- love.graphics.setColor(255, 0, 255)
+	-- love.graphics.rectangle('fill', self.x, self.y, tileSize, tileSize)
+	-- love.graphics.setColor(255, 255, 255)
 	self.sprite:draw()
 end
 
 function Player:update(dt)
 	local speed = self.speed
-
+	local nextAnim = 'idle'
 	local dx, dy = 0, 0
+
+	if self.y > (waterLevel)*tileSize then
+		if self.gamestate == 'dry' then self.gamestate = 'wet' end
+		if love.keyboard.isDown('down') then
+			dy = speed * 2 * dt
+			self.sprite.flipY = true
+			nextAnim = 'movey'
+		elseif love.keyboard.isDown('up') then
+			dy = -speed * 2 * dt
+			self.sprite.flipY = false
+			nextAnim = 'movey'
+		else
+			self.sprite.flipY = false
+		end
+	else
+		dy = speed * 2 * dt
+	end
 
 	if love.keyboard.isDown('right') then
 		dx = speed * dt
 		self.sprite.flipX = false
+		nextAnim = 'movex'
+		self.sprite.flipY = false
 	elseif love.keyboard.isDown('left') then
 		dx = -speed * dt
 		self.sprite.flipX = true
+		nextAnim = 'movex'
+		self.sprite.flipY = false
 	end
 
-	if love.keyboard.isDown('down') then
-		dy = speed * 2 * dt
-		self.sprite.flipY = true
-	elseif love.keyboard.isDown('up') then
-		dy = -speed * 2 * dt
-		self.sprite.flipY = false
-	else
-		self.sprite.flipY = false
+	if nextAnim ~= self.currentAnim then
+		self.currentAnim = nextAnim
+		self.sprite:switch(nextAnim)
 	end
+
 
 	if dx ~= 0 or dy ~= 0 then
 		local cols
@@ -79,7 +98,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 16,
 		frames      = {
-			{1, 1, 2, 1, .5},
+			{1, 1, 2, 1, .8},
 		},
 	})
 
@@ -88,7 +107,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 16,
 		frames      = {
-			{3, 1, 4, 1, .5},
+			{3, 1, 4, 1, .4},
 		},
 	})
 	self.sprite:addAnimation('movey', {
@@ -96,7 +115,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 16,
 		frames      = {
-			{5, 1, 6, 1, .5},
+			{5, 1, 6, 1, .4},
 		},
 	})
 

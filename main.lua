@@ -40,6 +40,8 @@ function love.draw()
 		currentPlayer:draw()
 	end)
 
+	-- love.graphics.draw(lightMask, 0, 0, 0, windowScale, windowScale)
+
 
 	-- map:draw()
 	-- currentPlayer:draw()	

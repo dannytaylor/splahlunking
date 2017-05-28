@@ -1,8 +1,8 @@
 -- Bubbler.lua
 
-Bubbler = Object:extend()
+Bubbler = class('Bubbler')
 
-function Bubbler:new(max, life)
+function Bubbler:initialize(max, life)
 	self.max = max or 4
 	self.life = life or 3
 	self.tickRate = 5

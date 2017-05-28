@@ -1,8 +1,8 @@
 -- Button.lua
 
-Button = Object:extend()
+Button = class('Button')
 
-function Button:new(x,y,text,a)
+function Button:initialize(x,y,text,a)
 	self.x,self.y = x,y or nil
 	self.active = false
 	self.text = text

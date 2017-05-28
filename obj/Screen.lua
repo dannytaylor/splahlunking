@@ -1,8 +1,8 @@
 -- Screen.lua
 
-Screen = Object:extend()
+Screen = class('Screen')
 
-function Screen:new()
+function Screen:initialize()
 	self.buttons = {}
 	self.bgImg = nil
 	self.prevScreen = nil

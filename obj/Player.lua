@@ -1,10 +1,10 @@
 -- Player.lua
 
-Player = Object:extend()
+Player = class('Player')
 
 
 
-function Player:new(x,y)
+function Player:initialize(x,y)
 	self.x = x 
 	self.y = y
 	self.playerid = id or 1
@@ -115,7 +115,7 @@ function Player:update(dt)
 		self.x, self.x = self.x + dx, self.y + dy
 
 
-		cam:setPosition(currentPlayer.x, currentPlayer.y)
+		cam:setPosition(players[pid].x, players[pid].y)
 		for i=1, cols_len do
 			local other = cols[i].other
 			if other:sub(1,4) == 'trea'  then

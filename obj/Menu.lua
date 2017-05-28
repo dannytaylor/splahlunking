@@ -1,8 +1,8 @@
 -- menu.lua
 
-Menu = Object:extend()
+Menu = class('Menu')
 
-function Menu:new()
+function Menu:initialize()
 	self.screens = {}
 	self.currentScreen = nil
 
@@ -37,16 +37,32 @@ function Menu:initScreens()
 		['join'] = Screen(),
 		['char'] = Screen(),
 	}
+
+	-- screen setups
+	self:ss_title()
+	self:ss_multi()
+
+
+	self.currentScreen = self.screens['title']
+
+end
+
+-- screensetup
+function Menu:ss_title()
 	local ss = self.screens
 
 	ss['title'].bgImg = titlebg
 	ss['title'].buttons = {
 		Button(2*tileSize,viewH-16,'single', function ()
+			-- initServer()
 			gamestate = 1
 			initMap()
 		end
 		),
-		Button(6.5*tileSize,viewH-16,'multi'),
+		Button(6.5*tileSize,viewH-16,'multi',function () 
+			self.currentScreen = self.screens['multi']
+		end
+		),
 		Button(11*tileSize,viewH-16,'quit',function () 
 			love.event.quit() 
 		end
@@ -55,7 +71,25 @@ function Menu:initScreens()
 	ss['title'].buttonIndex =  1
 	ss['title'].currentButton =  ss['title'].buttons[1]
 	ss['title'].currentButton.active = true
+end
 
-	self.currentScreen = ss['title']
+function Menu:ss_multi()
+	local ss = self.screens
 
+	ss['multi'].bgImg = titlebg2
+	ss['multi'].buttons = {
+		Button(4*tileSize,viewH-16,'host', function ()
+			initServer()
+			gamestate = 1
+			initMap()
+		end
+		),
+		Button(10*tileSize,viewH-16,'join', function ()
+			initClient()
+			client:connect()
+		end),
+	}
+	ss['multi'].buttonIndex =  1
+	ss['multi'].currentButton =  ss['multi'].buttons[1]
+	ss['multi'].currentButton.active = true
 end

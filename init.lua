@@ -8,6 +8,9 @@ waterLevel = 12
 maxTreasure = 30
 maxLargeTreasure = 3
 
+
+
+
 function init()
 	windowW, windowH = viewW*windowScale, viewH*windowScale
 	love.window.setMode(windowW, windowH, {msaa = 0})
@@ -29,18 +32,68 @@ function initMenu()
 end
 
 function initMap()
-	map = Map()
+	if server then
 
-	--temp
-	p1spawn = {x = 60, y = 7} 
-	currentPlayer = Player(p1spawn.x*tileSize,p1spawn.y*tileSize)
+		map = Map()
+		mapdata = map:packageData()
+		binary_map = bitser.dumps(mapdata)
 
+		--temp
+		p1spawn = {x = 60, y = 7} 
+		players[pid] = Player(p1spawn.x*tileSize,p1spawn.y*tileSize)
+	elseif client then
+		if not mapdata then print('no map data!') end
+		map = Map(mapdata)
+		--temp
+		pid = 1
+		p1spawn = {x = 60, y = 7} 
+		players[pid] = Player(p1spawn.x*tileSize,p1spawn.y*tileSize)
+	else -- single player
+		map = Map()
+		--temp
+		pid = 1
+		p1spawn = {x = 60, y = 7} 
+		players[pid] = Player(p1spawn.x*tileSize,p1spawn.y*tileSize)
+	end
 	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
 	cam:setScale(windowScale)
-	cam:setPosition(currentPlayer.x, currentPlayer.y)
+	cam:setPosition(players[pid].x, players[pid].y)
 
 	ui = UI()
 end
+
+function initServer()
+	tickRate = 1/60
+	tick = 0
+	server = sock.newServer("*", 22122,4)
+	server:setSerialization(bitser.dumps, bitser.loads)
+
+	pid = 1
+
+	server:on("connect", function(data, client)
+        -- Send a message back to the connected client
+        print('new client connected')
+        client:send("map",{
+	        m = binary_map,
+	    	})
+	end)
+end
+
+function initClient()
+	client = sock.newClient("localhost", 22122)
+	client:setSerialization(bitser.dumps, bitser.loads)
+
+	client:on("connect", function(data)
+		print('connected')
+	end)
+	client:on("map", function(data)
+		binary_map = data.m
+		mapdata = bitser.loads(binary_map)
+		print('received map: w='..mapdata.w..' h='..mapdata.h)
+		initMap()
+		gamestate = 1
+	end)
+end 
 
 function initSprites() -- and quads
 	playerSheet = love.graphics.newImage 'img/player.png'
@@ -50,6 +103,7 @@ function initSprites() -- and quads
 	treasureSheet = love.graphics.newImage 'img/treasureSheet.png'
 	playerLight = love.graphics.newImage 'img/playerLight.png'
 	titlebg = love.graphics.newImage 'img/titlebg.png'
+	titlebg2 = love.graphics.newImage 'img/titlebg2.png'
 
 	playerSheet:setFilter('nearest', 'nearest')
 	tileSheet:setFilter('nearest', 'nearest')
@@ -58,6 +112,7 @@ function initSprites() -- and quads
 	treasureSheet:setFilter('nearest', 'nearest')
 	playerLight:setFilter('nearest', 'nearest')
 	titlebg:setFilter('nearest', 'nearest')
+	titlebg2:setFilter('nearest', 'nearest')
 
 	local tilesetW, tilesetH = tileSheet:getWidth(), tileSheet:getHeight()
 	tq = { --tile quads

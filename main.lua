@@ -1,15 +1,21 @@
 debug = true
 
 -- main.lua
-Object = require 'lib/classic'  	-- simple class module    	https://github.com/rxi/classic/
-lume = require 'lib/lume'    		-- basic helper functions   https://github.com/rxi/lume/
-gamera = require 'lib/gamera'
-bump = require 'lib/bump'			-- collisions 				https://github.com/kikito/bump.lua
+-- Object  = require 'lib/classic'  	-- simple class module    	https://github.com/rxi/classic/
+class 	= require 'lib/middleclass'
+lume    = require 'lib/lume'    	-- basic helper functions   https://github.com/rxi/lume/
+gamera  = require 'lib/gamera'
+bump    = require 'lib/bump'		-- collisions 				https://github.com/kikito/bump.lua
 sodapop = require 'lib/sodapop'		-- sprite anim 				https://github.com/tesselode/sodapop
-sock = require 'lib/sock'		-- networking				https://github.com/camchenry/sock.lua
+sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock.lua
+
+bitser  = require "lib/bitser"
+binser  = require "lib/binser"
+
 
 require 'init'
 require 'input'
+require 'sockhelper'
 
 require 'obj/Map'
 require 'obj/Player'
@@ -21,24 +27,28 @@ require 'obj/Button'
 require 'obj/Screen'
 
 players = {}
-currentPlayer = nil
+pid = nil
 
 gamestate = 0
 
 
 function love.load()
 	math.randomseed(os.time())
+
 	init()
 end
 
 
 function love.update(dt)
-	if debug then require("lib/lovebird").update() end-- debug in http://127.0.0.1:8000/ 'F1'
+	-- if debug then require("lib/lovebird").update() end-- debug in http://127.0.0.1:8000/ 'F1'
 	
+	if client then clientUpdate(dt) end
+	if server then serverUpdate(dt) end
+
 	if gamestate == 0 then
 		menu:update(dt)
 	elseif gamestate == 1 then
-		currentPlayer:update(dt)
+		players[pid]:update(dt)
 		ui:update(dt)
 		map:update(dt)
 	end
@@ -54,7 +64,7 @@ function love.draw()
 		cam:draw(function()
 		  	map:draw()
 
-			currentPlayer:draw()
+			players[pid]:draw()
 
 			-- for i=1,#players do
 			-- 	players[i]:draw()

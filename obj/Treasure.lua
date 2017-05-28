@@ -1,8 +1,8 @@
 -- Treasure.lua
 
-Treasure = Object:extend()
+Treasure = class('Treasure')
 
-function Treasure:new(x,y,v,size)
+function Treasure:initialize(x,y,v,size)
 	self.x,self.y = (x-1)*tileSize,(y-1)*tileSize
 	self.value = v or 1
 	self.active = true

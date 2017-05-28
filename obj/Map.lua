@@ -1,31 +1,43 @@
 -- Map.lua
 
-Map = Object:extend()
+Map = class('Map')
+
+function Map:initialize(data)
+	if data then
+		self.w, self.h = data.w,data.h
+		self.state = data.s
+		self.caveState = {}
+		self.tileState = data.ts
+		self.treasure = {}
+		self.treasurePoints = data.t
+	else
+		self.w, self.h = 0,0
+		self.state = {}
+		self.caveState = {}
+		self.tileState = {}
+		self.treasure = {}
+		self.treasurePoints = {}
+
+	 	-- build random map
+		self:init()
+		self:buildCave()
+		self:drill()
+
+		-- assign hitboxes
+
+		self:getTreasures()
+	end
+	self:bumpBuild()
+	self:spawnTreasures()
 
 
-
-function Map:new()
-	self.w, self.h = 0,0
-	self.state = {}
-	self.caveState = {}
-	self.tileState = {}
-	self.treasure = {}
 	
 
 
- 	-- build random map
-	self:init()
-	self:buildCave()
-	self:drill()
 
-	-- assign hitboxes and quad images
-	self:bumpBuild()
-	self:drill()
 	self:setQuads()
-
 	self:setCanvas()
 
-	self:spawnTreasures()
 	-- self:setDecorations()
 
 end
@@ -64,7 +76,7 @@ function Map:init()
 end
 
 function Map:draw()
-	local cpy = currentPlayer.y
+	local cpy = players[pid].y
 	
 	love.graphics.setColor(0, 87, 132)
 	love.graphics.rectangle('fill', 0,0, windowW*tileSize, windowH*tileSize)
@@ -78,8 +90,8 @@ function Map:draw()
 	end
 	love.graphics.setColor(255, 255, 255)
 
-	if currentPlayer.gamestate == 'wet' and cpy > waterLevel*tileSize+8 then 
-		love.graphics.draw(lightMask, currentPlayer.x-128, cpy-80, 0, 1, 1)
+	if players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 then 
+		love.graphics.draw(lightMask, players[pid].x-128, cpy-80, 0, 1, 1)
 	end
 end
 
@@ -108,7 +120,7 @@ function Map:setCanvas()
 end
 
 function Map:setColor(x,y)
-	if self.state[x][y] == 'floor' then
+	if self.state[x][y] == 'floor' or self.state[x][y] == 'treasure'then
 		if y < waterLevel then -- above water line
 			love.graphics.setColor(178, 220, 239)
 		else
@@ -125,8 +137,8 @@ end
 
 function Map:playertracker()
 	love.graphics.setColor(255, 255, 255)
-	-- love.graphics.circle('fill', currentPlayer.x, currentPlayer.y, viewH/2)
-	love.graphics.draw(playerLight, currentPlayer.x-40, currentPlayer.y-40, 0, 1, 1)
+	-- love.graphics.circle('fill', players[pid].x, players[pid].y, viewH/2)
+	love.graphics.draw(playerLight, players[pid].x-40, players[pid].y-40, 0, 1, 1)
 end
 
 
@@ -381,23 +393,30 @@ function Map:assignCorners(x,y)
 	end
 end
 
-function Map:spawnTreasures()
+function Map:getTreasures()
+	local tp = self.treasurePoints
 	for i=1,maxTreasure do
-		local x,y,v = self:getFloorPoint(true)
-		self.state[x][y] = 'treasure'
-		self.treasure[i] = Treasure(x,y,v)
+		local a,b,c = self:getFloorPoint(true)
+		self.state[a][b] = 'treasure'
+		tp[#tp+1] = {x=a,y=b,v=c,s=1}
 	end
 	for i=1,maxLargeTreasure do
-		local x,y,v = self:getLargeFloorPoint()
-		self.state[x][y-1] = 'treasure'
-		self.state[x+1][y-1] = 'treasure'
-		self.state[x][y-2] = 'treasure'
-		self.state[x+1][y-1] = 'treasure'
-		self.treasure[#self.treasure+1] = Treasure(x,y-1,v,2)
-		self.treasure[#self.treasure].sprite = i
+		local a,b,c = self:getLargeFloorPoint()
+		self.state[a][b-1] = 'treasure'
+		self.state[a+1][b-1] = 'treasure'
+		self.state[a][b-2] = 'treasure'
+		self.state[a+1][b-1] = 'treasure'
+		tp[#tp+1] = {x=a,y=b-1,v=c,s=2}
 	end
-	local x,y,v = self:getXLFloorPoint()
-	self.treasure[#self.treasure+1] = Treasure(x,y-1,v,4)
+	local a,b,c = self:getXLFloorPoint()
+	tp[#tp+1] = {x=a,y=b-1,v=c,s=4}
+end
+
+function Map:spawnTreasures()
+	local tp = self.treasurePoints
+	for i=1,#tp do
+		self.treasure[#self.treasure+1] = Treasure(tp[i].x,tp[i].y,tp[i].v,tp[i].s)
+	end
 end
 
 function Map:getFloorPoint(weighted)
@@ -469,4 +488,24 @@ function Map:getXLFloorPoint()
 		end
 	end
 	return x1,y1,40
+end
+
+function Map:packageData()
+	local ts = {}
+
+	for i=1,self.w do
+		ts[i] = {}
+		for j=1,self.h do
+			ts[i][j] = 0
+		end
+	end
+
+	local mapdata = {
+		w 	= self.w,
+		h 	= self.h,
+		s 	= self.state,
+		t 	= self.treasurePoints,
+		ts 	= ts
+	}
+	return mapdata
 end

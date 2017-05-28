@@ -1,8 +1,8 @@
 -- ui.lua
 
-UI = Object:extend()
+UI = class('UI')
 
-function UI:new()
+function UI:initialize()
 	self.canvas = love.graphics.newCanvas(viewW*tileSize, viewH*tileSize,"normal",0)
 	self.canvas:setFilter("nearest", "nearest")
 
@@ -12,7 +12,7 @@ function UI:new()
 end
 
 function UI:draw()
-	if currentPlayer.gamestate == 'wet' then
+	if players[pid].gamestate == 'wet' then
 		love.graphics.setCanvas(self.canvas)
 		love.graphics.clear()
 
@@ -23,8 +23,8 @@ function UI:draw()
 
 		-- if debug then
 		-- 	love.graphics.setColor(255, 255, 255)
-		-- 	love.graphics.print('breath: '..math.floor(currentPlayer.breath), 2, 0)
-		-- 	love.graphics.print('score: '..currentPlayer.score, 2, 8)
+		-- 	love.graphics.print('breath: '..math.floor(players[pid].breath), 2, 0)
+		-- 	love.graphics.print('score: '..players[pid].score, 2, 8)
 		-- end
 
 		love.graphics.setCanvas()
@@ -33,8 +33,8 @@ function UI:draw()
 end
 
 function UI:update(dt)
-	self.breathNum = math.floor((16*currentPlayer.breath/100))
-	self.scoreNum = math.min(math.floor((8*currentPlayer.score/100)),8)
+	self.breathNum = math.floor((16*players[pid].breath/100))
+	self.scoreNum = math.min(math.floor((8*players[pid].score/100)),8)
 end
 
 function UI:breathbar()

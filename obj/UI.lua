@@ -15,9 +15,17 @@ function UI:draw()
 	if currentPlayer.gamestate == 'wet' then
 		love.graphics.setCanvas(self.canvas)
 		love.graphics.clear()
+
+
 		self:breathbar()
 		-- self:playerbar()
 		self:scorebar()
+
+		-- if debug then
+		-- 	love.graphics.setColor(255, 255, 255)
+		-- 	love.graphics.print('breath: '..math.floor(currentPlayer.breath), 2, 0)
+		-- 	love.graphics.print('score: '..currentPlayer.score, 2, 8)
+		-- end
 
 		love.graphics.setCanvas()
 		love.graphics.draw(self.canvas, 0, 0, 0, windowScale, windowScale)
@@ -25,20 +33,22 @@ function UI:draw()
 end
 
 function UI:update(dt)
-	self.breathNum = math.floor((17*currentPlayer.breath/100))
+	self.breathNum = math.floor((16*currentPlayer.breath/100))
 	self.scoreNum = math.min(math.floor((8*currentPlayer.score/100)),8)
 end
 
 function UI:breathbar()
 	-- breath bar
-	local bn = math.floor(self.breathNum/2)
-	for i=1, bn-1 do
-		love.graphics.draw(uiSheet,uiq.bubble_l,viewW-12, viewH-(i+1)*tileSize)
-	end
-	if self.breathNum % 2 == 0 then
-		love.graphics.draw(uiSheet,uiq.bubble_s,viewW-12, viewH-(bn+1)*tileSize)
-	else
-		love.graphics.draw(uiSheet,uiq.bubble_l,viewW-12, viewH-(bn+1)*tileSize)
+	local bn = math.ceil(self.breathNum/2)
+	if bn>0 then
+		for i=1, bn do
+			love.graphics.draw(uiSheet,uiq.bubble_l,viewW-11, viewH-(i+1)*tileSize)
+		end
+		if self.breathNum % 2 == 0 then
+			love.graphics.draw(uiSheet,uiq.bubble_l,viewW-11, viewH-(bn+1)*tileSize)
+		else
+			love.graphics.draw(uiSheet,uiq.bubble_s,viewW-11, viewH-(bn+1)*tileSize)
+		end
 	end
 	
 end
@@ -48,9 +58,9 @@ function UI:scorebar()
 	local sn = self.scoreNum
 	for i=1, sn do
 		if i % 2 == 0 then
-			love.graphics.draw(uiSheet,uiq.score1,4, viewH-(i+1)*tileSize)
+			love.graphics.draw(uiSheet,uiq.score1,3, viewH-(i+1)*tileSize)
 		else
-			love.graphics.draw(uiSheet,uiq.score2,4, viewH-(i+1)*tileSize)
+			love.graphics.draw(uiSheet,uiq.score2,3, viewH-(i+1)*tileSize)
 		end
 	end
 	

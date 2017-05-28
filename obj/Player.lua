@@ -133,6 +133,8 @@ function Player:update(dt)
 	if self.gamestate == 'wet' then 
 		if self.breath > 0 then
 			self.breath = self.breath - dt
+		else
+			self.breath = 0
 		end
 	end
 

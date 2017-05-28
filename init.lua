@@ -6,14 +6,29 @@ windowScale = 4
 
 waterLevel = 12
 maxTreasure = 30
-maxLargeTreasure = 2
+maxLargeTreasure = 3
 
 function init()
 	windowW, windowH = viewW*windowScale, viewH*windowScale
 	love.window.setMode(windowW, windowH, {msaa = 0})
 
-	initSprites()
+	local imgFont = love.graphics.newImage("img/font.png")
+	font = love.graphics.newImageFont(imgFont, " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,-!$:;'", 1)
+	love.graphics.setFont(font)
 
+	initSprites()
+	if gamestate == 0 then
+		initMenu()
+	elseif gamestate == 1 then
+		initMap()
+	end
+end
+
+function initMenu()
+	menu = Menu()
+end
+
+function initMap()
 	map = Map()
 
 	--temp
@@ -33,13 +48,16 @@ function initSprites() -- and quads
 	lightMask = love.graphics.newImage 'img/light_mask.png'
 	uiSheet = love.graphics.newImage 'img/uiSheet.png'
 	treasureSheet = love.graphics.newImage 'img/treasureSheet.png'
-
+	playerLight = love.graphics.newImage 'img/playerLight.png'
+	titlebg = love.graphics.newImage 'img/titlebg.png'
 
 	playerSheet:setFilter('nearest', 'nearest')
 	tileSheet:setFilter('nearest', 'nearest')
 	lightMask:setFilter('nearest', 'nearest')
 	uiSheet:setFilter('nearest', 'nearest')
 	treasureSheet:setFilter('nearest', 'nearest')
+	playerLight:setFilter('nearest', 'nearest')
+	titlebg:setFilter('nearest', 'nearest')
 
 	local tilesetW, tilesetH = tileSheet:getWidth(), tileSheet:getHeight()
 	tq = { --tile quads
@@ -106,5 +124,7 @@ function initSprites() -- and quads
 
 		tl1  = love.graphics.newQuad(0*tileSize,  2*tileSize, tileSize*2, tileSize*2, tilesetW, tilesetH),
 		tl2  = love.graphics.newQuad(2*tileSize,  2*tileSize, tileSize*2, tileSize*2, tilesetW, tilesetH),
+
+		txl1  = love.graphics.newQuad(0*tileSize,  4*tileSize, tileSize*4, tileSize*4, tilesetW, tilesetH),
 	}
 end

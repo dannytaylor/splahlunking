@@ -16,43 +16,53 @@ require 'obj/Player'
 require 'obj/Treasure'
 require 'obj/UI'
 require 'obj/Bubbler'
+require 'obj/Menu'
+require 'obj/Button'
+require 'obj/Screen'
 
 players = {}
 currentPlayer = nil
 
-gamestates = {[0]=splash, [1]=ingame, [2]=mainmenu}
+gamestate = 0
 
 
 function love.load()
 	math.randomseed(os.time())
 	init()
-
 end
 
 
 function love.update(dt)
 	if debug then require("lib/lovebird").update() end-- debug in http://127.0.0.1:8000/ 'F1'
-	currentPlayer:update(dt)
-	ui:update(dt)
+	
+	if gamestate == 0 then
+		menu:update(dt)
+	elseif gamestate == 1 then
+		currentPlayer:update(dt)
+		ui:update(dt)
+		map:update(dt)
+	end
 end
 
 
 function love.draw()
 	love.graphics.clear()
-	-- 
-	cam:draw(function()
-	  	map:draw()
+	
+	if gamestate == 0 then
+		menu:draw()
+	elseif gamestate == 1 then
+		cam:draw(function()
+		  	map:draw()
 
-		currentPlayer:draw()
+			currentPlayer:draw()
 
-		-- for i=1,#players do
-		-- 	players[i]:draw()
-		-- end
-	end)
+			-- for i=1,#players do
+			-- 	players[i]:draw()
+			-- end
+		end)
 
-	-- love.graphics.draw(lightMask, 0, 0, 0, windowScale, windowScale)
-
-	ui:draw()
+		ui:draw()
+	end
 
 
 end

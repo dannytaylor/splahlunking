@@ -64,16 +64,29 @@ function Map:init()
 end
 
 function Map:draw()
-
-	-- canvas = love.graphics.newCanvas(viewW, viewH,"normal",0)
-	-- canvas:setFilter("nearest", "nearest")
+	local cpy = currentPlayer.y
 	
-	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
+	love.graphics.setColor(0, 87, 132)
+	love.graphics.rectangle('fill', 0,0, windowW*tileSize, windowH*tileSize)
+	love.graphics.setColor(255, 255, 255)
 
+	self:playertracker()
+
+	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
 	for i=1,#self.treasure do
 		self.treasure[i]:draw()
 	end
 	love.graphics.setColor(255, 255, 255)
+
+	if currentPlayer.gamestate == 'wet' and cpy > waterLevel*tileSize+8 then 
+		love.graphics.draw(lightMask, currentPlayer.x-128, cpy-80, 0, 1, 1)
+	end
+end
+
+function Map:update(dt)
+	for i,t in ipairs(self.treasure) do
+		t:update(dt)
+	end
 end
 
 function Map:setCanvas()
@@ -99,7 +112,7 @@ function Map:setColor(x,y)
 		if y < waterLevel then -- above water line
 			love.graphics.setColor(178, 220, 239)
 		else
-			love.graphics.setColor(0, 87, 132)
+			love.graphics.setColor(0, 87, 132,0)
 		end
 	elseif self.state[x][y] == 'wall' then
 		love.graphics.setColor(0, 0, 0)
@@ -109,6 +122,13 @@ function Map:setColor(x,y)
 		love.graphics.setColor(255, 255, 255)
 	end
 end
+
+function Map:playertracker()
+	love.graphics.setColor(255, 255, 255)
+	-- love.graphics.circle('fill', currentPlayer.x, currentPlayer.y, viewH/2)
+	love.graphics.draw(playerLight, currentPlayer.x-40, currentPlayer.y-40, 0, 1, 1)
+end
+
 
 -- http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels
 function Map:buildCave()
@@ -369,13 +389,15 @@ function Map:spawnTreasures()
 	end
 	for i=1,maxLargeTreasure do
 		local x,y,v = self:getLargeFloorPoint()
-		self.state[x][y] = 'treasure'
-		self.state[x+1][y] = 'treasure'
+		self.state[x][y-1] = 'treasure'
 		self.state[x+1][y-1] = 'treasure'
+		self.state[x][y-2] = 'treasure'
 		self.state[x+1][y-1] = 'treasure'
-		self.treasure[#self.treasure+1] = Treasure(x,y-1,25,2)
+		self.treasure[#self.treasure+1] = Treasure(x,y-1,v,2)
 		self.treasure[#self.treasure].sprite = i
 	end
+	local x,y,v = self:getXLFloorPoint()
+	self.treasure[#self.treasure+1] = Treasure(x,y-1,v,4)
 end
 
 function Map:getFloorPoint(weighted)
@@ -410,7 +432,6 @@ function Map:getLargeFloorPoint()
 	local x1,y1 = 2,2
 	local p1good = false
 
-	print(x1,y1)
 	while not p1good do
 		x1,y1 = math.random(3,self.w-2), math.random(math.floor(self.h/2),self.h-2)
 		if  self.state[x1][y1] == 'floor' and  
@@ -423,4 +444,29 @@ function Map:getLargeFloorPoint()
 		end
 	end
 	return x1,y1,25
+end
+
+function Map:getXLFloorPoint()
+	local x1,y1 = 2,2
+	local p1good = false
+
+	while not p1good do
+		x1,y1 = math.random(3,self.w-4), math.random(math.floor(self.h*3/4),self.h-2)
+		p1good = true
+		for i=1,4 do
+			if self.state[x1+i-1][y1+1] == 'floor' then p1good = false end
+		end
+		for i=1,4 do
+			for j=1,4 do
+				if self.state[x1+i-1][y1-j+1] == 'wall' then p1good = false end
+			end
+		end
+
+	end
+	for i=0,4 do
+		for j=0,4 do
+			self.state[x1+i][y1-j] = 'treasure'
+		end
+	end
+	return x1,y1,40
 end

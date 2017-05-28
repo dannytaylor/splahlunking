@@ -1,0 +1,58 @@
+-- ui.lua
+
+UI = Object:extend()
+
+function UI:new()
+	self.canvas = love.graphics.newCanvas(viewW*tileSize, viewH*tileSize,"normal",0)
+	self.canvas:setFilter("nearest", "nearest")
+
+	self.breathMax = 8 -- num bubbles to display
+	self.breathNum = 0
+	self.scoreNum = 0
+end
+
+function UI:draw()
+	if currentPlayer.gamestate == 'wet' then
+		love.graphics.setCanvas(self.canvas)
+		love.graphics.clear()
+		self:breathbar()
+		-- self:playerbar()
+		self:scorebar()
+
+		love.graphics.setCanvas()
+		love.graphics.draw(self.canvas, 0, 0, 0, windowScale, windowScale)
+	end
+end
+
+function UI:update(dt)
+	self.breathNum = math.floor((17*currentPlayer.breath/100))
+	self.scoreNum = math.min(math.floor((8*currentPlayer.score/100)),8)
+end
+
+function UI:breathbar()
+	-- breath bar
+	local bn = math.floor(self.breathNum/2)
+	for i=1, bn-1 do
+		love.graphics.draw(uiSheet,uiq.bubble_l,viewW-12, viewH-(i+1)*tileSize)
+	end
+	if self.breathNum % 2 == 0 then
+		love.graphics.draw(uiSheet,uiq.bubble_s,viewW-12, viewH-(bn+1)*tileSize)
+	else
+		love.graphics.draw(uiSheet,uiq.bubble_l,viewW-12, viewH-(bn+1)*tileSize)
+	end
+	
+end
+
+function UI:scorebar()
+	-- breath bar
+	local sn = self.scoreNum
+	for i=1, sn do
+		if i % 2 == 0 then
+			love.graphics.draw(uiSheet,uiq.score1,4, viewH-(i+1)*tileSize)
+		else
+			love.graphics.draw(uiSheet,uiq.score2,4, viewH-(i+1)*tileSize)
+		end
+	end
+	
+end
+

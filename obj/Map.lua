@@ -9,6 +9,9 @@ function Map:new()
 	self.state = {}
 	self.caveState = {}
 	self.tileState = {}
+	self.treasure = {}
+	
+
 
  	-- build random map
 	self:init()
@@ -19,6 +22,11 @@ function Map:new()
 	self:bumpBuild()
 	self:drill()
 	self:setQuads()
+
+	self:setCanvas()
+
+	self:spawnTreasures()
+	-- self:setDecorations()
 
 end
 
@@ -56,6 +64,22 @@ function Map:init()
 end
 
 function Map:draw()
+
+	-- canvas = love.graphics.newCanvas(viewW, viewH,"normal",0)
+	-- canvas:setFilter("nearest", "nearest")
+	
+	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
+
+	for i=1,#self.treasure do
+		self.treasure[i]:draw()
+	end
+	love.graphics.setColor(255, 255, 255)
+end
+
+function Map:setCanvas()
+	self.tileCanvas = love.graphics.newCanvas(self.w*tileSize, self.h*tileSize,"normal",0)
+	love.graphics.setCanvas(self.tileCanvas)
+
 	for i=1, self.w do -- initialize map as empty first
 		for j=1, self.h do
 			self:setColor(i,j)
@@ -64,10 +88,10 @@ function Map:draw()
 			if self.tileState[i][j] == 0 then do end
 			else love.graphics.draw(tileSheet,self.tileState[i][j],(i-1)*tileSize, (j-1)*tileSize)
 			end
-
-			
 		end
 	end
+	love.graphics.setCanvas()
+	self.tileCanvas:setFilter("nearest", "nearest")
 end
 
 function Map:setColor(x,y)
@@ -75,7 +99,7 @@ function Map:setColor(x,y)
 		if y < waterLevel then -- above water line
 			love.graphics.setColor(178, 220, 239)
 		else
-			love.graphics.setColor(49, 162, 242)
+			love.graphics.setColor(0, 87, 132)
 		end
 	elseif self.state[x][y] == 'wall' then
 		love.graphics.setColor(0, 0, 0)
@@ -243,18 +267,29 @@ function Map:bumpBuild()
 end
 
 function Map:setQuads()
+
+	-- border tiles
 	for i = 1, self.w do
 		for j = 1, self.h do
 			if self.state[i][j] == 'wall' then
-				self:numNeighbors(i,j)
+				self:assignBorders(i,j)
 			else
 				self.tileState[i][j] = 0
 			end
 		end
 	end
+
+	-- corner connectors
+	for i = 1, self.w do
+		for j = 1, self.h do
+			if self.state[i][j] == 'wall' and self.tileState[i][j] == 0 then
+				self:assignCorners(i,j)
+			end
+		end
+	end
 end
 
-function Map:numNeighbors(x,y) -- no diagonals
+function Map:assignBorders(x,y) -- no diagonals
 	local num = 0
 	local dir = {0,0,0,0}
 	if x == 1 or y == 1 or x == self.w or y == self.h then 
@@ -302,8 +337,8 @@ function Map:numNeighbors(x,y) -- no diagonals
 			elseif dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.l90
 			elseif dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = tq.l180
 			elseif dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l270
-			elseif dir[1] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l0b
-			else self.tileState[x][y] = tq.l90b
+			elseif dir[1] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l0p
+			else self.tileState[x][y] = tq.l90p
 			end
 		end
 	elseif 	num == 1 then 
@@ -314,4 +349,78 @@ function Map:numNeighbors(x,y) -- no diagonals
 		end
 	else 	self.tileState[x][y] = 0
 	end
+end
+
+function Map:assignCorners(x,y)
+	if x == 1 or y == 1 or x == self.w or y == self.h then self.tileState[x][y] = 0
+	elseif	self.state[x+1][y-1] ~= 'wall' then self.tileState[x][y] = tq.c0 
+	elseif 	self.state[x+1][y+1] ~= 'wall' then self.tileState[x][y] = tq.c90 
+	elseif 	self.state[x-1][y+1] ~= 'wall' then self.tileState[x][y] = tq.c180 
+	elseif 	self.state[x-1][y-1] ~= 'wall' then self.tileState[x][y] = tq.c270
+	else self.tileState[x][y] = 0
+	end
+end
+
+function Map:spawnTreasures()
+	for i=1,maxTreasure do
+		local x,y,v = self:getFloorPoint(true)
+		self.state[x][y] = 'treasure'
+		self.treasure[i] = Treasure(x,y,v)
+	end
+	for i=1,maxLargeTreasure do
+		local x,y,v = self:getLargeFloorPoint()
+		self.state[x][y] = 'treasure'
+		self.state[x+1][y] = 'treasure'
+		self.state[x+1][y-1] = 'treasure'
+		self.state[x+1][y-1] = 'treasure'
+		self.treasure[#self.treasure+1] = Treasure(x,y-1,25,2)
+		self.treasure[#self.treasure].sprite = i
+	end
+end
+
+function Map:getFloorPoint(weighted)
+	local x1,y1,x2,y2 = 2,2,2,2
+	local p1good,p2good = false,false
+
+	while not p1good do
+		x1,y1 = math.random(3,self.w-2), math.random(waterLevel+1,self.h-2)
+		if self.state[x1][y1] == 'floor' and  self.state[x1][y1+1] == 'wall' then
+			p1good = true
+		end
+	end
+	if weighted then
+		while not p2good do
+			x2,y2 = math.random(3,self.w-2), math.random(waterLevel+1,self.h-2)
+			if self.state[x2][y2] == 'floor' and  self.state[x2][y2+1] == 'wall' then
+				p2good = true
+			end
+		end
+
+		local d1,d2 = lume.distance(x1,y1,self.w/2,0), lume.distance(x2,y2,self.w/2,0)
+		local p = lume.weightedchoice({[{x1,y1}] = d1, [{x2,y2}] = d2})
+		local value = math.ceil(2*math.random()*lume.distance(p[1],p[2],self.w/2,0)/20)
+		return p[1],p[2],value
+	else
+		local value = math.ceil(2*math.random()*lume.distance(x1,y1,self.w/2,0)/20)
+		return x1,y1,value
+	end
+end
+
+function Map:getLargeFloorPoint()
+	local x1,y1 = 2,2
+	local p1good = false
+
+	print(x1,y1)
+	while not p1good do
+		x1,y1 = math.random(3,self.w-2), math.random(math.floor(self.h/2),self.h-2)
+		if  self.state[x1][y1] == 'floor' and  
+			self.state[x1][y1+1] == 'wall' and  
+			self.state[x1+1][y1+1] == 'wall' and  
+			self.state[x1+1][y1] == 'floor' and
+			self.state[x1][y1-1] == 'floor' and  
+			self.state[x1+1][y1-1] == 'floor'  then
+			p1good = true
+		end
+	end
+	return x1,y1,25
 end

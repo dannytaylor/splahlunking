@@ -2,11 +2,13 @@
 
 Menu = class('Menu')
 
+menuscale = 2
+
 function Menu:initialize()
 	self.screens = {}
 	self.currentScreen = nil
 
-	self.canvas = love.graphics.newCanvas(viewW*tileSize, viewH*tileSize,"normal",0)
+	self.canvas = love.graphics.newCanvas(viewW*tileSize*menuscale, viewH*tileSize*menuscale,"normal",0)
 	self.canvas:setFilter("nearest", "nearest")
 
 	self:init()
@@ -23,7 +25,7 @@ function Menu:draw()
 	self.currentScreen:draw()
 
 	love.graphics.setCanvas()
-	love.graphics.draw(self.canvas, 0, 0, 0, windowScale, windowScale)
+	love.graphics.draw(self.canvas, 0, 0, 0, windowScale/menuscale, windowScale/menuscale)
 end
 
 function Menu:update(dt)
@@ -41,6 +43,7 @@ function Menu:initScreens()
 	-- screen setups
 	self:ss_title()
 	self:ss_multi()
+	self:ss_char()
 
 
 	self.currentScreen = self.screens['title']
@@ -80,16 +83,45 @@ function Menu:ss_multi()
 	ss['multi'].buttons = {
 		Button(4*tileSize,viewH-16,'host', function ()
 			initServer()
-			gamestate = 1
 			initMap()
+			self.currentScreen = self.screens['char']
 		end
 		),
 		Button(10*tileSize,viewH-16,'join', function ()
 			initClient()
 			client:connect()
+			self.currentScreen = self.screens['char']
 		end),
 	}
 	ss['multi'].buttonIndex =  1
 	ss['multi'].currentButton =  ss['multi'].buttons[1]
 	ss['multi'].currentButton.active = true
+end
+
+function Menu:ss_char()
+	local ss = self.screens
+
+	ss['char'].bgImg = titlebg
+	ss['char'].buttons = {
+		Button(4*tileSize,viewH-16,'char', function ()
+			
+		end
+		),
+		Button(10*tileSize,viewH-16,'start', function ()
+			
+			if server then 
+				numConnected = server:getClientCount() + 1
+				server:sendToAll('start', {
+					state = 1,
+					num = numConnected
+				})
+				gamestate = 1
+				startMatch()
+			end
+		end
+		),
+	}
+	ss['char'].buttonIndex =  1
+	ss['char'].currentButton =  ss['char'].buttons[1]
+	ss['char'].currentButton.active = true
 end

@@ -1,7 +1,6 @@
 -- ui.lua
 
 UI = class('UI')
-
 function UI:initialize()
 	self.canvas = love.graphics.newCanvas(viewW*tileSize, viewH*tileSize,"normal",0)
 	self.canvas:setFilter("nearest", "nearest")

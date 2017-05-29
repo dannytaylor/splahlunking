@@ -87,6 +87,8 @@ function initSprites() -- and quads
 	titlebg:setFilter('nearest', 'nearest')
 	titlebg2:setFilter('nearest', 'nearest')
 
+	playerAnimInit()
+
 	local tilesetW, tilesetH = tileSheet:getWidth(), tileSheet:getHeight()
 	tq = { --tile quads
 
@@ -155,4 +157,19 @@ function initSprites() -- and quads
 
 		txl1  = love.graphics.newQuad(0*tileSize,  4*tileSize, tileSize*4, tileSize*4, tilesetW, tilesetH),
 	}
+end
+
+function playerAnimInit()
+	local psw,psh = playerSheet:getWidth(), playerSheet:getHeight()
+	local psNum = psh/16
+	pGrid = anim8.newGrid(16, 16, psw,psh)
+	pAnim = {}
+	for i=1,psNum do
+		pAnim[i] = {}
+		pAnim[i]['idle'] = anim8.newAnimation(pGrid('1-2',i), 0.8)
+		pAnim[i]['movex'] = anim8.newAnimation(pGrid('3-4',i), 0.4)
+		pAnim[i]['movey'] = anim8.newAnimation(pGrid('5-6',i), 0.4)
+		pAnim[i]['idle_dry'] = anim8.newAnimation(pGrid('7-7',i), 0.8)
+		pAnim[i]['movex_dry'] = anim8.newAnimation(pGrid('8-11',i), 0.4)
+	end
 end

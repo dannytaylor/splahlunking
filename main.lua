@@ -8,6 +8,7 @@ gamera  = require 'lib/gamera'
 bump    = require 'lib/bump'		-- collisions 				https://github.com/kikito/bump.lua
 sodapop = require 'lib/sodapop'		-- sprite anim 				https://github.com/tesselode/sodapop
 sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock.lua
+-- anim8 	= require 'anim8'			-- https://github.com/kikito/anim8
 
 bitser  = require "lib/bitser"
 binser  = require "lib/binser"
@@ -48,7 +49,9 @@ function love.update(dt)
 	if gamestate == 0 then
 		menu:update(dt)
 	elseif gamestate == 1 then
-		players[pid]:update(dt)
+		for i=1,numConnected do
+			players[i]:update(dt)
+		end
 		ui:update(dt)
 		map:update(dt)
 	end
@@ -64,11 +67,9 @@ function love.draw()
 		cam:draw(function()
 		  	map:draw()
 
-			players[pid]:draw()
-
-			-- for i=1,#players do
-			-- 	players[i]:draw()
-			-- end
+			for i=1,numConnected do
+				players[i]:draw()
+			end
 		end)
 
 		ui:draw()

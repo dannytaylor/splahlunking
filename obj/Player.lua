@@ -47,109 +47,117 @@ function Player:draw()
 	-- love.graphics.setColor(255, 0, 255)
 	-- love.graphics.rectangle('fill', self.x, self.y, tileSize, tileSize)
 	-- love.graphics.setColor(255, 255, 255)
-	if self.y > (waterLevel + 1)*tileSize then self.bubbler:draw()	end
+	if self.y > (waterLevel + 1)*tileSize and self.alive then self.bubbler:draw()	end
 	self.sprite:draw()
 end
 
 function Player:update(dt)
 
 	if pid == self.id then
-		local speed = self.speed
+		if self.alive then
+			local speed = self.speed
 
-		self.nextAnim = nil
-		if self.gamestate == 'dry' then self.nextAnim = 'idle_dry' 
-		else self.nextAnim = 'idle' end
+			self.nextAnim = nil
+			if self.gamestate == 'dry' then self.nextAnim = 'idle_dry' 
+			else self.nextAnim = 'idle' end
 
-		local dx, dy = 0, 0
+			local dx, dy = 0, 0
 
-		if self.y > (waterLevel-1)*tileSize then
-			if self.gamestate == 'dry' then 
-				self.gamestate = 'wet' 
-				self.speedy = self.swimspeed
-				self.speedx = self.swimspeed
-			end
-			if love.keyboard.isDown('down') or love.keyboard.isDown('s') then
+			if self.y > (waterLevel-1)*tileSize then
+				if self.gamestate == 'dry' then 
+					self.gamestate = 'wet' 
+					self.speedy = self.swimspeed
+					self.speedx = self.swimspeed
+				end
+				if love.keyboard.isDown('down') or love.keyboard.isDown('s') then
+					dy = self.speedy * 2 * dt
+					self.sprite.flipY = true
+					self.nextAnim = 'movey'
+				elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
+					dy = -self.speedy * 2 * dt
+					if self.y < (waterLevel+0.5)*tileSize then
+						dy = dy/4
+					elseif self.y < (waterLevel+2)*tileSize then
+						dy = dy/2
+					end
+					self.sprite.flipY = false
+					self.nextAnim = 'movey'
+				else
+					self.sprite.flipY = false
+				end
+			else
 				dy = self.speedy * 2 * dt
-				self.sprite.flipY = true
-				self.nextAnim = 'movey'
-			elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
-				dy = -self.speedy * 2 * dt
-				if self.y < (waterLevel+0.5)*tileSize then
-					dy = dy/4
-				elseif self.y < (waterLevel+2)*tileSize then
-					dy = dy/2
+			end
+
+			if love.keyboard.isDown('right') or love.keyboard.isDown('d') then
+				dx = self.speedx * dt
+				self.sprite.flipX = false
+				if self.gamestate == 'dry' then
+					self.nextAnim = 'movex_dry'
+				else
+					self.nextAnim = 'movex'
 				end
 				self.sprite.flipY = false
-				self.nextAnim = 'movey'
-			else
+			elseif love.keyboard.isDown('left') or love.keyboard.isDown('a') then
+				dx = -self.speedx * dt
+				self.sprite.flipX = true
+				if self.gamestate == 'dry' then
+					self.nextAnim = 'movex_dry'
+				else
+					self.nextAnim = 'movex'
+				end
 				self.sprite.flipY = false
 			end
-		else
-			dy = self.speedy * 2 * dt
-		end
 
-		if love.keyboard.isDown('right') or love.keyboard.isDown('d') then
-			dx = self.speedx * dt
-			self.sprite.flipX = false
-			if self.gamestate == 'dry' then
-				self.nextAnim = 'movex_dry'
-			else
-				self.nextAnim = 'movex'
-			end
-			self.sprite.flipY = false
-		elseif love.keyboard.isDown('left') or love.keyboard.isDown('a') then
-			dx = -self.speedx * dt
-			self.sprite.flipX = true
-			if self.gamestate == 'dry' then
-				self.nextAnim = 'movex_dry'
-			else
-				self.nextAnim = 'movex'
-			end
-			self.sprite.flipY = false
-		end
-
-		if self.nextAnim ~= self.currentAnim then
-			self.currentAnim = self.nextAnim
-			self.sprite:switch(self.currentAnim)
-		end
-
-
-		if dx ~= 0 or dy ~= 0 then
-			local cols
-			local playerFilter = function (item, other)
-				if other:sub(1,4) == 'trea'  then
-					return 'cross'
-				elseif other:sub(1,4) == 'wall'  then
-					return 'slide'
-				else
-					return nil
-			 	end
+			if self.nextAnim ~= self.currentAnim then
+				self.currentAnim = self.nextAnim
+				self.sprite:switch(self.currentAnim)
 			end
 
-			self.x, self.y, cols, cols_len = world:move(self.bumpName, self.x + dx, self.y + dy, playerFilter)
-			self.x, self.x = self.x + dx, self.y + dy
+
+			if dx ~= 0 or dy ~= 0 then
+				local cols
+				local playerFilter = function (item, other)
+					if other:sub(1,4) == 'trea'  then
+						return 'cross'
+					elseif other:sub(1,4) == 'wall'  then
+						return 'slide'
+					else
+						return nil
+				 	end
+				end
+
+				self.x, self.y, cols, cols_len = world:move(self.bumpName, self.x + dx, self.y + dy, playerFilter)
+				self.x, self.x = self.x + dx, self.y + dy
 
 
-			cam:setPosition(players[pid].x, players[pid].y)
-			for i=1, cols_len do
-				local other = cols[i].other
-				if other:sub(1,4) == 'trea'  then
-					self.currentTreasure = other
-				else 
-					-- if self.activeTreasure then
-					-- 	self.activeTreasure.hovered = false
-					-- 	self.activeTreasure = nil
-					-- end
-					self.currentTreasure = nil
-			 	end
+				cam:setPosition(players[pid].x, players[pid].y)
+				for i=1, cols_len do
+					local other = cols[i].other
+					if other:sub(1,4) == 'trea'  then
+						self.currentTreasure = other
+					else 
+						-- if self.activeTreasure then
+						-- 	self.activeTreasure.hovered = false
+						-- 	self.activeTreasure = nil
+						-- end
+						self.currentTreasure = nil
+				 	end
+				end
 			end
 		end
 
 		if self.gamestate == 'wet' then 
 			if self.breath > 0 then
-				self.breath = self.breath - dt
+				self.breath = self.breath - dt*30
 			else
 				self.breath = 0
+				self.alive = false
+				self.bubbler = nil
+				self.sprite.flipY = false
+				self.currentAnim = 'dead'
+				self.nextAnim = 'dead'
+				self.sprite:switch('dead')
 			end
 		end
 
@@ -205,7 +213,7 @@ function Player:update(dt)
 		self.currentAnim = self.nextAnim
 		self.sprite:switch(self.currentAnim)
 	end
-	self.bubbler:update(dt, self.x+4, self.y-2)
+	if self.alive then self.bubbler:update(dt, self.x+4, self.y-2) end
 	self.sprite:update(dt)
 end
 
@@ -264,6 +272,14 @@ function Player:spriteInit()
 		frameHeight = 16,
 		frames      = {
 			{8, self.palette, 11, self.palette, .4},
+		},
+	})
+	self.sprite:addAnimation('dead', {
+		image       = playerSheet,
+		frameWidth  = 16,
+		frameHeight = 16,
+		frames      = {
+			{12, self.palette, 13, self.palette, .8},
 		},
 	})
 

@@ -82,7 +82,7 @@ function Map:draw()
 	love.graphics.rectangle('fill', 0,0, windowW*tileSize, windowH*tileSize)
 	love.graphics.setColor(255, 255, 255)
 
-	self:playertracker()
+	if players[pid].alive then self:playertracker() end
 
 	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
 	for i=1,#self.treasure do
@@ -90,7 +90,7 @@ function Map:draw()
 	end
 	love.graphics.setColor(255, 255, 255)
 
-	if players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 then 
+	if players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 and players[pid].alive then 
 		love.graphics.draw(lightMask, players[pid].x-128, cpy-80, 0, 1, 1)
 	end
 end

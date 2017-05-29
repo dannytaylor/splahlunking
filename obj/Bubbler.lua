@@ -17,6 +17,7 @@ end
 function Bubbler:draw()
 	
 	love.graphics.setColor(178, 220, 239)
+	love.graphics.setLineWidth(1)
 	for i=1,#self.bubbles do 
 		if self.bubbles[i].t < self.life*0.7 then
 			love.graphics.setPointSize(windowScale*2)

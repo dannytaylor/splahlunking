@@ -25,7 +25,7 @@ end
 function menukeys(key)
 	local mcs = menu.currentScreen
 
-	if mcs == menu.screens['char'] then
+	if mcs == menu.screens['char'] and mcs.currentButton.name == 'char' then
 		if key == 'down' or key == 's' then
 			local cc = menu.screens['char'].currentChar[pid]
 			cc = cc - 1

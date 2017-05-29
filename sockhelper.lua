@@ -110,6 +110,9 @@ end
 function initClient()
 	client = sock.newClient(ip_join, 22122)
 	client:setSerialization(bitser.dumps, bitser.loads)
+	
+	btq.c1 = btq.c3
+	btq.c1a = btq.c3a
 
 	client:on("connect", function(data)
 		print('connected')

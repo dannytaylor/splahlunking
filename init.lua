@@ -189,6 +189,8 @@ function initSprites() -- and quads
 		c1a = love.graphics.newQuad(5*32,  3*16, 24, 16, tilesetW, tilesetH),
 		c2  = love.graphics.newQuad(5*32,  0*16, 32, 16, tilesetW, tilesetH),
 		c2a = love.graphics.newQuad(5*32,  1*16, 32, 16, tilesetW, tilesetH),
+		c3  = love.graphics.newQuad(5*32,  4*16, 32, 16, tilesetW, tilesetH),
+		c3a = love.graphics.newQuad(5*32,  5*16, 32, 16, tilesetW, tilesetH),
 
 	}
 

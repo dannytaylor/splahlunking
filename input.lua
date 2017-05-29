@@ -1,12 +1,34 @@
 -- input.lua
 
 function love.keypressed(key) -- key bindings
+	
 	if gamestate == 0 then
+		if key == 'f2' and windowScale == 4 then 
+			windowScale = 8
+			windowW, windowH = viewW*windowScale, viewH*windowScale
+			love.window.setMode(windowW, windowH, {msaa = 0})
+		elseif key == 'f1' and windowScale == 8 then 
+			windowScale = 4
+			windowW, windowH = viewW*windowScale, viewH*windowScale
+			love.window.setMode(windowW, windowH, {msaa = 0})
+		end
 		menukeys(key)
 	end
 	if gamestate == 1 then
 		if key == 'escape' then
-			love.event.quit()
+			gamestate = 0
+			numConnected = 1
+			love.graphics.setLineWidth(2)
+			if client then 
+				client:disconnect() 
+				client = nil
+			end
+			if server then 
+				server:destroy()
+				server = nil
+			end
+			menu.currentScreen = menu.screens['title']
+			-- love.event.quit()
 		elseif key == 'q' and debug then
 			cam:setScale(cam:getScale()*2)
 		elseif key == 'e' and debug then
@@ -15,10 +37,6 @@ function love.keypressed(key) -- key bindings
 			map = Map()
 			world:add('player', players[pid].x,players[pid].y,tileSize,tileSize)
 		end
-	end
-
-	if key == 'f1' and debug then -- open debug window
-		love.system.openURL( 'http://127.0.0.1:8000/' )
 	end
 end
 
@@ -44,8 +62,15 @@ function menukeys(key)
 			love.event.quit()
 		else
 			menu.currentScreen = menu.screens['title']
-			client = nil
-			server = nil
+			numConnected = 1
+			if client then 
+				client:disconnect() 
+				client = nil
+			end
+			if server then 
+				server:destroy()
+				server = nil
+			end
 		end
 	elseif key == 'left' or key == 'a' then
 		if #mcs.buttons > 1 then

@@ -79,12 +79,13 @@ function Map:draw()
 	local cpy = players[pid].y
 	
 	love.graphics.setColor(0, 87, 132)
-	love.graphics.rectangle('fill', 0,0, windowW*tileSize, windowH*tileSize)
+	love.graphics.rectangle('fill', 0,0, self.w*tileSize, self.h*tileSize)
 	love.graphics.setColor(255, 255, 255)
 
-	if players[pid].alive then self:playertracker() end
+	self:playertracker()
 
 	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
+
 	for i=1,#self.treasure do
 		self.treasure[i]:draw()
 	end
@@ -105,13 +106,14 @@ function Map:setCanvas()
 	self.tileCanvas = love.graphics.newCanvas(self.w*tileSize, self.h*tileSize,"normal",0)
 	love.graphics.setCanvas(self.tileCanvas)
 
-	for i=1, self.w do -- initialize map as empty first
+	for i=1, self.w do
 		for j=1, self.h do
-			self:setColor(i,j)
-			love.graphics.rectangle('fill', (i-1)*tileSize, (j-1)*tileSize, tileSize, tileSize)
-			love.graphics.setColor(255, 255, 255)
-			if self.tileState[i][j] == 0 then do end
-			else love.graphics.draw(tileSheet,self.tileState[i][j],(i-1)*tileSize, (j-1)*tileSize)
+			if self.tileState[i][j] == 0 then
+				self:setColor(i,j)
+				love.graphics.rectangle('fill', (i-1)*tileSize, (j-1)*tileSize, tileSize, tileSize)
+				love.graphics.setColor(255, 255, 255)
+			else 
+				love.graphics.draw(tileSheet,self.tileState[i][j],(i-1)*tileSize, (j-1)*tileSize)
 			end
 		end
 	end
@@ -275,7 +277,7 @@ end
 
 function Map:drill()
 	for i = 1, #holeX do
-		self:drillHole(holeX[i],waterLevel+1)
+		self:drillHole(holeX[i],waterLevel+2)
 	end
 end
 
@@ -319,6 +321,37 @@ function Map:setQuads()
 			end
 		end
 	end
+
+	-- fill in bg
+	for i = 1, self.w-1 do
+		for j = waterLevel, self.h-1 do
+			if self.state[i][j] == 'floor' then
+				self.tileState[i][j] = lume.weightedchoice({
+					[tq.w1] = 2,
+					[tq.w2] = 1,
+					[tq.w3] = 2,
+					[tq.w4] = 1,
+					[tq.blank] = 194,
+					})
+			end
+		end
+	end
+
+	-- add decorations
+	for i = 1, self.w-1 do
+		for j = waterLevel, self.h-1 do
+			if self.state[i][j] == 'floor' and self.state[i][j+1] == 'wall' then
+				self.tileState[i][j] = lume.weightedchoice({
+					[tq.d00] = 2, [tq.d01] = 2, [tq.d02] = 2, [tq.d03] = 2, [tq.d04] = 2,
+					[tq.d10] = 1, [tq.d11] = 1, [tq.d12] = 1, [tq.d13] = 1, [tq.d14] = 1,
+					[tq.d00] = 1, [tq.d21] = 1, [tq.d22] = 1, [tq.d23] = 1, [tq.d24] = 1,
+					[tq.d00] = 1, [tq.d31] = 1, [tq.d32] = 1, [tq.d33] = 1, [tq.d34] = 1,
+					-- 16 decorations, 20 odds
+					[tq.blank] = 10,
+					})
+			end
+		end
+	end
 end
 
 function Map:assignBorders(x,y) -- no diagonals
@@ -348,36 +381,36 @@ function Map:assignBorders(x,y) -- no diagonals
 	if 	num == 0 then self.tileState[x][y] = tq.o
 	elseif 	num == 3 then 
 		if y < waterLevel then
-			if dir[2]     == 1 and dir[3] == 1 and dir[4] == 1  then self.tileState[x][y] = tq.gi0
-			elseif dir[3] == 1 and dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.gi90
-			else self.tileState[x][y] = tq.gi270
+			if dir[2]     == 1 and dir[3] == 1 and dir[4] == 1  then self.tileState[x][y] = lume.randomchoice({tq.gi0,tq.gi0b})
+			elseif dir[3] == 1 and dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = lume.randomchoice({tq.gi90,tq.gi90b})
+			else self.tileState[x][y] = lume.randomchoice({tq.gi270,tq.gi270b})
 			end
 		else
-			if dir[2]     == 1 and dir[3] == 1 and dir[4] == 1 then self.tileState[x][y] = tq.i0
-			elseif dir[3] == 1 and dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.i90
-			elseif dir[4] == 1 and dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = tq.i180
-			elseif dir[1] == 1 and dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.i270
+			if dir[2]     == 1 and dir[3] == 1 and dir[4] == 1 then self.tileState[x][y] = lume.randomchoice({tq.i0,tq.i0b})
+			elseif dir[3] == 1 and dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = lume.randomchoice({tq.i90,tq.i90b})
+			elseif dir[4] == 1 and dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = lume.randomchoice({tq.i180,tq.i180b})
+			elseif dir[1] == 1 and dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = lume.randomchoice({tq.i270,tq.i270b})
 			end
 		end
 	elseif 	num == 2 then
 		if y < waterLevel then
-			if dir[3]     == 1 and dir[4] == 1 then self.tileState[x][y] = tq.gt0
-			else self.tileState[x][y] = tq.gt180
+			if dir[3]     == 1 and dir[4] == 1 then self.tileState[x][y] = lume.randomchoice({tq.gt0,tq.gt0b})
+			else self.tileState[x][y] = lume.randomchoice({tq.gt180,tq.gt180b})
 			end
 		else 
-			if dir[3]     == 1 and dir[4] == 1 then self.tileState[x][y] = tq.l0
-			elseif dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = tq.l90
-			elseif dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = tq.l180
-			elseif dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l270
-			elseif dir[1] == 1 and dir[3] == 1 then self.tileState[x][y] = tq.l0p
-			else self.tileState[x][y] = tq.l90p
+			if dir[3]     == 1 and dir[4] == 1 then self.tileState[x][y] = lume.randomchoice({tq.l0,tq.l0b})
+			elseif dir[4] == 1 and dir[1] == 1 then self.tileState[x][y] = lume.randomchoice({tq.l90,tq.l90b})
+			elseif dir[1] == 1 and dir[2] == 1 then self.tileState[x][y] = lume.randomchoice({tq.l180,tq.l180b})
+			elseif dir[2] == 1 and dir[3] == 1 then self.tileState[x][y] = lume.randomchoice({tq.l270,tq.l270b})
+			elseif dir[1] == 1 and dir[3] == 1 then self.tileState[x][y] = lume.randomchoice({tq.l0p,tq.l0pb})
+			else self.tileState[x][y] = lume.randomchoice({tq.l90p,tq.l90pb})
 			end
 		end
 	elseif 	num == 1 then 
-		if dir[3]     == 1 then self.tileState[x][y] = tq.t0
-		elseif dir[4] == 1 then self.tileState[x][y] = tq.t90
-		elseif dir[1] == 1 then self.tileState[x][y] = tq.t180
-		elseif dir[2] == 1 then self.tileState[x][y] = tq.t270
+		if dir[3]     == 1 then self.tileState[x][y] = lume.randomchoice({tq.t0,tq.t0b})
+		elseif dir[4] == 1 then self.tileState[x][y] = lume.randomchoice({tq.t90,tq.t90b})
+		elseif dir[1] == 1 then self.tileState[x][y] = lume.randomchoice({tq.t180,tq.t180b})
+		elseif dir[2] == 1 then self.tileState[x][y] = lume.randomchoice({tq.t270,tq.t270b})
 		end
 	else 	self.tileState[x][y] = 0
 	end
@@ -385,10 +418,10 @@ end
 
 function Map:assignCorners(x,y)
 	if x == 1 or y == 1 or x == self.w or y == self.h then self.tileState[x][y] = 0
-	elseif	self.state[x+1][y-1] ~= 'wall' then self.tileState[x][y] = tq.c0 
-	elseif 	self.state[x+1][y+1] ~= 'wall' then self.tileState[x][y] = tq.c90 
-	elseif 	self.state[x-1][y+1] ~= 'wall' then self.tileState[x][y] = tq.c180 
-	elseif 	self.state[x-1][y-1] ~= 'wall' then self.tileState[x][y] = tq.c270
+	elseif	self.state[x+1][y-1] ~= 'wall' then self.tileState[x][y] = lume.randomchoice({tq.c0 ,tq.c0b})
+	elseif 	self.state[x+1][y+1] ~= 'wall' then self.tileState[x][y] = lume.randomchoice({tq.c90 ,tq.c90b})
+	elseif 	self.state[x-1][y+1] ~= 'wall' then self.tileState[x][y] = lume.randomchoice({tq.c180 ,tq.c180b})
+	elseif 	self.state[x-1][y-1] ~= 'wall' then self.tileState[x][y] = lume.randomchoice({tq.c270,tq.c270b})
 	else self.tileState[x][y] = 0
 	end
 end

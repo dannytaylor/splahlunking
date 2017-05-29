@@ -58,6 +58,7 @@ function Menu:ss_title()
 	ss['title'].buttons = {
 		Button('single', 16,48,btq.b1,btq.b1a,function ()
 			pid = 1
+			numConnected = 1
 			self.currentScreen = self.screens['char']
 
 		end
@@ -91,7 +92,8 @@ function Menu:ss_multi()
 		Button('join',72,24, btq.m2,btq.m2a,function ()
 			initClient()
 			client:connect()
-			
+			menu.screens['char'].buttons[2].img = btq.c3
+			menu.screens['char'].buttons[2].imgActive = btq.c3a
 		end),
 	}
 	ss['multi'].buttonIndex =  1
@@ -121,6 +123,7 @@ function Menu:ss_char()
 				startMatch()
 			elseif not client then
 				gamestate = 1
+				numConnected = 1
 				initMap()
 			end
 		end

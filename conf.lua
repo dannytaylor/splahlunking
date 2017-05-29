@@ -1,4 +1,5 @@
 -- conf.lua
 
-ip_host = '*'
+ip_host = 'localhost'
 join = 'localhost'
+windowScale = 8

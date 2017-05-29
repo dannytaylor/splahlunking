@@ -11,7 +11,9 @@ function Treasure:initialize(x,y,v,size)
 		self.bubbler = Bubbler(3,12)
 	end
 	world:add('treasure'..x..'x'..y..'x'..self.size, self.x,self.y, tileSize*self.size,tileSize*self.size)
-	self.sprite = nil
+	if self. size == 2 then
+		self.sprite = lume.randomchoice({1,2})
+	end
 end
 
 function Treasure:draw()

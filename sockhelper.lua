@@ -27,6 +27,7 @@ function clientUpdate(dt)
 
 				score  = players[pid].score,
 				breath = players[pid].breath,
+				alive = players[pid].alive,
 			})
 		end
 	end
@@ -58,6 +59,9 @@ function serverUpdate(dt)
 
 					score  = players[i].score,
 					breath = players[i].breath,
+					alive = players[i].alive,
+
+					time = gametime,
 				}
 			end
 			server:sendToAll("serverinfo", serverinfo)
@@ -66,7 +70,9 @@ function serverUpdate(dt)
 end
 
 function initServer()
-	server = sock.newServer(ip_host, 22122,3)
+	ip_host = love.system.getClipboardText()
+	-- server = sock.newServer(ip_host, 22122,3)
+	server = sock.newServer('*', 22122,3)
 	server:setSerialization(bitser.dumps, bitser.loads)
 
 	pid = 1
@@ -91,6 +97,7 @@ function initServer()
 
 		local score              = data.score
 		local breath             = data.breath
+		local alive	             = data.alive
 
 		players[id].x            = x
 		players[id].y            = y
@@ -101,6 +108,7 @@ function initServer()
 
 		players[id].score        = score
 		players[id].breath       = breath
+		players[id].alive      	 = alive
 	end)
 	server:on("charclient", function(data)
 		menu.screens['char'].currentChar[data.id] = data.char
@@ -108,11 +116,9 @@ function initServer()
 end
 
 function initClient()
+	ip_join = love.system.getClipboardText()
 	client = sock.newClient(ip_join, 22122)
 	client:setSerialization(bitser.dumps, bitser.loads)
-	
-	btq.c1 = btq.c3
-	btq.c1a = btq.c3a
 
 	client:on("connect", function(data)
 		print('connected')
@@ -132,6 +138,9 @@ function initClient()
 		menu.currentScreen = menu.screens['char']
 	end)
 	client:on("serverinfo", function(data)
+		local time  = data[1].time
+		gametime	= time
+
 		for i=1,numConnected do
 			if i~=pid then
 				local x                 = data[i].x
@@ -143,6 +152,8 @@ function initClient()
 
 				local score             = data[i].score
 				local breath            = data[i].breath
+				local alive           	= data[i].alive
+
 
 				players[i].x            = x
 				players[i].y            = y
@@ -154,6 +165,8 @@ function initClient()
 
 				players[i].score        = score
 				players[i].breath       = breath
+				players[i].alive       	= alive
+
 			end
 		end
 	end)

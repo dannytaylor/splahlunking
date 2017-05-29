@@ -35,9 +35,13 @@ function Player:initialize(x,y,id,skin)
 	-- for UI
 	self.score = 0
 	self.breath = 100
+	self.breathRate = 2.5
+	self.tWater = 0
 
 	self.alive = true
 	self.tank = true
+	self.win = false
+	self.surface = false
 
 
 	self:spriteInit()
@@ -48,116 +52,135 @@ function Player:draw()
 	-- love.graphics.rectangle('fill', self.x, self.y, tileSize, tileSize)
 	-- love.graphics.setColor(255, 255, 255)
 	if self.y > (waterLevel + 1)*tileSize and self.alive then self.bubbler:draw()	end
+	if tankBubbler then tankBubbler:draw() end
 	self.sprite:draw()
 end
 
 function Player:update(dt)
 
 	if pid == self.id then
-		if self.alive then
-			local speed = self.speed
+		if not self.win then
+			if gametime > gametimeMax then
+				self.win = true
+			elseif self.tWater > breakTime and self.y < (waterLevel-1)*tileSize then
+				self.win = true
+				self.surface = true
+			end
+			if self.alive and not self.win then
+				local speed = self.speed
 
-			self.nextAnim = nil
-			if self.gamestate == 'dry' then self.nextAnim = 'idle_dry' 
-			else self.nextAnim = 'idle' end
+				self.nextAnim = nil
+				if self.gamestate == 'dry' then self.nextAnim = 'idle_dry' 
+				else self.nextAnim = 'idle' end
 
-			local dx, dy = 0, 0
-
-			if self.y > (waterLevel-1)*tileSize then
-				if self.gamestate == 'dry' then 
-					self.gamestate = 'wet' 
-					self.speedy = self.swimspeed
-					self.speedx = self.swimspeed
-				end
-				if love.keyboard.isDown('down') or love.keyboard.isDown('s') then
+				local dx, dy = 0, 0
+				if self.y > (waterLevel-1)*tileSize then
+					if self.gamestate == 'dry' then 
+						self.gamestate = 'wet' 
+						self.speedy = self.swimspeed
+						self.speedx = self.swimspeed
+					end
+					if love.keyboard.isDown('down') or love.keyboard.isDown('s') then
+						dy = self.speedy * 2 * dt
+						self.sprite.flipY = true
+						self.nextAnim = 'movey'
+					elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
+						dy = -self.speedy * 2 * dt
+						self.sprite.flipY = false
+						self.nextAnim = 'movey'
+						if self.y < (waterLevel+2)*tileSize then
+							dy = dy/2
+							self.nextAnim = 'idle'
+						end
+					else
+						self.sprite.flipY = false
+					end
+				else
 					dy = self.speedy * 2 * dt
-					self.sprite.flipY = true
-					self.nextAnim = 'movey'
-				elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
-					dy = -self.speedy * 2 * dt
-					if self.y < (waterLevel+0.5)*tileSize then
-						dy = dy/4
-					elseif self.y < (waterLevel+2)*tileSize then
-						dy = dy/2
+				end
+
+				if love.keyboard.isDown('right') or love.keyboard.isDown('d') then
+					dx = self.speedx * dt
+					self.sprite.flipX = false
+					if self.gamestate == 'dry' then
+						self.nextAnim = 'movex_dry'
+					else
+						self.nextAnim = 'movex'
 					end
 					self.sprite.flipY = false
-					self.nextAnim = 'movey'
-				else
+				elseif love.keyboard.isDown('left') or love.keyboard.isDown('a') then
+					dx = -self.speedx * dt
+					self.sprite.flipX = true
+					if self.gamestate == 'dry' then
+						self.nextAnim = 'movex_dry'
+					else
+						self.nextAnim = 'movex'
+					end
 					self.sprite.flipY = false
 				end
-			else
-				dy = self.speedy * 2 * dt
-			end
 
-			if love.keyboard.isDown('right') or love.keyboard.isDown('d') then
-				dx = self.speedx * dt
-				self.sprite.flipX = false
-				if self.gamestate == 'dry' then
-					self.nextAnim = 'movex_dry'
-				else
-					self.nextAnim = 'movex'
-				end
-				self.sprite.flipY = false
-			elseif love.keyboard.isDown('left') or love.keyboard.isDown('a') then
-				dx = -self.speedx * dt
-				self.sprite.flipX = true
-				if self.gamestate == 'dry' then
-					self.nextAnim = 'movex_dry'
-				else
-					self.nextAnim = 'movex'
-				end
-				self.sprite.flipY = false
-			end
-
-			if self.nextAnim ~= self.currentAnim then
-				self.currentAnim = self.nextAnim
-				self.sprite:switch(self.currentAnim)
-			end
-
-
-			if dx ~= 0 or dy ~= 0 then
-				local cols
-				local playerFilter = function (item, other)
-					if other:sub(1,4) == 'trea'  then
-						return 'cross'
-					elseif other:sub(1,4) == 'wall'  then
-						return 'slide'
-					else
-						return nil
-				 	end
+				if self.nextAnim ~= self.currentAnim then
+					self.currentAnim = self.nextAnim
+					self.sprite:switch(self.currentAnim)
 				end
 
-				self.x, self.y, cols, cols_len = world:move(self.bumpName, self.x + dx, self.y + dy, playerFilter)
-				self.x, self.x = self.x + dx, self.y + dy
+
+				if dx ~= 0 or dy ~= 0 then
+					local cols
+					local playerFilter = function (item, other)
+						if other:sub(1,4) == 'trea'  then
+							return 'cross'
+						elseif other:sub(1,4) == 'wall'  then
+							return 'slide'
+						else
+							return nil
+					 	end
+					end
+
+					self.x, self.y, cols, cols_len = world:move(self.bumpName, self.x + dx, self.y + dy, playerFilter)
+					self.x, self.x = self.x + dx, self.y + dy
 
 
-				cam:setPosition(players[pid].x, players[pid].y)
-				for i=1, cols_len do
-					local other = cols[i].other
-					if other:sub(1,4) == 'trea'  then
-						self.currentTreasure = other
-					else 
-						-- if self.activeTreasure then
-						-- 	self.activeTreasure.hovered = false
-						-- 	self.activeTreasure = nil
-						-- end
-						self.currentTreasure = nil
-				 	end
+					cam:setPosition(players[pid].x, players[pid].y)
+					for i=1, cols_len do
+						local other = cols[i].other
+						if other:sub(1,4) == 'trea'  then
+							self.currentTreasure = other
+						else 
+							-- if self.activeTreasure then
+							-- 	self.activeTreasure.hovered = false
+							-- 	self.activeTreasure = nil
+							-- end
+							self.currentTreasure = nil
+					 	end
+					end
 				end
 			end
 		end
 
+
+-------- countdown breath -----------------------
 		if self.gamestate == 'wet' then 
-			if self.breath > 0 then
-				self.breath = self.breath - dt*30
-			else
-				self.breath = 0
-				self.alive = false
-				self.bubbler = nil
-				self.sprite.flipY = false
-				self.currentAnim = 'dead'
-				self.nextAnim = 'dead'
-				self.sprite:switch('dead')
+			self.tWater = self.tWater + dt
+			if self.tWater > breakTime and self.tank then 
+				tankBubbler = Bubbler(10,2)
+				self.tank = false 
+			end
+			if self.tWater > breakTime+6 and tankBubbler then 
+				tankBubbler = nil
+			end
+			if not self.tank and not self.win then
+				if self.breath > 0 then
+					self.breath = self.breath - dt*self.breathRate
+				elseif self.alive then
+					self.breath = 0
+					self.alive = false
+					self.bubbler = nil
+					self.sprite.flipY = false
+					self.currentAnim = 'dead'
+					self.nextAnim = 'dead'
+					self.sprite:switch('dead')
+				end
 			end
 		end
 
@@ -214,6 +237,7 @@ function Player:update(dt)
 		self.sprite:switch(self.currentAnim)
 	end
 	if self.alive then self.bubbler:update(dt, self.x+4, self.y-2) end
+	if tankBubbler then tankBubbler:update(dt, self.x+4, self.y-2) end
 	self.sprite:update(dt)
 end
 

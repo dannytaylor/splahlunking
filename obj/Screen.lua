@@ -12,11 +12,6 @@ function Screen:initialize()
 	-- char select specific
 	self.isChar = false
 	self.highlight = 1
-	self.rx,self.ry = 8,20
-	if pid == 2 then self.rx = 37
-	elseif pid == 3 then self.rx = 66
-	elseif pid == 4 then self.rx = 95	
-	end
 	self.currentChar = {1,1,1,1}
 	love.graphics.setLineWidth(2)
 end
@@ -28,6 +23,12 @@ function Screen:draw()
 		b:draw()
 	end
 	if self.isChar then
+		-- connection info
+		if server then
+			love.graphics.draw(titlebuttons,btq.hosting,47,2)
+		elseif client then
+			love.graphics.draw(titlebuttons,btq.connected,45,2)
+		end
 		-- all portraits
 		for i=1,numConnected do
 			love.graphics.draw(charsheet,csq[self.currentChar[i]],8+(i-1)*29,20)

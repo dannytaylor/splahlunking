@@ -2,7 +2,7 @@
 
 Menu = class('Menu')
 
-menuscale = 2
+menuscale = 1
 
 function Menu:initialize()
 	self.screens = {}
@@ -56,17 +56,17 @@ function Menu:ss_title()
 
 	ss['title'].bgImg = titlebg
 	ss['title'].buttons = {
-		Button(2*tileSize,viewH-16,'single', function ()
-			-- initServer()
-			gamestate = 1
-			initMap()
+		Button('single', 16,48,btq.b1,btq.b1a,function ()
+			pid = 1
+			self.currentScreen = self.screens['char']
+
 		end
 		),
-		Button(6.5*tileSize,viewH-16,'multi',function () 
+		Button('multi',48,48,btq.b2,btq.b2a,function () 
 			self.currentScreen = self.screens['multi']
 		end
 		),
-		Button(11*tileSize,viewH-16,'quit',function () 
+		Button('quit',80,48,btq.b3,btq.b3a,function () 
 			love.event.quit() 
 		end
 		),
@@ -81,16 +81,17 @@ function Menu:ss_multi()
 
 	ss['multi'].bgImg = titlebg2
 	ss['multi'].buttons = {
-		Button(4*tileSize,viewH-16,'host', function ()
+		Button('host', 24,24,btq.m1,btq.m1a,function ()
 			initServer()
 			initMap()
+			print(pid)
 			self.currentScreen = self.screens['char']
 		end
 		),
-		Button(10*tileSize,viewH-16,'join', function ()
+		Button('join',72,24, btq.m2,btq.m2a,function ()
 			initClient()
 			client:connect()
-			self.currentScreen = self.screens['char']
+			
 		end),
 	}
 	ss['multi'].buttonIndex =  1
@@ -100,14 +101,15 @@ end
 
 function Menu:ss_char()
 	local ss = self.screens
+	ss['char'].isChar= true
 
-	ss['char'].bgImg = titlebg
+	ss['char'].bgImg = titlebg3
 	ss['char'].buttons = {
-		Button(4*tileSize,viewH-16,'char', function ()
+		Button('char',62,56, btq.c1,btq.c1a,function ()
 			
 		end
 		),
-		Button(10*tileSize,viewH-16,'start', function ()
+		Button('start',88,56,btq.c2,btq.c2a,function ()
 			
 			if server then 
 				numConnected = server:getClientCount() + 1
@@ -117,6 +119,9 @@ function Menu:ss_char()
 				})
 				gamestate = 1
 				startMatch()
+			elseif not client then
+				gamestate = 1
+				initMap()
 			end
 		end
 		),

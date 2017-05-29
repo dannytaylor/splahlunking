@@ -24,6 +24,21 @@ end
 
 function menukeys(key)
 	local mcs = menu.currentScreen
+
+	if mcs == menu.screens['char'] then
+		if key == 'down' or key == 's' then
+			local cc = menu.screens['char'].currentChar[pid]
+			cc = cc - 1
+			if cc < 1 then cc = 5 end
+			menu.screens['char'].currentChar[pid] = cc
+		elseif  key == 'up' or key == 'w' then	
+			local cc = menu.screens['char'].currentChar[pid]
+			cc = cc + 1
+			if cc > 5 then cc = 1 end
+			menu.screens['char'].currentChar[pid] = cc
+		end
+	end
+
 	if key == 'escape' then
 		if mcs == menu.screens['title'] then
 			love.event.quit()
@@ -32,7 +47,7 @@ function menukeys(key)
 			client = nil
 			server = nil
 		end
-	elseif key == 'left'  then
+	elseif key == 'left' or key == 'a' then
 		if #mcs.buttons > 1 then
 			if mcs.buttonIndex == 1 then
 				mcs.buttonIndex = #mcs.buttons
@@ -43,7 +58,7 @@ function menukeys(key)
 			mcs.currentButton = mcs.buttons[mcs.buttonIndex]
 			mcs.currentButton.active = true
 		end
-	elseif key == 'right' then
+	elseif key == 'right' or key == 'd' then
 		if #mcs.buttons > 1 then
 			if mcs.buttonIndex == #mcs.buttons then
 				mcs.buttonIndex = 1
@@ -54,10 +69,10 @@ function menukeys(key)
 			mcs.currentButton = mcs.buttons[mcs.buttonIndex]
 			mcs.currentButton.active = true
 		end
-	elseif key == 'up' then
-	elseif key == 'down' then
+	elseif key == 'up' or key == 'w' then
+	elseif key == 'down' or key == 's' then
 		
-	elseif key == 'return' then
+	elseif key == 'return' or key == 'x' then
 		mcs.currentButton.action()
 	end
 end

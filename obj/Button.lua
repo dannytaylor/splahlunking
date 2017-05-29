@@ -2,26 +2,31 @@
 
 Button = class('Button')
 
-function Button:initialize(x,y,text,a)
-	self.x,self.y = x,y or nil
+function Button:initialize(name,x,y,i1,i2,a)
+	self.name = name
+	self.x,self.y = x,y
 	self.active = false
-	self.text = text
-	self.w = font:getWidth(self.text)+1 or 32
-	self.h = 12
+
+	self.img = i1
+	self.imgActive = i2
+
+	self.w = 32
+	self.h = 32
+
 	self.action = a or function()
 		do end
 	end
 end
 
 function Button:draw()
-	-- love.graphics.setColor(255, 255, 255)
-	-- love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
+	
 	if self.active then 
-		love.graphics.setColor(224,111, 139) 
-		love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
+		-- love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
+		love.graphics.draw(titlebuttons,self.imgActive,self.x,self.y)
+	else
+		love.graphics.draw(titlebuttons,self.img,self.x,self.y)
 	end
-	love.graphics.setColor(255, 255, 255)
-	love.graphics.print(self.text, self.x+1, self.y+1)
+	
 end
 
 function Button:update(dt)

@@ -9,7 +9,13 @@ function clientUpdate(dt)
 
 	if tick >= tickRate then
 		tick = 0
-		if ui then 
+		if gamestate == 0 and menu.currentScreen == menu.screens['char'] then
+			local clientinfo = {
+				id = pid,
+				char = menu.screens['char'].currentChar[pid]
+			}
+			client:send("charclient", clientinfo)
+		elseif ui then 
 			client:send("clientinfo", {
 				x      = players[pid].x,
 				y      = players[pid].y,
@@ -33,7 +39,13 @@ function serverUpdate(dt)
 	tick = tick + dt
 	if tick >= tickRate then
 		tick = 0
-		if ui then
+		if gamestate == 0 and menu.currentScreen == menu.screens['char'] then
+			local serverinfo = {
+				num = numConnected,
+				chars = menu.screens['char'].currentChar
+			}
+			server:sendToAll("charserver", serverinfo)
+		elseif gamestate == 1 and ui then
 			local serverinfo = {}
 			for i=1,numConnected do
 				serverinfo[i] = {
@@ -54,16 +66,18 @@ function serverUpdate(dt)
 end
 
 function initServer()
-	server = sock.newServer("*", 22122,3)
+	server = sock.newServer(ip_host, 22122,3)
 	server:setSerialization(bitser.dumps, bitser.loads)
 
 	pid = 1
 
 	server:on("connect", function(data, client)
 		-- Send a message back to the connected client
+		numConnected= server:getClientCount() + 1
+
 		client:send("map",{
 			m = binary_map,
-			p = #players,
+			n = numConnected
 			})
 	end)
 	server:on("clientinfo", function(data)
@@ -87,12 +101,14 @@ function initServer()
 
 		players[id].score        = score
 		players[id].breath       = breath
-
+	end)
+	server:on("charclient", function(data)
+		menu.screens['char'].currentChar[data.id] = data.char
 	end)
 end
 
 function initClient()
-	client = sock.newClient("localhost", 22122)
+	client = sock.newClient(ip_join, 22122)
 	client:setSerialization(bitser.dumps, bitser.loads)
 
 	client:on("connect", function(data)
@@ -101,15 +117,16 @@ function initClient()
 	client:on("start", function(data)
 		gamestate = data.state
 		numConnected = data.num
-		pid = client:getIndex() + 1
+		print(pid)
 		startMatch()
 		gamestate = 1
 	end)
 	client:on("map", function(data)
 		binary_map = data.m
+		pid = data.n
 		mapdata = bitser.loads(binary_map)
-		print('received map: w='..mapdata.w..' h='..mapdata.h)
 		initMap()
+		menu.currentScreen = menu.screens['char']
 	end)
 	client:on("serverinfo", function(data)
 		for i=1,numConnected do
@@ -134,6 +151,14 @@ function initClient()
 
 				players[i].score        = score
 				players[i].breath       = breath
+			end
+		end
+	end)
+	client:on('charserver', function(data)
+		numConnected = data.num
+		for i=1, numConnected do
+			if i ~= pid then
+				menu.screens['char'].currentChar[i] = data.chars[i]
 			end
 		end
 	end)

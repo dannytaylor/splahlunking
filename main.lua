@@ -11,7 +11,7 @@ sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock
 -- anim8 	= require 'anim8'			-- https://github.com/kikito/anim8
 
 bitser  = require "lib/bitser"
-binser  = require "lib/binser"
+-- binser  = require "lib/binser"
 
 
 require 'init'

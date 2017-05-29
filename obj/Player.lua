@@ -4,7 +4,7 @@ Player = class('Player')
 
 
 
-function Player:initialize(x,y,id)
+function Player:initialize(x,y,id,skin)
 	self.x = x 
 	self.y = y
 	self.id = id or 1
@@ -26,7 +26,7 @@ function Player:initialize(x,y,id)
 
 	-- sprite info
 	self.gamestate = 'dry'
-	self.palette = self.id or 1
+	self.palette = skin
 	self.currentAnim = 'idle_dry'
 	self.nextAnim = self.currentAnim
 	self.sprite = 'idle_dry'
@@ -35,6 +35,9 @@ function Player:initialize(x,y,id)
 	-- for UI
 	self.score = 0
 	self.breath = 100
+
+	self.alive = true
+	self.tank = true
 
 
 	self:spriteInit()
@@ -65,12 +68,17 @@ function Player:update(dt)
 				self.speedy = self.swimspeed
 				self.speedx = self.swimspeed
 			end
-			if love.keyboard.isDown('down') then
+			if love.keyboard.isDown('down') or love.keyboard.isDown('s') then
 				dy = self.speedy * 2 * dt
 				self.sprite.flipY = true
 				self.nextAnim = 'movey'
-			elseif love.keyboard.isDown('up') then
+			elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
 				dy = -self.speedy * 2 * dt
+				if self.y < (waterLevel+0.5)*tileSize then
+					dy = dy/4
+				elseif self.y < (waterLevel+2)*tileSize then
+					dy = dy/2
+				end
 				self.sprite.flipY = false
 				self.nextAnim = 'movey'
 			else
@@ -80,7 +88,7 @@ function Player:update(dt)
 			dy = self.speedy * 2 * dt
 		end
 
-		if love.keyboard.isDown('right') then
+		if love.keyboard.isDown('right') or love.keyboard.isDown('d') then
 			dx = self.speedx * dt
 			self.sprite.flipX = false
 			if self.gamestate == 'dry' then
@@ -89,7 +97,7 @@ function Player:update(dt)
 				self.nextAnim = 'movex'
 			end
 			self.sprite.flipY = false
-		elseif love.keyboard.isDown('left') then
+		elseif love.keyboard.isDown('left') or love.keyboard.isDown('a') then
 			dx = -self.speedx * dt
 			self.sprite.flipX = true
 			if self.gamestate == 'dry' then
@@ -153,10 +161,46 @@ function Player:update(dt)
 			end
 			self.activeTreasure.active = false
 		end
+
+	else
+		local cols
+		local playerFilter = function (item, other)
+			if other:sub(1,4) == 'trea'  then
+				return 'cross'
+			elseif other:sub(1,4) == 'wall'  then
+				return 'slide'
+			else
+				return nil
+		 	end
+		end
+
+		self.x, self.y, cols, cols_len = world:move(self.bumpName, self.x, self.y, playerFilter)
+
+		for i=1, cols_len do
+			local other = cols[i].other
+			if other:sub(1,4) == 'trea'  then
+				self.currentTreasure = other
+			else 
+				-- if self.activeTreasure then
+				-- 	self.activeTreasure.hovered = false
+				-- 	self.activeTreasure = nil
+				-- end
+				self.currentTreasure = nil
+		 	end
+		end
+
+		if self.currentTreasure then
+			self.activeTreasure = treasureAt(world:getRect(self.currentTreasure))
+
+			if self.activeTreasure.active then 
+				self.score = self.score + self.activeTreasure.value
+			end
+			self.activeTreasure.active = false
+		end
 	end
 
 
-	
+
 	if self.nextAnim and self.nextAnim ~= self.currentAnim then
 		self.currentAnim = self.nextAnim
 		self.sprite:switch(self.currentAnim)
@@ -178,7 +222,15 @@ function Player:spriteInit()
 	self.sprite:setAnchor(function ()
 		return self.x+4,self.y+4
 	end)
-	
+	--out of water
+	self.sprite:addAnimation('idle_dry', {
+		image       = playerSheet,
+		frameWidth  = 16,
+		frameHeight = 16,
+		frames      = {
+			{7, self.palette, 7, self.palette, .8},
+		},
+	})
 	-- in water
 	self.sprite:addAnimation('idle', {
 		image       = playerSheet,
@@ -205,15 +257,7 @@ function Player:spriteInit()
 			{5, self.palette, 6, self.palette, .4},
 		},
 	})
-	--out of water
-	self.sprite:addAnimation('idle_dry', {
-		image       = playerSheet,
-		frameWidth  = 16,
-		frameHeight = 16,
-		frames      = {
-			{7, self.palette, 7, self.palette, .8},
-		},
-	})
+	
 	self.sprite:addAnimation('movex_dry', {
 		image       = playerSheet,
 		frameWidth  = 16,

@@ -3,8 +3,9 @@
 
 game made with löve in ~72 hr for #divejam
 
-collect treasures, but be sure to know the way back if case your equipment fails! the deeper you go the more valuable the treasure. map and treasure is randomly generated.
+collect treasures, but be sure to know the way back if case your equipment fails! the deeper you go the more valuable the treasure. map and treasure is randomly generated. the deeper you go the more valuable the treasure. try and fill up your treasure bar and live to tell the tale!
 
+map is randomly generated. multiplayer is a bit buggy.  **if you connect to a game that's in progress you will crash the server**. no spaces or colons/ports in the ip address. game uses UDP on port 22122 for forwarding.
 
 
 - **wasd** or **arrow keys** to move

@@ -13,7 +13,7 @@ collect treasures, but be sure to know the way back if case your equipment fails
 
 other tools used:
 - aseprite (art)
-- [arne's 16 colour palette] https://androidarts.com/palette/16pal.htm)
+- [arne's 16 colour palette](https://androidarts.com/palette/16pal.htm)
 - bfxr.net (sfx)
 - beepbox.co (tunes)
 

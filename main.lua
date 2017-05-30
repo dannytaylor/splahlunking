@@ -1,4 +1,4 @@
-debug = true
+debug = false
 
 -- main.lua
 
@@ -30,7 +30,8 @@ players = {}
 pid = nil
 
 gamestate = 0
-
+mute = false
+if debug then mute = true end
 
 function love.load()
 	math.randomseed(os.time())
@@ -43,6 +44,12 @@ end
 function love.update(dt)
 	if client then clientUpdate(dt) end
 	if server then serverUpdate(dt) end
+
+	if not mute and currentsong then
+		if not currentsong:isPlaying() then
+			currentsong:play()
+		end
+	end
 
 	if gamestate == 0 then
 		menu:update(dt)

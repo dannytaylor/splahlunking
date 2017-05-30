@@ -13,7 +13,7 @@ tick = 0
 tickRate = 1/60
 
 gametime = 0
-gametimeMax = 90
+gametimeMax = 150
 breakTime = 12
 
 function init()
@@ -26,7 +26,7 @@ function init()
 	love.graphics.setLineStyle('rough')
 
 	-- local imgFont = love.graphics.newImage("img/font.png")
-
+	initSounds()
 	initSprites()
 	if gamestate == 0 then
 		initMenu()
@@ -59,10 +59,10 @@ end
 
 function startMatch()
 	-- init players
-	local p1s = {x = 58, y = 7} 
+	local spawnx = { 59, 69, 57,71}
 	print('pid: '..pid..', numconnected: '.. numConnected)
 	for i=1,numConnected do
-		players[i] = Player((p1s.x+i*2)*tileSize,(p1s.y)*tileSize,i,menu.screens['char'].currentChar[i])
+		players[i] = Player(spawnx[i]*tileSize,7*tileSize,i,menu.screens['char'].currentChar[i])
 	end
 	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
 	cam:setScale(windowScale)
@@ -71,7 +71,21 @@ function startMatch()
 	ui = UI()
 end
 	
+function initSounds()
+	sfx_button = love.audio.newSource("sfx/swap.wav","static")
+	sfx_buttonClick = love.audio.newSource("sfx/click.wav","static")
+	sfx_splash = love.audio.newSource("sfx/splash.wav","static")
+	sfx_explode = love.audio.newSource("sfx/explode.wav","static")
+	sfx_collect = love.audio.newSource("sfx/treasure.wav","static")
+	sfx_death = love.audio.newSource("sfx/death.wav","static")
 
+	song1 =  love.audio.newSource("sfx/song1.wav")
+	song2 = love.audio.newSource("sfx/song2.wav")
+	song3 = nil
+
+	currentsong = song1
+	if not mute then currentsong:play() end
+end
 
 function initSprites() -- and quads
 	playerSheet = love.graphics.newImage 'img/player.png'
@@ -88,6 +102,8 @@ function initSprites() -- and quads
 	titlebg = love.graphics.newImage 'img/titlebg.png'
 	titlebg2 = love.graphics.newImage 'img/connectbg.png'
 	titlebg3 = love.graphics.newImage 'img/charbg.png'
+	camp = love.graphics.newImage 'img/camp.png'
+
 
 	-- playerSheet:setFilter('nearest', 'nearest')
 	-- tileSheet:setFilter('nearest', 'nearest')

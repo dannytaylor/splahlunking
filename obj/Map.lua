@@ -91,7 +91,7 @@ function Map:draw()
 	end
 	love.graphics.setColor(255, 255, 255)
 
-	if players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 and players[pid].alive then 
+	if players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 and players[pid].alive and players[pid].palette ~=5 then 
 		love.graphics.draw(lightMask, players[pid].x-128, cpy-80, 0, 1, 1)
 	end
 end
@@ -117,6 +117,7 @@ function Map:setCanvas()
 			end
 		end
 	end
+	love.graphics.draw(camp, 29.25*tileSize, 0)
 	love.graphics.setCanvas()
 	self.tileCanvas:setFilter("nearest", "nearest")
 end

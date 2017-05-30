@@ -93,7 +93,7 @@ function UI:playerbar()
 			end
 		end
 		for i=1,nc do
-			local x = 48+(i-1)*8
+			local x = 56+(i-1)*8
 			love.graphics.draw(uiSheet, uiq2[players[i].palette], x, 0)
 			if i == pid then
 				love.graphics.draw(uiSheet, uiq.hl, x, 0)

@@ -45,6 +45,36 @@ function Player:initialize(x,y,id,skin)
 
 
 	self:spriteInit()
+	self:playerStats()
+end
+
+function Player:playerStats()
+	local sp = self.palette
+	if sp == 1 then
+		self.swimspeed = 32 -- higher linearly better
+		self.breathRate = 3 -- lower better
+		self.weight = 1.2
+		-- self.tWater = -x --higher break points
+	elseif sp == 2 then
+		self.swimspeed = 40
+		self.breathRate = 3.6
+		self.weight = 1.6
+	elseif sp == 3 then
+		self.swimspeed = 24
+		self.breathRate = 2.2
+		self.weight = 1
+	elseif sp == 4 then
+		self.swimspeed = 28
+		self.breathRate = 2.6
+		self.weight = 1.1
+		self.tWater = 3
+	elseif sp == 5 then
+		self.swimspeed = 28
+		self.breathRate = 3
+		self.tWater = -5 --higher break points
+		self.weight = 1.2
+	end
+	
 end
 
 function Player:draw()
@@ -62,12 +92,16 @@ function Player:update(dt)
 		if not self.win then
 			if gametime > gametimeMax then
 				self.win = true
+				if currentsong then currentsong:stop() end
+				currentsong = song3
 			elseif self.tWater > breakTime and self.y < (waterLevel-1)*tileSize then
 				self.win = true
 				self.surface = true
+				love.audio.play(sfx_splash)
+				if currentsong then currentsong:stop() end
+				currentsong = song3
 			end
 			if self.alive and not self.win then
-				local speed = self.speed
 
 				self.nextAnim = nil
 				if self.gamestate == 'dry' then self.nextAnim = 'idle_dry' 
@@ -75,7 +109,8 @@ function Player:update(dt)
 
 				local dx, dy = 0, 0
 				if self.y > (waterLevel-1)*tileSize then
-					if self.gamestate == 'dry' then 
+					if self.gamestate == 'dry' then
+						love.audio.play(sfx_splash)
 						self.gamestate = 'wet' 
 						self.speedy = self.swimspeed
 						self.speedx = self.swimspeed
@@ -126,6 +161,7 @@ function Player:update(dt)
 
 
 				if dx ~= 0 or dy ~= 0 then
+					
 					local cols
 					local playerFilter = function (item, other)
 						if other:sub(1,4) == 'trea'  then
@@ -163,6 +199,9 @@ function Player:update(dt)
 		if self.gamestate == 'wet' then 
 			self.tWater = self.tWater + dt
 			if self.tWater > breakTime and self.tank then 
+				love.audio.play(sfx_explode)
+				currentsong:stop()
+				currentsong = song2
 				tankBubbler = Bubbler(10,2)
 				self.tank = false 
 			end
@@ -173,6 +212,9 @@ function Player:update(dt)
 				if self.breath > 0 then
 					self.breath = self.breath - dt*self.breathRate
 				elseif self.alive then
+					love.audio.play(sfx_death)
+					currentsong:stop()
+					currentsong = song3
 					self.breath = 0
 					self.alive = false
 					self.bubbler = nil
@@ -189,6 +231,8 @@ function Player:update(dt)
 
 			if self.activeTreasure.active then 
 				self.score = self.score + self.activeTreasure.value
+				if sfx_collect:isPlaying() then sfx_collect:stop() end
+				love.audio.play(sfx_collect)
 			end
 			self.activeTreasure.active = false
 		end

@@ -73,6 +73,11 @@ function initServer()
 	ip_host = love.system.getClipboardText()
 	-- server = sock.newServer(ip_host, 22122,3)
 	server = sock.newServer('*', 22122,3)
+	local hostip = server:getSocketAddress()
+
+	hostip = string.sub(hostip, 1, string.find(hostip,':')-1)
+	print (hostip)
+	-- love.system.setClipboardText(hostip)
 	server:setSerialization(bitser.dumps, bitser.loads)
 
 	pid = 1

@@ -38,13 +38,15 @@ function UI:draw()
 	end
 	if not players[pid].alive then
 		love.graphics.draw(overlay_dead, 0, 0)
+		love.graphics.print('SCORE:'..players[pid].score, 53, 21)
 
 		if not alldone then
 			love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
 		end
 
 	elseif players[pid].surface then
-		love.graphics.draw(uiSheet,uiq.alivemsg,44,16)
+		love.graphics.draw(uiSheet,uiq.alivemsg,44,14)
+		love.graphics.print('SCORE:'..players[pid].score, 53, 21)
 		if not alldone then
 			love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
 		end
@@ -63,7 +65,7 @@ end
 
 function UI:update(dt)
 	self.breathNum = math.floor((16*players[pid].breath/100))
-	self.scoreNum = math.min(math.floor((8*players[pid].score/80)),8)
+	self.scoreNum = math.min(math.floor((8*players[pid].score/100)),8)
 end
 
 function UI:breathbar()
@@ -104,8 +106,8 @@ function UI:scorebar()
 end
 function UI:playerbar()
 	local nc = numConnected
+	local topscore = 0
 	if nc > 1 then
-		local topscore = 0
 		local pscore = {0,0,0,0}
 		for i=1,nc do
 			if players[i].alive then
@@ -128,6 +130,15 @@ function UI:playerbar()
 			end
 			if i == pid then
 				love.graphics.draw(uiSheet, uiq.hl, x, 0)
+			end
+		end
+	end
+	if client or server then
+		if alldone then
+			if topscore == 0 then 
+				love.graphics.print('NO WINNERS...', 37, 28)
+			else
+				love.graphics.print('WINNING SCORE:'..topscore, 37, 28)
 			end
 		end
 	end

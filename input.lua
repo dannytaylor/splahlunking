@@ -58,15 +58,20 @@ function love.keypressed(key) -- key bindings
 		elseif key == 'r' then
 			if alldone and not client then -- and match == over then
 				gamestate = 0
+
 				if currentsong then currentsong:stop() end
 				currentsong = song1
 				menu.currentScreen = menu.screens['char']
+
 				if server then
 					server:sendToAll('returntochar', {
 						num = numConnected,
 					})
 
 					map = Map()
+					mapdata = map:packageData()
+					binary_map = bitser.dumps(mapdata)
+
 					server:sendToAll("map",{
 						m = binary_map,
 						n = numConnected
@@ -174,6 +179,13 @@ function menukeys(key)
 		
 	elseif key == 'return' or key == 'x' then
 		love.audio.play(sfx_buttonClick)
+
 		mcs.currentButton.action()
+		if not client and mcs == menu.screens['char'] and mcs.buttonIndex ~=3 then
+			mcs.currentButton.active = false
+			mcs.buttonIndex = mcs.buttonIndex + 1
+			mcs.currentButton = mcs.buttons[mcs.buttonIndex]
+			mcs.currentButton.active = true
+		end
 	end
 end

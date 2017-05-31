@@ -2,6 +2,13 @@
 
 Map = class('Map')
 
+cellIter = 10
+caveGen = 0.515
+floodThresh = 0.28
+waterLevel = 10
+maxTreasure = 80
+maxLargeTreasure = 10
+
 function Map:initialize(data)
 	if data then
 		self.w, self.h = data.w,data.h
@@ -76,7 +83,7 @@ function Map:init()
 end
 
 function Map:draw()
-	local cpy = players[pid].y
+	local cpy = players[pid].y -- current player y
 	if mapsel == 3 then
 		love.graphics.setColor(0,0,0)
 	else
@@ -94,8 +101,20 @@ function Map:draw()
 	end
 	love.graphics.setColor(255, 255, 255)
 
-	if mapsel ~=3 and players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 and players[pid].palette ~=5 then 
+	if mapsel ~=3 
+		-- and players[pid].gamestate == 'wet' 
+		and cpy > waterLevel*tileSize+24
+		and players[pid].palette ~=5 
+		-- and players[pid].alive 
+		and not players[pid].surface 
+		and players[pid].deadtimer < deadtime then
+		if mapsel == 1  then 
+			love.graphics.setColor(0,0,0)
+		else
+			love.graphics.setColor(27, 38, 50)
+		end
 		love.graphics.draw(lightMask, players[pid].x-128, cpy-80, 0, 1, 1)
+		love.graphics.setColor(255,255,255)
 	end
 end
 
@@ -148,9 +167,10 @@ function Map:setColor(x,y)
 end
 
 function Map:playertracker()
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(49, 162, 242)
 	-- love.graphics.circle('fill', players[pid].x, players[pid].y, viewH/2)
 	love.graphics.draw(playerLight, players[pid].x-40, players[pid].y-40, 0, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 end
 
 
@@ -158,12 +178,11 @@ end
 function Map:buildCave()
 	caveW, caveH = self.w, self.h - 12
 
-	cellIter = 12
-	caveGen = 0.52
+
 	currentIter = 1
 
 	self.caveState = {}
-	for i=1, self.w do -- initialize cave, 0.46
+	for i=1, self.w do 
 		self.caveState[i] = {}
 		for j=1, self.h do
 			self.caveState[i][j] = lume.weightedchoice({ [0] = caveGen, [1] = 1-caveGen })
@@ -180,7 +199,7 @@ function Map:buildCave()
 	self:floodFill()
 	local caveArea = caveW*caveH
 	local floodPercent = numFlood/caveArea
-	if floodPercent < 0.35 then 
+	if floodPercent < floodThresh then 
 		self:buildCave()
 		return false
 	end -- redo if not enough filled

@@ -90,10 +90,12 @@ function initServer()
 	server:on("connect", function(data, client)
 		-- Send a message back to the connected client
 		numConnected= server:getClientCount() + 1
+		client:send("pid",{
+			n = numConnected,
+			})
 
 		client:send("map",{
 			m = binary_map,
-			n = numConnected
 			})
 	end)
 	server:on("clientinfo", function(data)
@@ -143,6 +145,9 @@ function initClient()
 	client:on("connect", function(data)
 		print('connected')
 	end)
+	client:on("pid", function(data)
+		pid = data.n
+	end)
 	client:on("start", function(data)
 		gamestate = data.state
 		numConnected = data.num
@@ -152,9 +157,8 @@ function initClient()
 		gamestate = 1
 	end)
 	client:on("map", function(data)
-		map = {}
+		map = nil
 		binary_map = data.m
-		pid = data.n
 		mapdata = bitser.loads(binary_map)
 		initMap()
 		menu.currentScreen = menu.screens['char']

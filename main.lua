@@ -1,4 +1,4 @@
-debug = false
+debug = true
 
 -- main.lua
 
@@ -61,9 +61,30 @@ function love.update(dt)
 			if not alldone and players[i].win or not players[i].alive or players[i].surface then
 				dc = dc + 1
 			end
-		end 
-		if not alldone and dc == numConnected then
-			alldone = true
+		end
+
+		-- cam swps
+		if not alldone then
+			if not players[pid].alive or players[pid].surface then 
+				players[pid].deadtimer = players[pid].deadtimer + dt
+				local cp = pid -- cam player
+				if players[pid].deadtimer > deadtime then
+					for i=1, numConnected do
+						if players[i].alive and not players[i].surface then
+							cp = i
+						break end
+					end
+				end
+				cam:setPosition(players[cp].x, players[cp].y)
+			end
+
+			if dc == numConnected then
+				alldone = true
+			end
+		end
+		
+		if alldone then
+			cam:setPosition(players[pid].x, players[pid].y)
 		end
 
 		ui:update(dt)

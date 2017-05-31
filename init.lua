@@ -4,17 +4,13 @@ tileSize = 8
 viewW, viewH = 16*tileSize, 10*tileSize
 windowScale = 4
 
-waterLevel = 10
-maxTreasure = 30
-maxLargeTreasure = 3
 
 numConnected = 1
 tick = 0
 tickRate = 1/60
 
+
 gametime = 0
-gametimeMax = 150
-breakTime = 14
 
 
 function init()
@@ -26,7 +22,9 @@ function init()
 	love.window.setIcon(icon)
 	love.graphics.setLineStyle('rough')
 
-	-- local imgFont = love.graphics.newImage("img/font.png")
+	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!='\"+", 1)
+	love.graphics.setFont( font )
+
 	initSounds()
 	initSprites()
 	if gamestate == 0 then
@@ -118,6 +116,7 @@ function initSprites() -- and quads
 		love.graphics.newImage 'img/camp3.png',
 	}
 
+	sparklesheet = love.graphics.newImage 'img/sparklesheet.png'
 
 	-- playerSheet:setFilter('nearest', 'nearest')
 	-- tileSheet:setFilter('nearest', 'nearest')

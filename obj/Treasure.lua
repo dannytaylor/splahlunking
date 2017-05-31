@@ -11,9 +11,24 @@ function Treasure:initialize(x,y,v,size)
 		self.bubbler = Bubbler(3,12)
 	end
 	world:add('treasure'..x..'x'..y..'x'..self.size, self.x,self.y, tileSize*self.size,tileSize*self.size)
-	if self. size == 2 then
+	if self.size == 2 then
 		self.sprite = lume.randomchoice({1,2})
 	end
+	local cx,cy = self.x+4,self.y+4
+	if self.size == 2 then
+		cx,cy = self.x+8,self.y+8
+	elseif self.size == 3 then
+		cx,cy = self.x+16,self.y+16
+	end
+	self.sparkle = sodapop.newAnimatedSprite(cx, cy)
+	self.sparkle:addAnimation('default', {
+		image        = sparklesheet,
+		frameWidth   = 16,
+		frameHeight  = 16,
+		frames       = {
+		  {1, 1, 4, 1, .4},
+		},
+	})
 end
 
 function Treasure:draw()
@@ -38,12 +53,16 @@ function Treasure:draw()
 			love.graphics.draw(treasureSheet,trq.txl1,self.x, self.y-16)
 			self.bubbler:draw()
 		end
+		self.sparkle:draw()
 	end
 
 end
 
 function Treasure:update(dt)
-	if self.size > 1 then
+	if self.active and self.size > 1 then
 		self.bubbler:update(dt,self.x,self.y)
+	end
+	if self.active then
+		self.sparkle:update(dt)
 	end
 end

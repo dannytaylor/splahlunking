@@ -2,6 +2,7 @@
 
 Player = class('Player')
 
+breakTime = 1
 
 
 function Player:initialize(x,y,id,skin)
@@ -35,7 +36,7 @@ function Player:initialize(x,y,id,skin)
 	-- for UI
 	self.score = 0
 	self.breath = 100
-	self.breathRate = 2.5
+	self.breathRate = 1.5
 	self.tWater = 0
 
 	self.alive = true
@@ -43,6 +44,8 @@ function Player:initialize(x,y,id,skin)
 	self.win = false
 	self.surface = false
 
+	self.deadtimer = 0
+	deadtime = 5
 
 	self:spriteInit()
 	self:playerStats()
@@ -52,26 +55,26 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 32 -- higher linearly better
-		self.breathRate = 3 -- lower better
+		self.breathRate = 20 -- lower better
 		self.weight = 1.2
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 40
-		self.breathRate = 3.4
+		self.breathRate = 2.4
 		self.weight = 1.6
 	elseif sp == 3 then
 		self.swimspeed = 24
-		self.breathRate = 2.2
+		self.breathRate = 1.6
 		self.weight = 1
 	elseif sp == 4 then
 		self.swimspeed = 28
-		self.breathRate = 2.6
+		self.breathRate = 1.8
 		self.weight = 1.1
-		self.tWater = 5
+		self.tWater = 6
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 3
-		self.tWater = -5 --higher break points
+		self.breathRate = 2.2
+		self.tWater = -6 --higher break points
 		self.weight = 1.2
 	end
 	
@@ -193,7 +196,6 @@ function Player:update(dt)
 			end
 		end
 
-
 		-------- countdown breath -----------------------
 		if self.gamestate == 'wet' then 
 			self.tWater = self.tWater + dt
@@ -235,6 +237,8 @@ function Player:update(dt)
 			end
 			self.activeTreasure.active = false
 		end
+
+
 
 	else
 		local cols

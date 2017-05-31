@@ -11,6 +11,15 @@ function Menu:initialize()
 	self.canvas = love.graphics.newCanvas(viewW*tileSize*menuscale, viewH*tileSize*menuscale,"normal",0)
 	self.canvas:setFilter("nearest", "nearest")
 
+	titlebgSprite = sodapop.newAnimatedSprite(viewW/2, viewH/2)
+	titlebgSprite:addAnimation('bg', {
+		image        = love.graphics.newImage 'img/titlebgSheet.png',
+		frameWidth   = 128,
+		frameHeight  = 80,
+		frames       = {
+		  {1, 1, 16, 1, .2},
+		},
+	})
 	self:init()
 end
 	
@@ -23,12 +32,18 @@ function Menu:draw()
 	love.graphics.clear()
 
 	self.currentScreen:draw()
+	if self.currentScreen == self.screens['title'] then 
+		titlebgSprite:draw()
+	end
 
 	love.graphics.setCanvas()
 	love.graphics.draw(self.canvas, 0, 0, 0, windowScale/menuscale, windowScale/menuscale)
 end
 
 function Menu:update(dt)
+	if self.currentScreen == self.screens['title'] then 
+		titlebgSprite:update(dt)
+	end
 	self.currentScreen:update(dt)
 end
 

@@ -1,4 +1,4 @@
-debug = true
+debug = false
 
 -- main.lua
 
@@ -55,12 +55,22 @@ function love.update(dt)
 		menu:update(dt)
 	elseif gamestate == 1 then
 		if not client then gametime = gametime + dt end
+		local dc = 0 
 		for i=1,numConnected do
 			players[i]:update(dt)
+			if not alldone and players[i].win or not players[i].alive or players[i].surface then
+				dc = dc + 1
+			end
+		end 
+		if not alldone and dc == numConnected then
+			alldone = true
 		end
+
 		ui:update(dt)
 		map:update(dt)
+
 	end
+
 end
 
 
@@ -77,6 +87,8 @@ function love.draw()
 				players[i]:draw()
 			end
 		end)
+
+
 
 		ui:draw()
 	end

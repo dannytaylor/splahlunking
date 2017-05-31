@@ -67,7 +67,7 @@ function Player:playerStats()
 		self.swimspeed = 28
 		self.breathRate = 2.6
 		self.weight = 1.1
-		self.tWater = 3
+		self.tWater = 5
 	elseif sp == 5 then
 		self.swimspeed = 28
 		self.breathRate = 3
@@ -87,7 +87,6 @@ function Player:draw()
 end
 
 function Player:update(dt)
-
 	if pid == self.id then
 		if not self.win then
 			-- if gametime > gametimeMax then
@@ -123,7 +122,7 @@ function Player:update(dt)
 						dy = -self.speedy * 2 * dt
 						self.sprite.flipY = false
 						self.nextAnim = 'movey'
-						if self.y < (waterLevel+2)*tileSize then
+						if self.y < (waterLevel+1)*tileSize then
 							dy = dy/2
 							self.nextAnim = 'idle'
 						end
@@ -195,7 +194,7 @@ function Player:update(dt)
 		end
 
 
--------- countdown breath -----------------------
+		-------- countdown breath -----------------------
 		if self.gamestate == 'wet' then 
 			self.tWater = self.tWater + dt
 			if self.tWater > breakTime and self.tank then 
@@ -280,7 +279,7 @@ function Player:update(dt)
 		self.currentAnim = self.nextAnim
 		self.sprite:switch(self.currentAnim)
 	end
-	if self.alive then self.bubbler:update(dt, self.x+4, self.y-2) end
+	if self.alive and not self.surface then self.bubbler:update(dt, self.x+4, self.y-2) end
 	if tankBubbler then tankBubbler:update(dt, self.x+4, self.y-2) end
 	self.sprite:update(dt)
 end

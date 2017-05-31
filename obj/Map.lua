@@ -77,12 +77,15 @@ end
 
 function Map:draw()
 	local cpy = players[pid].y
-	
-	love.graphics.setColor(0, 87, 132)
+	if mapsel == 3 then
+		love.graphics.setColor(0,0,0)
+	else
+		love.graphics.setColor(0, 87, 132)
+	end
 	love.graphics.rectangle('fill', 0,0, self.w*tileSize, self.h*tileSize)
 	love.graphics.setColor(255, 255, 255)
 
-	self:playertracker()
+	if mapsel ~=3 then self:playertracker() end
 
 	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
 
@@ -91,7 +94,7 @@ function Map:draw()
 	end
 	love.graphics.setColor(255, 255, 255)
 
-	if players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 and players[pid].alive and players[pid].palette ~=5 then 
+	if mapsel ~=3 and players[pid].gamestate == 'wet' and cpy > waterLevel*tileSize+8 and players[pid].palette ~=5 then 
 		love.graphics.draw(lightMask, players[pid].x-128, cpy-80, 0, 1, 1)
 	end
 end
@@ -124,13 +127,19 @@ end
 
 function Map:setColor(x,y)
 	if self.state[x][y] == 'floor' or self.state[x][y] == 'treasure'then
-		if y < waterLevel then -- above water line
-			love.graphics.setColor(178, 220, 239)
+		if mapsel == 3 then love.graphics.setColor(0,0,0)
 		else
-			love.graphics.setColor(0, 87, 132,0)
+			if y < waterLevel then -- above water line
+				love.graphics.setColor(178, 220, 239)
+			else
+				love.graphics.setColor(0, 87, 132,0)
+			end
 		end
 	elseif self.state[x][y] == 'wall' then
-		love.graphics.setColor(0, 0, 0)
+		if mapsel ==3 then love.graphics.setColor(47, 72, 78)
+		elseif mapsel == 2 then love.graphics.setColor(27, 38, 50)
+		else love.graphics.setColor(0, 0, 0) end
+
 	elseif self.state[x][y] == 'empty' then
 		love.graphics.setColor(128, 128, 128)
 	else

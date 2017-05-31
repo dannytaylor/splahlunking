@@ -29,16 +29,33 @@ function UI:draw()
 	-- 	love.graphics.print('breath: '..math.floor(players[pid].breath), 2, 0)
 	-- 	love.graphics.print('score: '..players[pid].score, 2, 8)
 	-- end
-
+	if alldone then
+		if not client then
+			love.graphics.draw(uiSheet,uiq.host_msg,44,56)
+		else 
+			love.graphics.draw(uiSheet,uiq.client_msg,44,56)
+		end
+	end
 	if not players[pid].alive then
 		love.graphics.draw(overlay_dead, 0, 0)
+
+		if not alldone then
+			love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
+		end
+
 	elseif players[pid].surface then
-		love.graphics.draw(uiSheet,uiq.alivemsg,40,16)
-	elseif gametime > gametimeMax then
-		love.graphics.draw(uiSheet,uiq.timemsg,40,16)
+		love.graphics.draw(uiSheet,uiq.alivemsg,44,16)
+		if not alldone then
+			love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
+		end
+
+	-- elseif gametime > gametimeMax then
+	-- 	love.graphics.draw(uiSheet,uiq.timemsg,40,16)
 	elseif tankBubbler then
-		love.graphics.draw(uiSheet,uiq.tankmsg,40,16)
+		love.graphics.draw(uiSheet,uiq.tankmsg,44,16)
 	end
+
+
 
 	love.graphics.setCanvas()
 	love.graphics.draw(self.canvas, 0, 0, 0, windowScale, windowScale)
@@ -50,7 +67,6 @@ function UI:update(dt)
 end
 
 function UI:breathbar()
-	-- breath bar'
 
 	-- tank icon
 	-- if players[pid].tank then

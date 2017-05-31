@@ -56,18 +56,22 @@ function love.keypressed(key) -- key bindings
 
 		-- return to char sel
 		elseif key == 'r' then
-			if server and matchinprogress then -- and match == over then
+			if alldone and not client then -- and match == over then
 				gamestate = 0
+				if currentsong then currentsong:stop() end
+				currentsong = song1
 				menu.currentScreen = menu.screens['char']
-				server:sendToAll('returntochar', {
-					num = numConnected,
-				})
+				if server then
+					server:sendToAll('returntochar', {
+						num = numConnected,
+					})
 
-				map = Map()
-				server:sendToAll("map",{
-					m = binary_map,
-					n = numConnected
-				})
+					map = Map()
+					server:sendToAll("map",{
+						m = binary_map,
+						n = numConnected
+					})
+				end
 			end
 		elseif key == 'q' and debug then
 			cam:setScale(cam:getScale()*2)

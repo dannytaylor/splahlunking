@@ -28,6 +28,9 @@ function clientUpdate(dt)
 				score  = players[pid].score,
 				breath = players[pid].breath,
 				alive = players[pid].alive,
+
+				surface = players[pid].surface,
+				win = players[pid].win,
 			})
 		end
 	end
@@ -63,6 +66,7 @@ function serverUpdate(dt)
 					alive = players[i].alive,
 
 					time = gametime,
+					ad = alldone,
 				}
 			end
 			server:sendToAll("serverinfo", serverinfo)
@@ -105,6 +109,9 @@ function initServer()
 		local breath             = data.breath
 		local alive	             = data.alive
 
+		local surface      		= data.surface
+		local win      		 	= data.win
+
 		players[id].x            = x
 		players[id].y            = y
 
@@ -115,6 +122,9 @@ function initServer()
 		players[id].score        = score
 		players[id].breath       = breath
 		players[id].alive      	 = alive
+
+		players[id].surface      = surface
+		players[id].win      	 = win
 	end)
 	server:on("charclient", function(data)
 		menu.screens['char'].currentChar[data.id] = data.char
@@ -152,6 +162,7 @@ function initClient()
 	client:on("serverinfo", function(data)
 		local time  = data[1].time
 		gametime	= time
+		alldone = data[1].ad
 
 		for i=1,numConnected do
 			if i~=pid then
@@ -166,6 +177,9 @@ function initClient()
 				local breath            = data[i].breath
 				local alive           	= data[i].alive
 
+				local win           	= data[i].win
+				local surface           = data[i].surface
+
 
 				players[i].x            = x
 				players[i].y            = y
@@ -178,6 +192,10 @@ function initClient()
 				players[i].score        = score
 				players[i].breath       = breath
 				players[i].alive       	= alive
+
+				players[i].surface      = surface
+				players[i].win       	= win
+
 
 			end
 		end

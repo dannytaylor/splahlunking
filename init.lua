@@ -14,7 +14,8 @@ tickRate = 1/60
 
 gametime = 0
 gametimeMax = 150
-breakTime = 12
+breakTime = 14
+
 
 function init()
 	windowW, windowH = viewW*windowScale, viewH*windowScale
@@ -73,6 +74,7 @@ function startMatch()
 
 	ui = UI()
 	matchinprogress = true
+	alldone = false
 end
 	
 function initSounds()
@@ -111,9 +113,9 @@ function initSprites() -- and quads
 	titlebg2 = love.graphics.newImage 'img/connectbg.png'
 	titlebg3 = love.graphics.newImage 'img/charbg.png'
 	camp = {
-		love.graphics.newImage 'img/camp.png',
-		love.graphics.newImage 'img/camp.png',
-		love.graphics.newImage 'img/camp.png',
+		love.graphics.newImage 'img/camp1.png',
+		love.graphics.newImage 'img/camp2.png',
+		love.graphics.newImage 'img/camp3.png',
 	}
 
 
@@ -247,8 +249,10 @@ function initSprites() -- and quads
 		tank2  	 = love.graphics.newQuad(0*tileSize,  4*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 
 		tankmsg  	 = love.graphics.newQuad(0*tileSize,  5*tileSize, 6*tileSize, 2*tileSize, tilesetW, tilesetH),
-		timemsg  	 = love.graphics.newQuad(0*tileSize,  7*tileSize, 6*tileSize, 2*tileSize, tilesetW, tilesetH),
 		alivemsg  	 = love.graphics.newQuad(0*tileSize,  9*tileSize, 6*tileSize, 2*tileSize, tilesetW, tilesetH),
+		client_msg 	 = love.graphics.newQuad(48,  56,6*tileSize, 2*tileSize, tilesetW, tilesetH),
+		host_msg 	 = love.graphics.newQuad(48,  72, 6*tileSize, 2*tileSize, tilesetW, tilesetH),
+		wait_msg 	 = love.graphics.newQuad(0,  56, 6*tileSize, 2*tileSize, tilesetW, tilesetH),
 	}
 
 	uiq2 = {

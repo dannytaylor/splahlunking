@@ -43,7 +43,8 @@ function serverUpdate(dt)
 		if gamestate == 0 and menu.currentScreen == menu.screens['char'] then
 			local serverinfo = {
 				num = numConnected,
-				chars = menu.screens['char'].currentChar
+				chars = menu.screens['char'].currentChar,
+				msel = mapsel
 			}
 			server:sendToAll("charserver", serverinfo)
 		elseif gamestate == 1 and ui then
@@ -121,7 +122,11 @@ function initServer()
 end
 
 function initClient()
-	ip_join = love.system.getClipboardText()
+	if debug then
+		ip_join = 'localhost'
+	else
+		ip_join = love.system.getClipboardText()
+	end
 	client = sock.newClient(ip_join, 22122)
 	client:setSerialization(bitser.dumps, bitser.loads)
 
@@ -131,11 +136,13 @@ function initClient()
 	client:on("start", function(data)
 		gamestate = data.state
 		numConnected = data.num
+		mapsel = data.msel
 		print(pid)
 		startMatch()
 		gamestate = 1
 	end)
 	client:on("map", function(data)
+		map = {}
 		binary_map = data.m
 		pid = data.n
 		mapdata = bitser.loads(binary_map)
@@ -180,7 +187,19 @@ function initClient()
 		for i=1, numConnected do
 			if i ~= pid then
 				menu.screens['char'].currentChar[i] = data.chars[i]
+				mapsel = data.msel
+				menu.screens['char'].currentChar[i] = data.chars[i]
 			end
 		end
+	end)
+	client:on('returntochar', function(data)
+		gamestate = 0
+		numConnected = data.num
+		ui = nil
+		gametime = 0
+		tankBubbler = nil
+		if currentsong then currentsong:stop() end
+		currentsong = song1
+		players = {}
 	end)
 end 

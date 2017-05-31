@@ -113,11 +113,11 @@ function Map:setCanvas()
 				love.graphics.rectangle('fill', (i-1)*tileSize, (j-1)*tileSize, tileSize, tileSize)
 				love.graphics.setColor(255, 255, 255)
 			else 
-				love.graphics.draw(tileSheet,self.tileState[i][j],(i-1)*tileSize, (j-1)*tileSize)
+				love.graphics.draw(tiles[mapsel],self.tileState[i][j],(i-1)*tileSize, (j-1)*tileSize)
 			end
 		end
 	end
-	love.graphics.draw(camp, 29.25*tileSize, 0)
+	love.graphics.draw(camp[mapsel], 29.25*tileSize, 0)
 	love.graphics.setCanvas()
 	self.tileCanvas:setFilter("nearest", "nearest")
 end
@@ -496,7 +496,7 @@ function Map:getLargeFloorPoint()
 			p1good = true
 		end
 	end
-	return x1,y1,25
+	return x1,y1,14
 end
 
 function Map:getXLFloorPoint()
@@ -521,7 +521,7 @@ function Map:getXLFloorPoint()
 			self.state[x1+i][y1-j] = 'treasure'
 		end
 	end
-	return x1,y1,40
+	return x1,y1,24
 end
 
 function Map:packageData()

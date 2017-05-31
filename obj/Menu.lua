@@ -92,8 +92,13 @@ function Menu:ss_multi()
 		Button('join',72,24, btq.m2,btq.m2a,function ()
 			initClient()
 			client:connect()
-			menu.screens['char'].buttons[2].img = btq.c3
-			menu.screens['char'].buttons[2].imgActive = btq.c3a
+			menu.screens['char'].buttons[3].img = btq.c3
+			menu.screens['char'].buttons[3].imgActive = btq.c3a
+
+			ss['char'].currentButton.active = false
+			ss['char'].buttonIndex =  1
+			ss['char'].currentButton =  ss['char'].buttons[1]
+			ss['char'].currentButton.active = true
 		end),
 	}
 	ss['multi'].buttonIndex =  1
@@ -107,17 +112,22 @@ function Menu:ss_char()
 
 	ss['char'].bgImg = titlebg3
 	ss['char'].buttons = {
-		Button('char',62,56, btq.c1,btq.c1a,function ()
+		Button('char',62,20, btq.c1,btq.c1a,function ()
 			
 		end
 		),
-		Button('start',88,56,btq.c2,btq.c2a,function ()
+		Button('map',64,54, btq.map,btq.mapa,function ()
+			
+		end
+		),
+		Button('start',94,61,btq.c2,btq.c2a,function ()
 			
 			if server then 
 				numConnected = server:getClientCount() + 1
 				server:sendToAll('start', {
 					state = 1,
-					num = numConnected
+					num = numConnected,
+					msel = mapsel
 				})
 				gamestate = 1
 				startMatch()

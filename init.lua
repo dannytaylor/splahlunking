@@ -33,6 +33,7 @@ function init()
 	elseif gamestate == 1 then
 		initMap()
 	end
+	mapsel = 1
 end
 
 function initMenu()
@@ -58,6 +59,8 @@ function initMap()
 end
 
 function startMatch()
+	map:setQuads()
+	map:setCanvas()
 	-- init players
 	local spawnx = { 59, 69, 57,71}
 	print('pid: '..pid..', numconnected: '.. numConnected)
@@ -69,6 +72,7 @@ function startMatch()
 	cam:setPosition(players[pid].x, players[pid].y)
 
 	ui = UI()
+	matchinprogress = true
 end
 	
 function initSounds()
@@ -89,7 +93,11 @@ end
 
 function initSprites() -- and quads
 	playerSheet = love.graphics.newImage 'img/player.png'
-	tileSheet = love.graphics.newImage 'img/tile.png'
+	tiles = {
+		love.graphics.newImage 'img/tiles1.png',
+		love.graphics.newImage 'img/tiles2.png',
+		love.graphics.newImage 'img/tiles3.png',
+	}
 	uiSheet = love.graphics.newImage 'img/uiSheet.png'
 	treasureSheet = love.graphics.newImage 'img/treasureSheet.png'
 	titlebuttons = love.graphics.newImage 'img/titlebuttons.png'
@@ -102,7 +110,11 @@ function initSprites() -- and quads
 	titlebg = love.graphics.newImage 'img/titlebg.png'
 	titlebg2 = love.graphics.newImage 'img/connectbg.png'
 	titlebg3 = love.graphics.newImage 'img/charbg.png'
-	camp = love.graphics.newImage 'img/camp.png'
+	camp = {
+		love.graphics.newImage 'img/camp.png',
+		love.graphics.newImage 'img/camp.png',
+		love.graphics.newImage 'img/camp.png',
+	}
 
 
 	-- playerSheet:setFilter('nearest', 'nearest')
@@ -118,7 +130,7 @@ function initSprites() -- and quads
 	-- charsheet:setFilter('nearest', 'nearest')
 	-- overlay_dead:setFilter('nearest', 'nearest')
 
-	local tilesetW, tilesetH = tileSheet:getWidth(), tileSheet:getHeight()
+	local tilesetW, tilesetH = tiles[1]:getWidth(), tiles[2]:getHeight()
 	tq = { --tile quads
 
 		-- flat
@@ -229,6 +241,7 @@ function initSprites() -- and quads
 		dead   	 = love.graphics.newQuad(3*tileSize,  0*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		winning  = love.graphics.newQuad(3*tileSize,  1*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		hl  	 = love.graphics.newQuad(3*tileSize,  2*tileSize, tileSize, tileSize, tilesetW, tilesetH),
+		surface	 = love.graphics.newQuad(3*tileSize,  3*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 
 		tank1  	 = love.graphics.newQuad(0*tileSize,  3*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		tank2  	 = love.graphics.newQuad(0*tileSize,  4*tileSize, tileSize, tileSize, tilesetW, tilesetH),
@@ -286,9 +299,20 @@ function initSprites() -- and quads
 		c3  = love.graphics.newQuad(5*32,  4*16, 32, 16, tilesetW, tilesetH),
 		c3a = love.graphics.newQuad(5*32,  5*16, 32, 16, tilesetW, tilesetH),
 
+		mapa = love.graphics.newQuad(3*16,  4*16, 32, 8, tilesetW, tilesetH),
+		map = love.graphics.newQuad(3*16,  4.5*16, 32, 8, tilesetW, tilesetH),
+
+		mapbg = love.graphics.newQuad(5*16,  4*16, 21, 24, tilesetW, tilesetH),
+
 
 		hosting 	= love.graphics.newQuad(0*32,  64, 48,8, tilesetW, tilesetH),
 		connected 	= love.graphics.newQuad(0*32,  72, 48,8, tilesetW, tilesetH)
+	}
+
+	mapicons = {
+		love.graphics.newQuad(7*16,  4*16, 21, 6, tilesetW, tilesetH),
+		love.graphics.newQuad(7*16,  4.5*16, 21,6, tilesetW, tilesetH),
+		love.graphics.newQuad(7*16,  5*16, 21,6, tilesetW, tilesetH),
 	}
 
 	tilesetW, tilesetH = charsheet:getWidth(), charsheet:getHeight()
@@ -305,5 +329,14 @@ function initSprites() -- and quads
 		love.graphics.newQuad(2*48,  0*24, 48, 24, tilesetW, tilesetH),
 		love.graphics.newQuad(3*48,  0*24, 48, 24, tilesetW, tilesetH),
 		love.graphics.newQuad(4*48,  0*24, 48, 24, tilesetW, tilesetH),
+
+	}
+	bio = {
+		love.graphics.newQuad(0,  4*16, 6*16,3*16, tilesetW, tilesetH),
+		love.graphics.newQuad(96,  2*32, 5*16,2*16, tilesetW, tilesetH),
+		love.graphics.newQuad(96,  3*32, 5*16,2*16, tilesetW, tilesetH),
+		love.graphics.newQuad(176,  2*32, 5*16,2*16, tilesetW, tilesetH),
+		love.graphics.newQuad(176,  3*32, 5*16,2*16, tilesetW, tilesetH),
+		love.graphics.newQuad(176,  4*32, 5*16,2*16, tilesetW, tilesetH),
 	}
 end

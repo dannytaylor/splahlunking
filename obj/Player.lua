@@ -57,7 +57,7 @@ function Player:playerStats()
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 40
-		self.breathRate = 3.6
+		self.breathRate = 3.4
 		self.weight = 1.6
 	elseif sp == 3 then
 		self.swimspeed = 24
@@ -90,11 +90,11 @@ function Player:update(dt)
 
 	if pid == self.id then
 		if not self.win then
-			if gametime > gametimeMax then
-				self.win = true
-				if currentsong then currentsong:stop() end
-				currentsong = song3
-			elseif self.tWater > breakTime and self.y < (waterLevel-1)*tileSize then
+			-- if gametime > gametimeMax then
+			-- 	self.win = true
+			-- 	if currentsong then currentsong:stop() end
+			-- 	currentsong = song3
+			if self.tWater > breakTime and self.y < (waterLevel-1)*tileSize then
 				self.win = true
 				self.surface = true
 				love.audio.play(sfx_splash)

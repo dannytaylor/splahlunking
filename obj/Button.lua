@@ -22,9 +22,20 @@ function Button:draw()
 	
 	if self.active then 
 		-- love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
-		love.graphics.draw(titlebuttons,self.imgActive,self.x,self.y)
+		if self.name == 'char' then
+			love.graphics.draw(titlebuttons,self.imgActive,10+(pid-1)*29,45)
+		elseif self.name == 'map' then
+			love.graphics.draw(titlebuttons,self.imgActive,64,54+(mapsel-1)*8)
+		else
+			love.graphics.draw(titlebuttons,self.imgActive,self.x,self.y)
+		end
 	else
-		love.graphics.draw(titlebuttons,self.img,self.x,self.y)
+		if self.name == 'char' then
+			love.graphics.draw(titlebuttons,self.img,10+(pid-1)*29,45)
+		elseif self.name == 'map' then
+		else
+			love.graphics.draw(titlebuttons,self.img,self.x,self.y)
+		end
 	end
 	
 end

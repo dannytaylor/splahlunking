@@ -10,12 +10,16 @@ function love.keypressed(key) -- key bindings
 		end
 	end
 	if gamestate == 0 then
-		if key == 'f2' and windowScale == 4 then 
+		if key == 'f2'  then 
 			windowScale = 8
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f1' and windowScale == 8 then 
+		elseif key == 'f1' then 
 			windowScale = 4
+			windowW, windowH = viewW*windowScale, viewH*windowScale
+			love.window.setMode(windowW, windowH, {msaa = 0})
+		elseif key == 'f3' then 
+			windowScale = 2
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
 		end
@@ -34,8 +38,11 @@ function love.keypressed(key) -- key bindings
 			tankBubbler = nil
 			if currentsong then currentsong:stop() end
 			currentsong = song1
+			matchinprogress = true
 
-			love.graphics.setLineWidth(2)
+			menu.screens['char'].buttons[3].img = btq.c2
+			menu.screens['char'].buttons[3].imgActive = btq.c2a
+
 			if client then 
 				client:disconnect() 
 				client = nil
@@ -46,11 +53,27 @@ function love.keypressed(key) -- key bindings
 			end
 			menu.currentScreen = menu.screens['title']
 			-- love.event.quit()
+
+		-- return to char sel
+		elseif key == 'r' then
+			if server and matchinprogress then -- and match == over then
+				gamestate = 0
+				menu.currentScreen = menu.screens['char']
+				server:sendToAll('returntochar', {
+					num = numConnected,
+				})
+
+				map = Map()
+				server:sendToAll("map",{
+					m = binary_map,
+					n = numConnected
+				})
+			end
 		elseif key == 'q' and debug then
 			cam:setScale(cam:getScale()*2)
 		elseif key == 'e' and debug then
 			cam:setScale(cam:getScale()/2)
-		elseif key == 'r' and debug  then
+		elseif key == 'g' and debug  then
 			map = Map()
 			world:add('player', players[pid].x,players[pid].y,tileSize,tileSize)
 		end
@@ -60,18 +83,37 @@ end
 function menukeys(key)
 	local mcs = menu.currentScreen
 
-	if mcs == menu.screens['char'] and mcs.currentButton.name == 'char' then
-		if key == 'down' or key == 's' then
-			local cc = menu.screens['char'].currentChar[pid]
-			cc = cc - 1
-			if cc < 1 then cc = 5 end
-			menu.screens['char'].currentChar[pid] = cc
-		elseif  key == 'up' or key == 'w' then	
-			local cc = menu.screens['char'].currentChar[pid]
-			cc = cc + 1
-			if cc > 5 then cc = 1 end
-			menu.screens['char'].currentChar[pid] = cc
+	if mcs == menu.screens['char'] then
+		if mcs.currentButton.name == 'char' then
+			if key == 'down' or key == 's' then
+				local cc = menu.screens['char'].currentChar[pid]
+				cc = cc - 1
+				if cc < 1 then cc = 5 end
+				menu.screens['char'].currentChar[pid] = cc
+				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+				love.audio.play(sfx_buttonClick)
+			elseif  key == 'up' or key == 'w' then	
+				local cc = menu.screens['char'].currentChar[pid]
+				cc = cc + 1
+				if cc > 5 then cc = 1 end
+				menu.screens['char'].currentChar[pid] = cc
+				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+				love.audio.play(sfx_buttonClick)
+			end
+		elseif mcs.currentButton.name == 'map' and not client then
+			if key == 'down' or key == 's' then
+				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+				love.audio.play(sfx_buttonClick)
+				if mapsel == 3 then mapsel = 1
+				else mapsel = mapsel + 1 end
+			elseif  key == 'up' or key == 'w' then	
+				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+				love.audio.play(sfx_buttonClick)
+				if mapsel == 1 then mapsel = 3
+				else mapsel = mapsel - 1 end
+			end
 		end
+
 	end
 
 	if key == 'escape' then
@@ -81,6 +123,8 @@ function menukeys(key)
 			love.event.quit()
 		else
 			menu.currentScreen = menu.screens['title']
+			menu.screens['char'].buttons[3].img = btq.c2
+			menu.screens['char'].buttons[3].imgActive = btq.c2a
 			numConnected = 1
 			if client then 
 				client:disconnect() 
@@ -92,37 +136,37 @@ function menukeys(key)
 			end
 		end
 	elseif key == 'left' or key == 'a' then
-		if sfx_button:isPlaying() then sfx_button:stop() end
-		love.audio.play(sfx_button)
-		if #mcs.buttons > 1 then
-			if mcs.buttonIndex == 1 then
-				mcs.buttonIndex = #mcs.buttons
-			else
-				mcs.buttonIndex = mcs.buttonIndex-1
+		if not client then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			if #mcs.buttons > 1 then
+				if mcs.buttonIndex == 1 then
+					mcs.buttonIndex = #mcs.buttons
+				else
+					mcs.buttonIndex = mcs.buttonIndex-1
+				end
+				mcs.currentButton.active = false
+				mcs.currentButton = mcs.buttons[mcs.buttonIndex]
+				mcs.currentButton.active = true
 			end
-			mcs.currentButton.active = false
-			mcs.currentButton = mcs.buttons[mcs.buttonIndex]
-			mcs.currentButton.active = true
 		end
-	elseif key == 'right' or key == 'd' then
-		if sfx_button:isPlaying() then sfx_button:stop() end
-		love.audio.play(sfx_button)
-		if #mcs.buttons > 1 then
-			if mcs.buttonIndex == #mcs.buttons then
-				mcs.buttonIndex = 1
-			else
-				mcs.buttonIndex = mcs.buttonIndex+1
+	elseif key == 'right' or key == 'd' and not client then
+		if not client then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			if #mcs.buttons > 1 then
+				if mcs.buttonIndex == #mcs.buttons then
+					mcs.buttonIndex = 1
+				else
+					mcs.buttonIndex = mcs.buttonIndex+1
+				end
+				mcs.currentButton.active = false
+				mcs.currentButton = mcs.buttons[mcs.buttonIndex]
+				mcs.currentButton.active = true
 			end
-			mcs.currentButton.active = false
-			mcs.currentButton = mcs.buttons[mcs.buttonIndex]
-			mcs.currentButton.active = true
 		end
 	elseif key == 'up' or key == 'w' then
-		if sfx_button:isPlaying() then sfx_button:stop() end
-		love.audio.play(sfx_button)
 	elseif key == 'down' or key == 's' then
-		if sfx_button:isPlaying() then sfx_button:stop() end
-		love.audio.play(sfx_button)
 		
 	elseif key == 'return' or key == 'x' then
 		love.audio.play(sfx_buttonClick)

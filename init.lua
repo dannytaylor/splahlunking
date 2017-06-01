@@ -82,6 +82,7 @@ function initSounds()
 	sfx_explode = love.audio.newSource("sfx/explode.wav","static")
 	sfx_collect = love.audio.newSource("sfx/treasure.wav","static")
 	sfx_death = love.audio.newSource("sfx/death.wav","static")
+	sfx_bubble1 = love.audio.newSource("sfx/bubble1.wav","static")
 
 	song1 =  love.audio.newSource("sfx/song1.wav")
 	song2 = love.audio.newSource("sfx/song2.wav")
@@ -117,6 +118,7 @@ function initSprites() -- and quads
 	}
 
 	sparklesheet = love.graphics.newImage 'img/sparklesheet.png'
+	splashsheet = love.graphics.newImage 'img/splash.png'
 
 	-- playerSheet:setFilter('nearest', 'nearest')
 	-- tileSheet:setFilter('nearest', 'nearest')

@@ -11,7 +11,7 @@ function Menu:initialize()
 	self.canvas = love.graphics.newCanvas(viewW*tileSize*menuscale, viewH*tileSize*menuscale,"normal",0)
 	self.canvas:setFilter("nearest", "nearest")
 
-	titlebgSprite = sodapop.newAnimatedSprite(viewW/2, viewH/2)
+	titlebgSprite = sodapop.newAnimatedSprite(viewW/2, 40)
 	titlebgSprite:addAnimation('bg', {
 		image        = love.graphics.newImage 'img/titlebgSheet.png',
 		frameWidth   = 128,

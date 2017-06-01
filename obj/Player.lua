@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 1
+breakTime = 30
 
 
 function Player:initialize(x,y,id,skin)
@@ -10,7 +10,7 @@ function Player:initialize(x,y,id,skin)
 	self.y = y
 	self.id = id or 1
 	self.bumpName = 'player'..self.id
-	world:add(self.bumpName, self.x,self.y,tileSize,tileSize)
+	world:add(self.bumpName, self.x,self.y,tileSize-1,tileSize-1)
 
 
 	self.right = true 	-- == not left
@@ -55,7 +55,7 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 32 -- higher linearly better
-		self.breathRate = 20 -- lower better
+		self.breathRate = 2 -- lower better
 		self.weight = 1.2
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
@@ -81,11 +81,16 @@ function Player:playerStats()
 end
 
 function Player:draw()
-	-- love.graphics.setColor(255, 0, 255)
-	-- love.graphics.rectangle('fill', self.x, self.y, tileSize, tileSize)
-	-- love.graphics.setColor(255, 255, 255)
-	if self.y > (waterLevel + 1)*tileSize and self.alive then self.bubbler:draw()	end
-	if tankBubbler then tankBubbler:draw() end
+	-- if debug then
+	-- 	love.graphics.setColor(255, 0, 255)
+	-- 	love.graphics.rectangle('fill', self.x, self.y, tileSize-1, tileSize-1)
+	-- 	love.graphics.setColor(255, 255, 255)
+	-- end
+	if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
+	if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
+	if self.gamestate == 'wet' and self.tWater < 0.5 then
+		self.splash:draw()
+	end
 	self.sprite:draw()
 end
 
@@ -114,6 +119,7 @@ function Player:update(dt)
 					if self.gamestate == 'dry' then
 						love.audio.play(sfx_splash)
 						self.gamestate = 'wet' 
+						self.splash:goToFrame(1)
 						self.speedy = self.swimspeed
 						self.speedx = self.swimspeed
 					end
@@ -122,12 +128,14 @@ function Player:update(dt)
 						self.sprite.flipY = true
 						self.nextAnim = 'movey'
 					elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
-						dy = -self.speedy * 2 * dt
-						self.sprite.flipY = false
-						self.nextAnim = 'movey'
-						if self.y < (waterLevel+1)*tileSize then
-							dy = dy/2
-							self.nextAnim = 'idle'
+						if not self.tank or self.y > (waterLevel-0.8)*tileSize then
+							dy = -self.speedy * 2 * dt
+							self.sprite.flipY = false
+							self.nextAnim = 'movey'
+							if self.y < (waterLevel+0.5)*tileSize then
+								dy = dy/2
+								self.nextAnim = 'idle'
+							end
 						end
 					else
 						self.sprite.flipY = false
@@ -286,6 +294,7 @@ function Player:update(dt)
 	if self.alive and not self.surface then self.bubbler:update(dt, self.x+4, self.y-2) end
 	if tankBubbler then tankBubbler:update(dt, self.x+4, self.y-2) end
 	self.sprite:update(dt)
+	if self.tWater < 1 then self.splash:update(dt) end
 end
 
 function treasureAt(x,y)
@@ -298,6 +307,7 @@ end
 
 function Player:spriteInit()
 	self.sprite  = sodapop.newAnimatedSprite()
+
 	self.sprite:setAnchor(function ()
 		return self.x+4,self.y+4
 	end)
@@ -305,7 +315,7 @@ function Player:spriteInit()
 	self.sprite:addAnimation('idle_dry', {
 		image       = playerSheet,
 		frameWidth  = 16,
-		frameHeight = 16,
+		frameHeight = 24,
 		frames      = {
 			{7, self.palette, 7, self.palette, .8},
 		},
@@ -314,7 +324,7 @@ function Player:spriteInit()
 	self.sprite:addAnimation('idle', {
 		image       = playerSheet,
 		frameWidth  = 16,
-		frameHeight = 16,
+		frameHeight = 24,
 		frames      = {
 			{1, self.palette, 2, self.palette, .8},
 		},
@@ -323,7 +333,7 @@ function Player:spriteInit()
 	self.sprite:addAnimation('movex', {
 		image       = playerSheet,
 		frameWidth  = 16,
-		frameHeight = 16,
+		frameHeight = 24,
 		frames      = {
 			{3, self.palette, 4, self.palette, .4},
 		},
@@ -331,7 +341,7 @@ function Player:spriteInit()
 	self.sprite:addAnimation('movey', {
 		image       = playerSheet,
 		frameWidth  = 16,
-		frameHeight = 16,
+		frameHeight = 24,
 		frames      = {
 			{5, self.palette, 6, self.palette, .4},
 		},
@@ -340,7 +350,7 @@ function Player:spriteInit()
 	self.sprite:addAnimation('movex_dry', {
 		image       = playerSheet,
 		frameWidth  = 16,
-		frameHeight = 16,
+		frameHeight = 24,
 		frames      = {
 			{8, self.palette, 11, self.palette, .4},
 		},
@@ -348,10 +358,19 @@ function Player:spriteInit()
 	self.sprite:addAnimation('dead', {
 		image       = playerSheet,
 		frameWidth  = 16,
-		frameHeight = 16,
+		frameHeight = 24,
 		frames      = {
 			{12, self.palette, 13, self.palette, .8},
 		},
 	})
 
+	self.splash  = sodapop.newAnimatedSprite(64*tileSize,8*tileSize+6)
+	self.splash:addAnimation('default', {
+		image       = splashsheet,
+		frameWidth  = 16,
+		frameHeight = 8,
+		frames      = {
+			{1, 1, 4, 1, .1},
+		},
+	})
 end

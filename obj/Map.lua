@@ -139,7 +139,7 @@ function Map:setCanvas()
 			end
 		end
 	end
-	love.graphics.draw(camp[mapsel], 29.25*tileSize, 0)
+	love.graphics.draw(camp[mapsel], 48*tileSize, 0)
 	love.graphics.setCanvas()
 	self.tileCanvas:setFilter("nearest", "nearest")
 end

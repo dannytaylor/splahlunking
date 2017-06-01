@@ -64,8 +64,13 @@ function UI:draw()
 end
 
 function UI:update(dt)
+	local bn = self.breathNum
 	self.breathNum = math.floor((16*players[pid].breath/100))
 	self.scoreNum = math.min(math.floor((8*players[pid].score/100)),8)
+
+	if bn ~= self.breathNum and bn ~= 16 and bn > 0 and (bn%2) == 1 then
+		sfx_bubble1:play()
+	end
 end
 
 function UI:breathbar()

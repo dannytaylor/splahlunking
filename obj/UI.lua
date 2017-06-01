@@ -141,7 +141,7 @@ function UI:playerbar()
 		end
 	end
 	if client or server then
-		if alldone then
+		if alldone and numConnected > 1 then
 			if topscore == 0 then 
 				love.graphics.print('NO WINNERS...', 37, 28)
 			else

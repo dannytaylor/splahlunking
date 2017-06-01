@@ -34,10 +34,22 @@ function Map:initialize(data)
 
 		self:getTreasures()
 	end
+	
 	self:bumpBuild()
 	self:spawnTreasures()
 
-
+	self.playerlight  = sodapop.newAnimatedSprite()
+	self.playerlight:setAnchor(function ()
+		return players[pid].x+4,players[pid].y+4
+	end)
+	self.playerlight:addAnimation('default', {
+		image       = playerLightSheet,
+		frameWidth  = 80,
+		frameHeight = 80,
+		frames      = {
+			{3, 1, 3, 1, 2},
+		},
+	})
 	
 
 
@@ -80,6 +92,8 @@ function Map:init()
 		end
 	end
 
+
+
 end
 
 function Map:draw()
@@ -113,7 +127,7 @@ function Map:draw()
 		else
 			love.graphics.setColor(27, 38, 50)
 		end
-		love.graphics.draw(lightMask, players[pid].x-128, cpy-80, 0, 1, 1)
+		love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1, 1)
 		love.graphics.setColor(255,255,255)
 	end
 end
@@ -122,6 +136,8 @@ function Map:update(dt)
 	for i,t in ipairs(self.treasure) do
 		t:update(dt)
 	end
+
+	self.playerlight:update(dt)
 end
 
 function Map:setCanvas()
@@ -169,7 +185,7 @@ end
 function Map:playertracker()
 	love.graphics.setColor(49, 162, 242)
 	-- love.graphics.circle('fill', players[pid].x, players[pid].y, viewH/2)
-	love.graphics.draw(playerLight, players[pid].x-40, players[pid].y-40, 0, 1, 1)
+	self.playerlight:draw()
 	love.graphics.setColor(255, 255, 255)
 end
 

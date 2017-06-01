@@ -164,7 +164,6 @@ function initClient()
 		ip_join = love.system.getClipboardText()
 	end
 
-	print (ip_join)
 	local ipcheck = string.match(ip_join,"%d+.%d+.%d+.%d+")
 	if ipcheck == ip_join or ip_join == 'localhost' then
 		client = sock.newClient(ip_join, 22122)

@@ -54,28 +54,33 @@ end
 function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
-		self.swimspeed = 32 -- higher linearly better
+		self.swimspeed = 35 -- higher linearly better
 		self.breathRate = 2 -- lower better
-		self.weight = 1.2
+		self.speedMin = 0.80 -- max speed adjustment 
+		self.scoreMax = 80 -- min speed at score
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
-		self.swimspeed = 40
+		self.swimspeed = 42
 		self.breathRate = 2.4
-		self.weight = 1.6
+		self.speedMin = 0.8
+		self.scoreMax = 60 -- min speed at score
 	elseif sp == 3 then
 		self.swimspeed = 24
 		self.breathRate = 1.6
-		self.weight = 1
+		self.speedMin = 1
+		self.scoreMax = 100 -- min speed at score
 	elseif sp == 4 then
 		self.swimspeed = 28
 		self.breathRate = 1.8
-		self.weight = 1.1
+		self.speedMin = 0.95
 		self.tWater = 6
+		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
-		self.swimspeed = 28
+		self.swimspeed = 30
 		self.breathRate = 2.2
 		self.tWater = -6 --higher break points
-		self.weight = 1.2
+		self.speedMin = 0.9
+		self.scoreMax = 60 -- min speed at score
 	end
 	
 end
@@ -182,7 +187,8 @@ function Player:update(dt)
 
 
 				if dx ~= 0 or dy ~= 0 then
-					
+					dx = dx*self.weight
+					dy = dy*self.weight
 					local cols
 					local playerFilter = function (item, other)
 						if other:sub(1,4) == 'trea'  then
@@ -251,6 +257,9 @@ function Player:update(dt)
 
 			if self.activeTreasure.active then 
 				self.score = self.score + self.activeTreasure.value
+				if self.score <= self.scoreMax and self.gamestate == 'wet' then
+					self.weight = math.max(self.speedMin, 1-self.speedMin*self.score/self.scoreMax)
+				end
 				if sfx_collect:isPlaying() then sfx_collect:stop() end
 				love.audio.play(sfx_collect)
 			end
@@ -389,4 +398,6 @@ function Player:spriteInit()
 			{1, 1, 4, 1, .1},
 		},
 	})
+
+	
 end

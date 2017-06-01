@@ -104,7 +104,7 @@ function initSprites() -- and quads
 	titlebuttons = love.graphics.newImage 'img/titlebuttons.png'
 	charsheet = love.graphics.newImage 'img/charsheet.png'
 
-	playerLight = love.graphics.newImage 'img/playerLight.png'
+	playerLightSheet = love.graphics.newImage 'img/playerLightSheet.png'
 	lightMask = love.graphics.newImage 'img/light_mask.png'
 	overlay_dead = love.graphics.newImage 'img/overlay_dead.png'
 
@@ -120,18 +120,7 @@ function initSprites() -- and quads
 	sparklesheet = love.graphics.newImage 'img/sparklesheet.png'
 	splashsheet = love.graphics.newImage 'img/splash.png'
 
-	-- playerSheet:setFilter('nearest', 'nearest')
-	-- tileSheet:setFilter('nearest', 'nearest')
-	-- lightMask:setFilter('nearest', 'nearest')
-	-- uiSheet:setFilter('nearest', 'nearest')
-	-- treasureSheet:setFilter('nearest', 'nearest')
-	-- playerLight:setFilter('nearest', 'nearest')
-	-- titlebg:setFilter('nearest', 'nearest')
-	-- titlebg2:setFilter('nearest', 'nearest')
-	-- titlebuttons:setFilter('nearest', 'nearest')
-	-- titlebg3:setFilter('nearest', 'nearest')
-	-- charsheet:setFilter('nearest', 'nearest')
-	-- overlay_dead:setFilter('nearest', 'nearest')
+
 
 	local tilesetW, tilesetH = tiles[1]:getWidth(), tiles[2]:getHeight()
 	tq = { --tile quads

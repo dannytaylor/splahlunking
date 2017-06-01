@@ -36,6 +36,11 @@ function Menu:draw()
 		titlebgSprite:draw()
 	end
 
+	if self.currentScreen == self.screens['multi'] then 
+		if connectmsg then love.graphics.print(connectmsg, 32, 4) end
+		-- love.graphics.print("ESC TO CANCEL", 40, 10)
+	end
+
 	love.graphics.setCanvas()
 	love.graphics.draw(self.canvas, 0, 0, 0, windowScale/menuscale, windowScale/menuscale)
 end
@@ -80,6 +85,7 @@ function Menu:ss_title()
 		),
 		Button('multi',48,48,btq.b2,btq.b2a,function () 
 			self.currentScreen = self.screens['multi']
+			connectswitch = false
 		end
 		),
 		Button('quit',80,48,btq.b3,btq.b3a,function () 
@@ -106,14 +112,11 @@ function Menu:ss_multi()
 		),
 		Button('join',72,24, btq.m2,btq.m2a,function ()
 			initClient()
-			client:connect()
-			menu.screens['char'].buttons[3].img = btq.c3
-			menu.screens['char'].buttons[3].imgActive = btq.c3a
-
-			ss['char'].currentButton.active = false
-			ss['char'].buttonIndex =  1
-			ss['char'].currentButton =  ss['char'].buttons[1]
-			ss['char'].currentButton.active = true
+			if client then
+				client:connect()
+				connectswitch = true
+				connectmsg = "TRYING CONNECTION..."
+			end
 		end),
 	}
 	ss['multi'].buttonIndex =  1

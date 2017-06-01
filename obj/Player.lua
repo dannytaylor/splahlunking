@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 30
+breakTime = 29
 
 
 function Player:initialize(x,y,id,skin)
@@ -88,8 +88,9 @@ function Player:draw()
 	-- end
 	if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
 	if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
-	if self.gamestate == 'wet' and self.tWater < 0.5 then
-		self.splash:draw()
+
+	if self.splashtimer and splashx and mapsel ~= 3 then
+		self.splash:draw(splashx+4,0)
 	end
 	self.sprite:draw()
 end
@@ -104,7 +105,13 @@ function Player:update(dt)
 			if self.tWater > breakTime and self.y < (waterLevel-1)*tileSize then
 				self.win = true
 				self.surface = true
+
 				love.audio.play(sfx_splash)
+				self.splash:goToFrame(1)
+				splashx = self.x
+				self.splashtimer = 0
+
+
 				if currentsong then currentsong:stop() end
 				currentsong = song3
 			end
@@ -117,9 +124,13 @@ function Player:update(dt)
 				local dx, dy = 0, 0
 				if self.y > (waterLevel-1)*tileSize then
 					if self.gamestate == 'dry' then
-						love.audio.play(sfx_splash)
 						self.gamestate = 'wet' 
+
+						love.audio.play(sfx_splash)
 						self.splash:goToFrame(1)
+						splashx = self.x
+						self.splashtimer = 0
+
 						self.speedy = self.swimspeed
 						self.speedx = self.swimspeed
 					end
@@ -293,8 +304,13 @@ function Player:update(dt)
 	end
 	if self.alive and not self.surface then self.bubbler:update(dt, self.x+4, self.y-2) end
 	if tankBubbler then tankBubbler:update(dt, self.x+4, self.y-2) end
+	if self.splashtimer then
+		self.splashtimer = self.splashtimer + dt
+		self.splash:update(dt) 
+		if self.splashtimer > 0.5 then self.splashtimer = nil end
+	end
+
 	self.sprite:update(dt)
-	if self.tWater < 1 then self.splash:update(dt) end
 end
 
 function treasureAt(x,y)
@@ -364,7 +380,7 @@ function Player:spriteInit()
 		},
 	})
 
-	self.splash  = sodapop.newAnimatedSprite(64*tileSize,8*tileSize+6)
+	self.splash  = sodapop.newAnimatedSprite(0,8*tileSize+6)
 	self.splash:addAnimation('default', {
 		image       = splashsheet,
 		frameWidth  = 16,

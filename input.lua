@@ -58,6 +58,7 @@ function love.keypressed(key) -- key bindings
 		elseif key == 'r' then
 			if alldone and not client then -- and match == over then
 				gamestate = 0
+				tankBubbler = nil
 
 				if currentsong then currentsong:stop() end
 				currentsong = song1
@@ -126,6 +127,8 @@ function menukeys(key)
 	end
 
 	if key == 'escape' then
+		connectswitch = false
+		connectmsg = nil
 		if sfx_button:isPlaying() then sfx_button:stop() end
 		love.audio.play(sfx_button)
 		if mcs == menu.screens['title'] then
@@ -136,7 +139,7 @@ function menukeys(key)
 			menu.screens['char'].buttons[3].imgActive = btq.c2a
 			numConnected = 1
 			if client then 
-				client:disconnect() 
+				if client:isConnected() then client:disconnect() end 
 				client = nil
 			end
 			if server then 

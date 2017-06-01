@@ -19,7 +19,9 @@ function UI:draw()
 	-- love.graphics.setColor(255, 255, 255)
 	-- local lineend = math.max(0,math.floor(viewW*(gametimeMax-gametime)/gametimeMax))
 	-- love.graphics.line(0, viewH, lineend, viewH)
-
+	if players[pid].gamestate == 'dry' then 
+		love.graphics.print('DIVE!', 60, 20)
+	end
 	if not players[pid].win and players[pid].alive then self:breathbar() end
 	self:playerbar()
 	self:scorebar()

@@ -7,6 +7,24 @@ function clientUpdate(dt)
 		tick = tick + dt
 	end
 
+	if connectswitch then
+		if client:isConnected() then
+			menu.screens['char'].buttons[3].img = btq.c3
+			menu.screens['char'].buttons[3].imgActive = btq.c3a
+
+			menu.screens['char'].currentButton.active = false
+			menu.screens['char'].buttonIndex =  1
+			menu.screens['char'].currentButton =  menu.screens['char'].buttons[1]
+			menu.screens['char'].currentButton.active = true
+			connectswitch = nil
+			connectmsg = nil
+		elseif client:isConnecting() then
+			connectmsg = "TRYING CONNECTION..."
+		else
+			connectmsg = "CONNECTION FAILED"
+		end
+	end
+
 	if tick >= tickRate then
 		tick = 0
 		if gamestate == 0 and menu.currentScreen == menu.screens['char'] then
@@ -89,14 +107,19 @@ function initServer()
 
 	server:on("connect", function(data, client)
 		-- Send a message back to the connected client
-		numConnected= server:getClientCount() + 1
-		client:send("pid",{
-			n = numConnected,
-			})
+		if gamestate == 0 then
+			numConnected= server:getClientCount() + 1
+			client:send("pid",{
+				n = numConnected,
+				})
 
-		client:send("map",{
-			m = binary_map,
-			})
+			client:send("map",{
+				m = binary_map,
+				})
+		else
+			client:send("notallowed",{
+				})
+		end
 	end)
 	server:on("clientinfo", function(data)
 		local id                 = data.id
@@ -136,73 +159,81 @@ end
 function initClient()
 	if debug then
 		ip_join = 'localhost'
+		-- ip_join = love.system.getClipboardText()
 	else
 		ip_join = love.system.getClipboardText()
 	end
-	client = sock.newClient(ip_join, 22122)
-	client:setSerialization(bitser.dumps, bitser.loads)
 
-	client:on("connect", function(data)
-		print('connected')
-	end)
-	client:on("pid", function(data)
-		pid = data.n
-	end)
-	client:on("start", function(data)
-		gamestate = data.state
-		numConnected = data.num
-		mapsel = data.msel
-		print(pid)
-		startMatch()
-		gamestate = 1
-	end)
-	client:on("map", function(data)
-		map = nil
-		binary_map = data.m
-		mapdata = bitser.loads(binary_map)
-		initMap()
-		menu.currentScreen = menu.screens['char']
-	end)
-	client:on("serverinfo", function(data)
-		local time  = data[1].time
-		gametime	= time
-		alldone = data[1].ad
+	print (ip_join)
+	local ipcheck = string.match(ip_join,"%d+.%d+.%d+.%d+")
+	if ipcheck == ip_join or ip_join == 'localhost' then
+		client = sock.newClient(ip_join, 22122)
+		client:setSerialization(bitser.dumps, bitser.loads)
 
-		for i=1,numConnected do
-			if i~=pid then
-				local x                 = data[i].x
-				local y                 = data[i].y
+		client:on("connect", function(data)
+			print('connected')
+		end)
+		client:on("notallowed", function(data)
+			client:disconnectNow()
+		end)
+		client:on("pid", function(data)
+			pid = data.n
+		end)
+		client:on("start", function(data)
+			gamestate = data.state
+			numConnected = data.num
+			mapsel = data.msel
+			print(pid)
+			startMatch()
+			gamestate = 1
+		end)
+		client:on("map", function(data)
+			map = nil
+			binary_map = data.m
+			mapdata = bitser.loads(binary_map)
+			initMap()
+			menu.currentScreen = menu.screens['char']
+		end)
+		client:on("serverinfo", function(data)
+			local time  = data[1].time
+			gametime	= time
+			alldone = data[1].ad
 
-				local anim              = data[i].anim
-				local flipX             = data[i].flipX
-				local flipY             = data[i].flipY
+			for i=1,numConnected do
+				if i~=pid then
+					local x                 = data[i].x
+					local y                 = data[i].y
 
-				local score             = data[i].score
-				local breath            = data[i].breath
-				local alive           	= data[i].alive
+					local anim              = data[i].anim
+					local flipX             = data[i].flipX
+					local flipY             = data[i].flipY
 
-				local win           	= data[i].win
-				local surface           = data[i].surface
+					local score             = data[i].score
+					local breath            = data[i].breath
+					local alive           	= data[i].alive
 
-
-				players[i].x            = x
-				players[i].y            = y
-
-
-				players[i].nextAnim     = anim
-				players[i].sprite.flipX = flipX
-				players[i].sprite.flipY = flipY
-
-				players[i].score        = score
-				players[i].breath       = breath
-				players[i].alive       	= alive
-
-				players[i].surface      = surface
-				players[i].win       	= win
+					local win           	= data[i].win
+					local surface           = data[i].surface
 
 
+					players[i].x            = x
+					players[i].y            = y
+
+
+					players[i].nextAnim     = anim
+					players[i].sprite.flipX = flipX
+					players[i].sprite.flipY = flipY
+
+					players[i].score        = score
+					players[i].breath       = breath
+					players[i].alive       	= alive
+
+					players[i].surface      = surface
+					players[i].win       	= win
+
+
+				end
 			end
-		end
 	end)
 	client:on('charserver', function(data)
 		numConnected = data.num
@@ -223,5 +254,9 @@ function initClient()
 		if currentsong then currentsong:stop() end
 		currentsong = song1
 		players = {}
+
 	end)
+	else
+		connectmsg = '   BAD IP ADDRESS' 
+	end
 end 

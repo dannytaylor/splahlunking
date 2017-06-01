@@ -2,9 +2,9 @@
 
 Map = class('Map')
 
-cellIter = 10
-caveGen = 0.515
-floodThresh = 0.28
+cellIter = 12
+caveGen = 0.52
+floodThresh = 0.35
 waterLevel = 10
 maxTreasure = 80
 maxLargeTreasure = 10

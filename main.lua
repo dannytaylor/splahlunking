@@ -1,4 +1,4 @@
-debug = true
+debug = false
 
 -- main.lua
 
@@ -82,7 +82,7 @@ function love.update(dt)
 				alldone = true
 			end
 		end
-		
+
 		if alldone then
 			cam:setPosition(players[pid].x, players[pid].y)
 		end

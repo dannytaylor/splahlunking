@@ -2,8 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 29
-
+breakTime = 26
 
 function Player:initialize(x,y,id,skin)
 	self.x = x 
@@ -19,6 +18,7 @@ function Player:initialize(x,y,id,skin)
 
 	-- movement
 	self.speedx, self.speedy = 8, 48 --dry speed
+	if mapsel == 3 then self.speedx, self.speedy = 32,32 end
 	self.swimspeed = 32
 	self.weight = 1
 
@@ -31,6 +31,7 @@ function Player:initialize(x,y,id,skin)
 	self.currentAnim = 'idle_dry'
 	self.nextAnim = self.currentAnim
 	self.sprite = 'idle_dry'
+	self.emoteTimer = nil
 	self.bubbler = Bubbler()
 
 	-- for UI
@@ -38,6 +39,9 @@ function Player:initialize(x,y,id,skin)
 	self.breath = 100
 	self.breathRate = 1.5
 	self.tWater = 0
+
+	self.scoreMax = 100
+	self.speedMin = 1
 
 	self.alive = true
 	self.tank = true
@@ -81,6 +85,20 @@ function Player:playerStats()
 		self.tWater = -6 --higher break points
 		self.speedMin = 0.9
 		self.scoreMax = 60 -- min speed at score
+	elseif sp == 6 then
+		if debug then
+			self.swimspeed = 80
+			self.breathRate = 10
+			self.tWater = math.max(1,breakTime-2) --higher break points
+			self.speedMin = 1
+			self.scoreMax = 60 -- min speed at score
+		else
+			self.swimspeed = 60
+			self.breathRate = 4
+			self.tWater = math.max(1,breakTime-8) --higher break points
+			self.speedMin = 1
+			self.scoreMax = 60 -- min speed at score
+		end
 	end
 	
 end
@@ -102,6 +120,9 @@ end
 
 function Player:update(dt)
 	if pid == self.id then
+
+		gametime = gametime + dt
+	
 		if not self.win then
 			-- if gametime > gametimeMax then
 			-- 	self.win = true
@@ -111,7 +132,7 @@ function Player:update(dt)
 				self.win = true
 				self.surface = true
 
-				love.audio.play(sfx_splash)
+				if mapsel ~= 3 then love.audio.play(sfx_splash) end
 				self.splash:goToFrame(1)
 				splashx = self.x
 				self.splashtimer = 0
@@ -120,10 +141,10 @@ function Player:update(dt)
 				if currentsong then currentsong:stop() end
 				currentsong = song3
 			end
-			if self.alive and not self.win then
+			if self.alive and not self.win and not self.emoteTimer and (gametime > 6 or debug) then
 
 				self.nextAnim = nil
-				if self.gamestate == 'dry' then self.nextAnim = 'idle_dry' 
+				if self.gamestate == 'dry' and mapsel ~= 3 then self.nextAnim = 'idle_dry' 
 				else self.nextAnim = 'idle' end
 
 				local dx, dy = 0, 0
@@ -131,7 +152,7 @@ function Player:update(dt)
 					if self.gamestate == 'dry' then
 						self.gamestate = 'wet' 
 
-						love.audio.play(sfx_splash)
+						if mapsel ~= 3 then love.audio.play(sfx_splash) end
 						self.splash:goToFrame(1)
 						splashx = self.x
 						self.splashtimer = 0
@@ -145,25 +166,33 @@ function Player:update(dt)
 						self.nextAnim = 'movey'
 					elseif love.keyboard.isDown('up') or love.keyboard.isDown('w') then
 						if not self.tank or self.y > (waterLevel-0.8)*tileSize then
-							dy = -self.speedy * 2 * dt
-							self.sprite.flipY = false
-							self.nextAnim = 'movey'
-							if self.y < (waterLevel+0.5)*tileSize then
-								dy = dy/2
-								self.nextAnim = 'idle'
-							end
+								dy = -self.speedy * 2 * dt
+								self.sprite.flipY = false
+								self.nextAnim = 'movey'
+								if self.y < (waterLevel+0.5)*tileSize then
+									dy = dy/2
+									self.nextAnim = 'idle'
+								end
 						end
 					else
 						self.sprite.flipY = false
 					end
 				else
-					dy = self.speedy * 2 * dt
+					if mapsel == 3 then 
+						if love.keyboard.isDown('up') or love.keyboard.isDown('w') then
+							dy = -self.speedy * 2 * dt
+						elseif love.keyboard.isDown('down') or love.keyboard.isDown('s') then 
+							dy = self.speedy * 2 * dt
+						end
+					else
+						dy = self.speedy * 2 * dt
+					end
 				end
 
 				if love.keyboard.isDown('right') or love.keyboard.isDown('d') then
 					dx = self.speedx * dt
 					self.sprite.flipX = false
-					if self.gamestate == 'dry' then
+					if self.gamestate == 'dry' and mapsel ~= 3 then
 						self.nextAnim = 'movex_dry'
 					else
 						self.nextAnim = 'movex'
@@ -172,7 +201,7 @@ function Player:update(dt)
 				elseif love.keyboard.isDown('left') or love.keyboard.isDown('a') then
 					dx = -self.speedx * dt
 					self.sprite.flipX = true
-					if self.gamestate == 'dry' then
+					if self.gamestate == 'dry' and mapsel ~= 3 then
 						self.nextAnim = 'movex_dry'
 					else
 						self.nextAnim = 'movex'
@@ -305,12 +334,31 @@ function Player:update(dt)
 		end
 	end
 
+	if self.emoteTimer then
+		if self.emoteTimer == 0 then
+			self.sprite:switch('emote')
+			self.nextAnim = 'emote'
+			self.currentAnim = 'emote'
+		end
 
-
-	if self.nextAnim and self.nextAnim ~= self.currentAnim then
+		self.emoteTimer = self.emoteTimer + dt
+		if 
+			self.emoteTimer > 0.8 then self.emoteTimer = nil 
+			if self.gamestate == 'dry' then
+				self.sprite:switch("idle_dry")
+				self.nextAnim = 'idle_dry'
+				self.currentAnim = 'idle_dry'
+			else
+				self.sprite:switch("idle")
+				self.nextAnim = 'idle'
+				self.currentAnim = 'idle'
+			end
+		end
+	elseif self.nextAnim and self.nextAnim ~= self.currentAnim then
 		self.currentAnim = self.nextAnim
 		self.sprite:switch(self.currentAnim)
 	end
+
 	if self.alive and not self.surface then self.bubbler:update(dt, self.x+4, self.y-2) end
 	if tankBubbler then tankBubbler:update(dt, self.x+4, self.y-2) end
 	if self.splashtimer then
@@ -386,6 +434,14 @@ function Player:spriteInit()
 		frameHeight = 24,
 		frames      = {
 			{12, self.palette, 13, self.palette, .8},
+		},
+	})
+	self.sprite:addAnimation('emote', {
+		image       = playerSheet,
+		frameWidth  = 16,
+		frameHeight = 24,
+		frames      = {
+			{12, self.palette, 13, self.palette, .2},
 		},
 	})
 

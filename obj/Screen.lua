@@ -40,7 +40,7 @@ function Screen:draw()
 		end
 
 		-- single info sheet
-		love.graphics.draw(charsheet,csq[self.currentChar[pid]+5],16,55)
+		love.graphics.draw(charsheet,csq[self.currentChar[pid]+numChars],16,55)
 
 		-- bg map
 		love.graphics.draw(titlebuttons,btq.mapbg,68,54)

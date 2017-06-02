@@ -60,11 +60,14 @@ end
 function startMatch()
 	map:setQuads()
 	map:setCanvas()
+	mapoverlay_init()
+
+	gametime = 0
 	-- init players
 	local spawnx = { 59, 69, 57,71}
 	print('pid: '..pid..', numconnected: '.. numConnected)
 	for i=1,numConnected do
-		players[i] = Player(spawnx[i]*tileSize,7*tileSize,i,menu.screens['char'].currentChar[i])
+		players[i] = Player(spawnx[i]*tileSize,7*tileSize+1,i,menu.screens['char'].currentChar[i])
 	end
 	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
 	cam:setScale(windowScale)
@@ -100,7 +103,8 @@ function initSprites() -- and quads
 		love.graphics.newImage 'img/tiles3.png',
 	}
 	uiSheet = love.graphics.newImage 'img/uiSheet.png'
-	treasureSheet = love.graphics.newImage 'img/treasureSheet.png'
+	treasureSheet1 = love.graphics.newImage 'img/treasureSheet1.png'
+	treasureSheet3 = love.graphics.newImage 'img/treasureSheet3.png'
 	titlebuttons = love.graphics.newImage 'img/titlebuttons.png'
 	charsheet = love.graphics.newImage 'img/charsheet.png'
 
@@ -119,6 +123,12 @@ function initSprites() -- and quads
 
 	sparklesheet = love.graphics.newImage 'img/sparklesheet.png'
 	splashsheet = love.graphics.newImage 'img/splash.png'
+
+	moAni_sheets = {
+		love.graphics.newImage 'img/camp1_ani.png',
+		love.graphics.newImage 'img/camp3_ani.png',
+		love.graphics.newImage 'img/camp3_ani.png'
+	}
 
 
 
@@ -251,9 +261,10 @@ function initSprites() -- and quads
 		love.graphics.newQuad(2*tileSize,  2*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		love.graphics.newQuad(2*tileSize,  3*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		love.graphics.newQuad(2*tileSize,  4*tileSize, tileSize, tileSize, tilesetW, tilesetH),
+		love.graphics.newQuad(3*tileSize,  4*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 	}
 
-	tilesetW, tilesetH = treasureSheet:getWidth(), treasureSheet:getHeight()
+	tilesetW, tilesetH = treasureSheet1:getWidth(), treasureSheet1:getHeight()
 	
 	trq = { -- treasure quads
 		t1  = love.graphics.newQuad(0*tileSize,  0*tileSize, tileSize, tileSize, tilesetW, tilesetH),
@@ -310,6 +321,7 @@ function initSprites() -- and quads
 	}
 
 	tilesetW, tilesetH = charsheet:getWidth(), charsheet:getHeight()
+	numChars = 6
 	csq = { --char select icon quads
 		--portraits
 		love.graphics.newQuad(0*48,  1*24, 24, 32, tilesetW, tilesetH),
@@ -317,12 +329,14 @@ function initSprites() -- and quads
 		love.graphics.newQuad(2*48,  1*24, 24, 32, tilesetW, tilesetH),
 		love.graphics.newQuad(3*48,  1*24, 24, 32, tilesetW, tilesetH),
 		love.graphics.newQuad(4*48,  1*24, 24, 32, tilesetW, tilesetH),
+		love.graphics.newQuad(5*48,  1*24, 24, 32, tilesetW, tilesetH),
 
 		love.graphics.newQuad(0*48,  0*24, 48, 24, tilesetW, tilesetH),
 		love.graphics.newQuad(1*48,  0*24, 48, 24, tilesetW, tilesetH),
 		love.graphics.newQuad(2*48,  0*24, 48, 24, tilesetW, tilesetH),
 		love.graphics.newQuad(3*48,  0*24, 48, 24, tilesetW, tilesetH),
 		love.graphics.newQuad(4*48,  0*24, 48, 24, tilesetW, tilesetH),
+		love.graphics.newQuad(5*48,  0*24, 48, 24, tilesetW, tilesetH),
 
 	}
 	bio = {
@@ -332,5 +346,6 @@ function initSprites() -- and quads
 		love.graphics.newQuad(176,  2*32, 5*16,2*16, tilesetW, tilesetH),
 		love.graphics.newQuad(176,  3*32, 5*16,2*16, tilesetW, tilesetH),
 		love.graphics.newQuad(176,  4*32, 5*16,2*16, tilesetW, tilesetH),
+		love.graphics.newQuad(176,  5*32, 5*16,2*16, tilesetW, tilesetH),
 	}
 end

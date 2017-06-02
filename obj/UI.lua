@@ -9,6 +9,16 @@ function UI:initialize()
 	self.breathNum = 0
 	self.scoreNum = 0
 	love.graphics.setLineWidth(1)
+	self.tankmsg  = sodapop.newAnimatedSprite(68,24)
+	self.tankmsg:addAnimation('default', {
+		image       = love.graphics.newImage('img/tankmsgsheet.png'),
+		frameWidth  = 48,
+		frameHeight = 16,
+		frames      = {
+			{1, 1, 5, 1, .4},
+		},
+	})
+
 end
 
 function UI:draw()
@@ -19,12 +29,13 @@ function UI:draw()
 	-- love.graphics.setColor(255, 255, 255)
 	-- local lineend = math.max(0,math.floor(viewW*(gametimeMax-gametime)/gametimeMax))
 	-- love.graphics.line(0, viewH, lineend, viewH)
-	if players[pid].gamestate == 'dry' then 
+	if players[pid].y < (waterLevel+2)*tileSize and players[pid].tWater < breakTime and gametime>6 then 
 		love.graphics.print('DIVE!', 60, 20)
 	end
 	if not players[pid].win and players[pid].alive then self:breathbar() end
 	self:playerbar()
 	self:scorebar()
+	self:countdown()
 
 	-- if debug then
 	-- 	love.graphics.setColor(255, 255, 255)
@@ -56,7 +67,8 @@ function UI:draw()
 	-- elseif gametime > gametimeMax then
 	-- 	love.graphics.draw(uiSheet,uiq.timemsg,40,16)
 	elseif tankBubbler then
-		love.graphics.draw(uiSheet,uiq.tankmsg,44,16)
+		-- love.graphics.draw(uiSheet,uiq.tankmsg,44,16)
+		self.tankmsg:draw()
 	end
 
 
@@ -70,8 +82,19 @@ function UI:update(dt)
 	self.breathNum = math.floor((16*players[pid].breath/100))
 	self.scoreNum = math.min(math.floor((8*players[pid].score/100)),8)
 
-	if bn ~= self.breathNum and bn ~= 16 and bn > 0 and (bn%2) == 1 then
+	if bn ~= self.breathNum and bn ~= 16 and bn > 0  then --and (bn%2) == 1
 		sfx_bubble1:play()
+	end
+	if tankBubbler then
+		-- love.graphics.draw(uiSheet,uiq.tankmsg,44,16)
+		self.tankmsg:update(dt)
+	end
+end
+
+function UI:countdown()
+	if gametime <= 6 then
+		love.graphics.print('READY IN', 53, 14)
+		love.graphics.print(3-math.floor(gametime/2), 66, 20)
 	end
 end
 

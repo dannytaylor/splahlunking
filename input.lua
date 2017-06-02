@@ -10,16 +10,16 @@ function love.keypressed(key) -- key bindings
 		end
 	end
 	if gamestate == 0 then
-		if key == 'f2'  then 
-			windowScale = 8
+		if key == 'f1' and windowScale~=2 then 
+			windowScale = 2
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f1' then 
+		elseif key == 'f2' and windowScale~=4 then 
 			windowScale = 4
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f3' then 
-			windowScale = 2
+		elseif key == 'f3' and windowScale~=8 then 
+			windowScale = 8
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
 		end
@@ -86,14 +86,22 @@ function love.keypressed(key) -- key bindings
 		elseif key == 'g' and debug  then
 			map = Map()
 			world:add('player', players[pid].x,players[pid].y,tileSize,tileSize)
+		elseif key == 'x' or key == 'return'  then
+			if not players[pid].emoteTimer and gametime > 0 and players[pid].alive then
+				players[pid].emoteTimer = 0 
+			end
 		end
 	end
 end
 
 function menukeys(key)
 	local mcs = menu.currentScreen
-
 	if mcs == menu.screens['char'] then
+		if key == 'f4' then
+			menu.screens['char'].currentChar[pid] = 6
+			if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+			love.audio.play(sfx_buttonClick)
+		end
 		if mcs.currentButton.name == 'char' then
 			if key == 'down' or key == 's' then
 				local cc = menu.screens['char'].currentChar[pid]

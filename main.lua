@@ -16,6 +16,7 @@ bitser  = require "lib/bitser"
 require 'init'
 require 'input'
 require 'sockhelper'
+require 'mapoverlay'
 
 require 'obj/Map'
 require 'obj/Player'
@@ -36,7 +37,6 @@ if debug then mute = true end
 function love.load()
 	math.randomseed(os.time())
 	love.graphics.setDefaultFilter('nearest', 'nearest',0)
-
 	init()
 end
 
@@ -64,31 +64,33 @@ function love.update(dt)
 		end
 
 		-- cam swps
-		if not alldone then
-			if not players[pid].alive or players[pid].surface then 
-				players[pid].deadtimer = players[pid].deadtimer + dt
-				local cp = pid -- cam player
-				if players[pid].deadtimer > deadtime then
-					for i=1, numConnected do
-						if players[i].alive and not players[i].surface then
-							cp = i
-						break end
+			if not alldone then
+				if not players[pid].alive or players[pid].surface then 
+					players[pid].deadtimer = players[pid].deadtimer + dt
+					local cp = pid -- cam player
+					if players[pid].deadtimer > deadtime then
+						for i=1, numConnected do
+							if players[i].alive and not players[i].surface then
+								cp = i
+							break end
+						end
 					end
+					cam:setPosition(players[cp].x, players[cp].y)
 				end
-				cam:setPosition(players[cp].x, players[cp].y)
+
+				if dc == numConnected then
+					alldone = true
+				end
 			end
 
-			if dc == numConnected then
-				alldone = true
+			if alldone then
+				cam:setPosition(players[pid].x, players[pid].y)
 			end
-		end
-
-		if alldone then
-			cam:setPosition(players[pid].x, players[pid].y)
-		end
+		-- cam swps end
 
 		ui:update(dt)
 		map:update(dt)
+		mapoverlay_update(dt)
 
 	end
 
@@ -107,6 +109,8 @@ function love.draw()
 			for i=1,numConnected do
 				players[i]:draw()
 			end
+
+			mapoverlay_draw()
 		end)
 
 

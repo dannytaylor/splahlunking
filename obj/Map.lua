@@ -4,10 +4,10 @@ Map = class('Map')
 
 cellIter = 12
 caveGen = 0.52
-floodThresh = 0.35
+floodThresh = 0.40
 waterLevel = 10
-maxTreasure = 80
-maxLargeTreasure = 10
+maxTreasure = 90
+maxLargeTreasure = 12
 
 function Map:initialize(data)
 	if data then
@@ -19,6 +19,7 @@ function Map:initialize(data)
 		self.treasurePoints = data.t
 	else
 		self.w, self.h = 0,0
+		self.attempts = 0 
 		self.state = {}
 		self.caveState = {}
 		self.tileState = {}
@@ -34,7 +35,7 @@ function Map:initialize(data)
 
 		self:getTreasures()
 	end
-	
+
 	self:bumpBuild()
 	self:spawnTreasures()
 
@@ -117,18 +118,18 @@ function Map:draw()
 
 	if mapsel ~=3 
 		-- and players[pid].gamestate == 'wet' 
-		and cpy > waterLevel*tileSize+24
+		and cpy > waterLevel*tileSize+28
 		and players[pid].palette ~=5 
 		-- and players[pid].alive 
 		and not players[pid].surface 
 		and players[pid].deadtimer < deadtime then
-		if mapsel == 1  then 
-			love.graphics.setColor(0,0,0)
-		else
-			love.graphics.setColor(27, 38, 50)
-		end
-		love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1, 1)
-		love.graphics.setColor(255,255,255)
+			if mapsel == 1  then 
+				love.graphics.setColor(0,0,0)
+			else
+				love.graphics.setColor(27, 38, 50)
+			end
+			love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1, 1)
+			love.graphics.setColor(255,255,255)
 	end
 end
 
@@ -215,7 +216,9 @@ function Map:buildCave()
 	self:floodFill()
 	local caveArea = caveW*caveH
 	local floodPercent = numFlood/caveArea
-	if floodPercent < floodThresh then 
+	if floodPercent < floodThresh then
+		self.attempts = self.attempts + 1
+		if self.attempts > 10000 then love.event.quit() end
 		self:buildCave()
 		return false
 	end -- redo if not enough filled
@@ -530,7 +533,7 @@ function Map:getLargeFloorPoint()
 	local p1good = false
 
 	while not p1good do
-		x1,y1 = math.random(3,self.w-2), math.random(math.floor(self.h/2),self.h-2)
+		x1,y1 = math.random(3,self.w-2), math.random(math.floor(self.h/3),self.h-2)
 		if  self.state[x1][y1] == 'floor' and  
 			self.state[x1][y1+1] == 'wall' and  
 			self.state[x1+1][y1+1] == 'wall' and  

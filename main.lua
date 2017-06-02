@@ -1,6 +1,6 @@
-debug = true
+debug = false
 
--- main.lua
+-- main.luafalse
 
 class 	= require 'lib/middleclass'
 lume    = require 'lib/lume'    	-- basic helper functions   https://github.com/rxi/lume/

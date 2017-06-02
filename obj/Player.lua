@@ -115,7 +115,11 @@ function Player:draw()
 	if self.splashtimer and splashx and mapsel ~= 3 then
 		self.splash:draw(splashx+4,0)
 	end
-	self.sprite:draw()
+	if self.gamestate == 'dry' then
+		self.sprite:draw(0,-3)
+	else
+		self.sprite:draw(0,-3)
+	end
 end
 
 function Player:update(dt)
@@ -441,7 +445,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{12, self.palette, 13, self.palette, .2},
+			{14, self.palette, 21, self.palette, .1},
 		},
 	})
 

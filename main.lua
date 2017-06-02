@@ -1,6 +1,6 @@
-debug = false
+debug = true
 
--- main.luafalse
+-- main.lua
 
 class 	= require 'lib/middleclass'
 lume    = require 'lib/lume'    	-- basic helper functions   https://github.com/rxi/lume/
@@ -66,16 +66,20 @@ function love.update(dt)
 		-- cam swps
 			if not alldone then
 				if not players[pid].alive or players[pid].surface then 
+					if fid ~= pid then followtimer = followtimer + dt end
 					players[pid].deadtimer = players[pid].deadtimer + dt
 					local cp = pid -- cam player
-					if players[pid].deadtimer > deadtime then
-						for i=1, numConnected do
-							if players[i].alive and not players[i].surface then
-								cp = i
-							break end
-						end
+					for i=1, numConnected do
+						if players[i].alive and not players[i].win then
+							cp = i
+						break end
 					end
-					cam:setPosition(players[cp].x, players[cp].y)
+					if fid ~= cp then 
+						fid = cp
+						followtimer = 0
+					elseif followtimer>deadtime then
+						cam:setPosition(players[fid].x, players[fid].y)
+					end
 				end
 
 				if dc == numConnected then

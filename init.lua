@@ -11,6 +11,8 @@ tickRate = 1/60
 
 
 gametime = 0
+fid = 1
+followtimer = 0
 
 
 function init()
@@ -63,11 +65,14 @@ function startMatch()
 	mapoverlay_init()
 
 	gametime = 0
+	fid = pid
 	-- init players
-	local spawnx = { 59, 69, 57,71}
+	local spawnx = { 59, 68.5, 57,70.5}
 	print('pid: '..pid..', numconnected: '.. numConnected)
 	for i=1,numConnected do
 		players[i] = Player(spawnx[i]*tileSize,7*tileSize+1,i,menu.screens['char'].currentChar[i])
+		if i > 2 then players[i].sprite.flipX = true end
+		if mapsel ~=3 and i > 2 then players[i].speedx = 14 end
 	end
 	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
 	cam:setScale(windowScale)
@@ -243,7 +248,7 @@ function initSprites() -- and quads
 		dead   	 = love.graphics.newQuad(3*tileSize,  0*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		winning  = love.graphics.newQuad(3*tileSize,  1*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		hl  	 = love.graphics.newQuad(3*tileSize,  2*tileSize, tileSize, tileSize, tilesetW, tilesetH),
-		surface	 = love.graphics.newQuad(3*tileSize,  3*tileSize, tileSize, tileSize, tilesetW, tilesetH),
+		check	 = love.graphics.newQuad(3*tileSize,  3*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 
 		tank1  	 = love.graphics.newQuad(0*tileSize,  3*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 		tank2  	 = love.graphics.newQuad(0*tileSize,  4*tileSize, tileSize, tileSize, tilesetW, tilesetH),

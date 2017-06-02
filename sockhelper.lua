@@ -82,6 +82,8 @@ function serverUpdate(dt)
 					score  = players[i].score,
 					breath = players[i].breath,
 					alive = players[i].alive,
+					surface = players[i].surface,
+					win = players[i].win,
 
 					time = gametime,
 					ad = alldone,
@@ -165,6 +167,7 @@ function initClient()
 	end
 
 	local ipcheck = string.match(ip_join,"%d+.%d+.%d+.%d+")
+	print (ipcheck)
 	if ipcheck == ip_join or ip_join == 'localhost' then
 		client = sock.newClient(ip_join, 22122)
 		client:setSerialization(bitser.dumps, bitser.loads)

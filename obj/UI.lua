@@ -34,7 +34,7 @@ function UI:draw()
 	end
 	if not players[pid].win and players[pid].alive then self:breathbar() end
 	self:playerbar()
-	self:scorebar()
+	if fid == pid then self:scorebar() end
 	self:countdown()
 
 	-- if debug then
@@ -50,18 +50,27 @@ function UI:draw()
 		end
 	end
 	if not players[pid].alive then
-		love.graphics.draw(overlay_dead, 0, 0)
-		love.graphics.print('SCORE:'..players[pid].score, 53, 21)
+		-- love.graphics.draw(overlay_dead, 0, 0)
+		love.graphics.print('UR DEAD,BUD', 48, 12)
+		love.graphics.print('YOUR SCORE:'..players[pid].score, 45, 19)
 
 		if not alldone then
-			love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
+			if fid ~= pid and followtimer > deadtime then 
+				love.graphics.print('WATCHING P'..fid, 50, 56) 
+			else
+				love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
+			end
 		end
 
 	elseif players[pid].surface then
-		love.graphics.draw(uiSheet,uiq.alivemsg,44,14)
-		love.graphics.print('SCORE:'..players[pid].score, 53, 21)
+		love.graphics.draw(uiSheet,uiq.alivemsg,44,12)
+		love.graphics.print('YOUR SCORE:'..players[pid].score, 45, 19)
 		if not alldone then
-			love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
+			if fid ~= pid and followtimer > deadtime then 
+				love.graphics.print('WATCHING P'..fid, 50, 56) 
+			else
+				love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
+			end
 		end
 
 	-- elseif gametime > gametimeMax then
@@ -158,6 +167,9 @@ function UI:playerbar()
 			elseif not players[i].alive then
 				love.graphics.draw(uiSheet, uiq.dead, x, 4)
 			end
+			if players[i].win then
+				love.graphics.draw(uiSheet, uiq.check, x, 0)
+			end
 			if i == pid then
 				love.graphics.draw(uiSheet, uiq.hl, x, 0)
 			end
@@ -166,11 +178,12 @@ function UI:playerbar()
 	if client or server then
 		if alldone and numConnected > 1 then
 			if topscore == 0 then 
-				love.graphics.print('NO WINNERS...', 37, 28)
+				love.graphics.print('NO WINNERS...', 48, 26)
 			else
-				love.graphics.print('WINNING SCORE:'..topscore, 37, 28)
+				love.graphics.print('WINNING SCORE:'..topscore, 40, 26)
 			end
 		end
 	end
 end
+
 

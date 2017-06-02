@@ -18,6 +18,8 @@ function Map:initialize(data)
 		self.treasure = {}
 		self.treasurePoints = data.t
 	else
+		maxTreasure = 80*(1+(numConnected)/4)
+		maxLargeTreasure = 12*(1+(numConnected)/4)
 		self.w, self.h = 0,0
 		self.attempts = 0 
 		self.state = {}

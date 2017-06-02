@@ -1,6 +1,5 @@
 -- Breath.lua
 
--- Treasure.lua
 
 Treasure = class('Treasure')
 

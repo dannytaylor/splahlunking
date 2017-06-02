@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 26
+breakTime = 35
 
 function Player:initialize(x,y,id,skin)
 	self.x = x 
@@ -74,16 +74,16 @@ function Player:playerStats()
 		self.speedMin = 1
 		self.scoreMax = 100 -- min speed at score
 	elseif sp == 4 then
-		self.swimspeed = 28
+		self.swimspeed = 32
 		self.breathRate = 1.8
-		self.speedMin = 0.95
+		self.speedMin = 0.90
 		self.tWater = 6
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
-		self.swimspeed = 30
+		self.swimspeed = 28
 		self.breathRate = 2.2
 		self.tWater = -6 --higher break points
-		self.speedMin = 0.9
+		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
 	elseif sp == 6 then
 		if debug then
@@ -94,8 +94,8 @@ function Player:playerStats()
 			self.scoreMax = 60 -- min speed at score
 		else
 			self.swimspeed = 60
-			self.breathRate = 4
-			self.tWater = math.max(1,breakTime-8) --higher break points
+			self.breathRate = 5
+			self.tWater = breakTime/2 --higher break points
 			self.speedMin = 1
 			self.scoreMax = 60 -- min speed at score
 		end
@@ -118,7 +118,7 @@ function Player:draw()
 	if self.gamestate == 'dry' then
 		self.sprite:draw(0,-3)
 	else
-		self.sprite:draw(0,-3)
+		self.sprite:draw()
 	end
 end
 
@@ -338,7 +338,7 @@ function Player:update(dt)
 		end
 	end
 
-	if self.emoteTimer then
+	if self.emoteTimer and self.alive then
 		if self.emoteTimer == 0 then
 			self.sprite:switch('emote')
 			self.nextAnim = 'emote'

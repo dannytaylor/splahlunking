@@ -106,14 +106,14 @@ function menukeys(key)
 			if key == 'down' or key == 's' then
 				local cc = menu.screens['char'].currentChar[pid]
 				cc = cc - 1
-				if cc < 1 then cc = 5 end
+				if cc < 1 then cc = 6 end
 				menu.screens['char'].currentChar[pid] = cc
 				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
 				love.audio.play(sfx_buttonClick)
 			elseif  key == 'up' or key == 'w' then	
 				local cc = menu.screens['char'].currentChar[pid]
 				cc = cc + 1
-				if cc > 5 then cc = 1 end
+				if cc > 6 then cc = 1 end
 				menu.screens['char'].currentChar[pid] = cc
 				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
 				love.audio.play(sfx_buttonClick)

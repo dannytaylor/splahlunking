@@ -46,6 +46,7 @@ function clientUpdate(dt)
 				score  = players[pid].score,
 				breath = players[pid].breath,
 				alive = players[pid].alive,
+				tank = players[pid].tank,
 
 				surface = players[pid].surface,
 				win = players[pid].win,
@@ -81,8 +82,11 @@ function serverUpdate(dt)
 
 					score  = players[i].score,
 					breath = players[i].breath,
+
 					alive = players[i].alive,
 					surface = players[i].surface,
+					tank = players[i].tank,
+
 					win = players[i].win,
 
 					time = gametime,
@@ -135,6 +139,7 @@ function initServer()
 		local score              = data.score
 		local breath             = data.breath
 		local alive	             = data.alive
+		local tank	             = data.tank
 
 		local surface      		= data.surface
 		local win      		 	= data.win
@@ -149,6 +154,7 @@ function initServer()
 		players[id].score        = score
 		players[id].breath       = breath
 		players[id].alive      	 = alive
+		players[id].tank      	 = tank
 
 		players[id].surface      = surface
 		players[id].win      	 = win
@@ -213,6 +219,7 @@ function initClient()
 					local score             = data[i].score
 					local breath            = data[i].breath
 					local alive           	= data[i].alive
+					local tank           	= data[i].tank
 
 					local win           	= data[i].win
 					local surface           = data[i].surface
@@ -229,6 +236,7 @@ function initClient()
 					players[i].score        = score
 					players[i].breath       = breath
 					players[i].alive       	= alive
+					players[i].tank       	= tank
 
 					players[i].surface      = surface
 					players[i].win       	= win

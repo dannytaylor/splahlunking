@@ -226,6 +226,8 @@ function Player:update(dt)
 					local playerFilter = function (item, other)
 						if other:sub(1,4) == 'trea'  then
 							return 'cross'
+						elseif other:sub(1,4) == 'brea'  then
+							return 'cross'
 						elseif other:sub(1,4) == 'wall'  then
 							return 'slide'
 						else
@@ -243,11 +245,12 @@ function Player:update(dt)
 						if other:sub(1,4) == 'trea'  then
 							self.currentTreasure = other
 						else 
-							-- if self.activeTreasure then
-							-- 	self.activeTreasure.hovered = false
-							-- 	self.activeTreasure = nil
-							-- end
 							self.currentTreasure = nil
+						end
+						if other:sub(1,4) == 'brea'  then
+							self.currentBreath = other
+						else 
+							self.currentBreath = nil
 					 	end
 					end
 				end
@@ -297,14 +300,24 @@ function Player:update(dt)
 				love.audio.play(sfx_collect)
 			end
 			self.activeTreasure.active = false
+		elseif self.currentBreath and not self.tank then
+			self.activeBreath = breathAt(world:getRect(self.currentBreath))
+			if self.activeBreath.active then
+				self.breath = self.breath + breathPlus
+				if self.breath > 100 then self.breath = 100 end
+				if sfx_collect:isPlaying() then sfx_collect:stop() end
+				love.audio.play(sfx_collect)
+			end
+			self.activeBreath.active = false
 		end
-
 
 
 	else
 		local cols
 		local playerFilter = function (item, other)
 			if other:sub(1,4) == 'trea'  then
+				return 'cross'
+			elseif other:sub(1,4) == 'brea'  then
 				return 'cross'
 			elseif other:sub(1,4) == 'wall'  then
 				return 'slide'
@@ -320,21 +333,21 @@ function Player:update(dt)
 			if other:sub(1,4) == 'trea'  then
 				self.currentTreasure = other
 			else 
-				-- if self.activeTreasure then
-				-- 	self.activeTreasure.hovered = false
-				-- 	self.activeTreasure = nil
-				-- end
 				self.currentTreasure = nil
+		 	end
+		 	if other:sub(1,4) == 'brea'  then
+				self.currentBreath = other
+			else 
+				self.currentBreath = nil
 		 	end
 		end
 
 		if self.currentTreasure then
 			self.activeTreasure = treasureAt(world:getRect(self.currentTreasure))
-
-			if self.activeTreasure.active then 
-				self.score = self.score + self.activeTreasure.value
-			end
 			self.activeTreasure.active = false
+		elseif self.currentBreath and not self.tank then
+			self.activeBreath = breathAt(world:getRect(self.currentBreath))
+			self.activeBreath.active = false
 		end
 	end
 
@@ -374,12 +387,20 @@ function Player:update(dt)
 	self.sprite:update(dt)
 end
 
-function treasureAt(x,y)
+function treasureAt(x,y) -- gets the treasure at x,y
 	for i = 1, #map.treasure do
 		if map.treasure[i].x == x and map.treasure[i].y == y then return map.treasure[i] end
 	end
 	return nil
 end
+
+function breathAt(x,y) -- gets the breath at x,y
+	for i = 1, #map.breaths do
+		if map.breaths[i].x == x and map.breaths[i].y == y then return map.breaths[i] end
+	end
+	return nil
+end
+
 
 
 function Player:spriteInit()

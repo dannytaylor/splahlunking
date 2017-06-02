@@ -8,6 +8,7 @@ floodThresh = 0.40
 waterLevel = 10
 maxTreasure = 90
 maxLargeTreasure = 12
+maxBreaths = 24
 
 function Map:initialize(data)
 	if data then
@@ -16,10 +17,13 @@ function Map:initialize(data)
 		self.caveState = {}
 		self.tileState = data.ts
 		self.treasure = {}
+		self.breaths = {}
 		self.treasurePoints = data.t
+		self.breathPoints = data.b
 	else
-		maxTreasure = 80*(1+(numConnected)/4)
-		maxLargeTreasure = 12*(1+(numConnected)/4)
+		maxTreasure = 80*(1+(numConnected)/3)
+		maxLargeTreasure = 12*(1+(numConnected)/3)
+		maxBreaths = 24*(1+numConnected/3)
 		self.w, self.h = 0,0
 		self.attempts = 0 
 		self.state = {}
@@ -27,6 +31,8 @@ function Map:initialize(data)
 		self.tileState = {}
 		self.treasure = {}
 		self.treasurePoints = {}
+		self.breaths = {}
+		self.breathPoints = {}
 
 	 	-- build random map
 		self:init()
@@ -36,10 +42,12 @@ function Map:initialize(data)
 		-- assign hitboxes
 
 		self:getTreasures()
+		self:getBreaths()
 	end
 
 	self:bumpBuild()
 	self:spawnTreasures()
+	self:spawnBreaths()
 
 	self.playerlight  = sodapop.newAnimatedSprite()
 	self.playerlight:setAnchor(function ()
@@ -116,6 +124,9 @@ function Map:draw()
 	for i=1,#self.treasure do
 		self.treasure[i]:draw()
 	end
+	for i,b in ipairs(self.breaths) do
+		b:draw()
+	end
 	love.graphics.setColor(255, 255, 255)
 
 	if mapsel ~=3 
@@ -138,6 +149,9 @@ end
 function Map:update(dt)
 	for i,t in ipairs(self.treasure) do
 		t:update(dt)
+	end
+	for i,b in ipairs(self.breaths) do
+		b:update(dt)
 	end
 
 	self.playerlight:update(dt)
@@ -164,7 +178,7 @@ function Map:setCanvas()
 end
 
 function Map:setColor(x,y)
-	if self.state[x][y] == 'floor' or self.state[x][y] == 'treasure'then
+	if self.state[x][y] == 'floor' or self.state[x][y] == 'treasure' or self.state[x][y] == 'breath' then
 		if mapsel == 3 then love.graphics.setColor(0,0,0)
 		else
 			if y < waterLevel then -- above water line
@@ -574,7 +588,7 @@ function Map:getXLFloorPoint()
 end
 
 function Map:packageData()
-	local ts = {}
+	local ts = {} -- tilestate
 
 	for i=1,self.w do
 		ts[i] = {}
@@ -588,7 +602,46 @@ function Map:packageData()
 		h 	= self.h,
 		s 	= self.state,
 		t 	= self.treasurePoints,
+		b 	= self.breathPoints,
 		ts 	= ts
 	}
 	return mapdata
 end
+
+
+function Map:getBreaths()
+	local bp = self.breathPoints
+	for i=1,maxBreaths do
+		local a,b = self:getEmptyPoint()
+		self.state[a][b] = 'breath'
+		bp[#bp+1] = {x=a,y=b}
+	end
+end
+
+function Map:getEmptyPoint() -- empty point no wall neighbors
+	local x1,y1 = 3,3
+	local p1good = false
+
+	while not p1good do
+		x1,y1 = math.random(3,self.w-3), math.random(math.floor(self.h/4),self.h-3)
+		p1good = true
+		for i = x1-1, x1+3 do
+			for j = y1-1, y1+3 do
+				if self.state[i][j] ~= 'floor' then
+					p1good = false
+				end
+			end
+		end
+	end
+	return x1,y1
+end
+
+function Map:spawnBreaths()
+	local bp = self.breathPoints
+	for i=1,#bp do
+		self.breaths[#self.breaths+1] = Breath(bp[i].x,bp[i].y,i)
+	end
+end
+
+
+

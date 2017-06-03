@@ -67,7 +67,7 @@ function Map:initialize(data)
 
 	self:setQuads()
 	self:setCanvas()
-
+	-- self.lscale = 2
 	-- self:setDecorations()
 
 end
@@ -141,12 +141,17 @@ function Map:draw()
 			else
 				love.graphics.setColor(27, 38, 50)
 			end
-			love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1, 1)
+			-- local ls = self.lscale
+			love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1,1 )
 			love.graphics.setColor(255,255,255)
 	end
 end
 
 function Map:update(dt)
+	-- if self.lscale > 1 and players[pid].tWater < 3 then self.lscale = 2 - players[pid].tWater/3
+	-- else self.lscale = 1 
+	-- end
+
 	for i,t in ipairs(self.treasure) do
 		t:update(dt)
 	end

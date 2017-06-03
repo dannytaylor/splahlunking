@@ -112,7 +112,7 @@ function Menu:ss_multi()
 		),
 		Button('join',72,24, btq.m2,btq.m2a,function ()
 			initClient()
-			if client then
+			if client and not connectswitch then
 				client:connect()
 				connectswitch = true
 				connectmsg = "TRYING CONNECTION..."

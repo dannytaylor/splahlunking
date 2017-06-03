@@ -21,7 +21,9 @@ function clientUpdate(dt)
 		elseif client:isConnecting() then
 			connectmsg = "TRYING CONNECTION..."
 		else
-			connectmsg = "CONNECTION FAILED"
+			connectswitch = false
+			client = nil
+			connectmsg = "FAILED. TRY AGAIN"
 		end
 	end
 

@@ -91,7 +91,7 @@ function UI:update(dt)
 	self.breathNum = math.ceil((16*players[pid].breath/100))
 	self.scoreNum = math.min(math.ceil((8*players[pid].score/100)),8)
 
-	if bn >= self.breathNum and bn < 16 and bn > 1  then --and (bn%2) == 1
+	if bn > self.breathNum and bn < 16 and bn > 1  then --and (bn%2) == 1
 		sfx_bubble1:play()
 	end
 	if tankBubbler then

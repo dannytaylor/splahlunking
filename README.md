@@ -1,18 +1,27 @@
 # [splahlunking](https://xhg.itch.io/splahlunking)
-### (splash spelunking)
+### (splash-spelunking)
 
-game made with löve in ~72 hr for #divejam
+game made with löve in ~1 week (jam version ~3 days) for #divejam
 
-collect treasures, but be sure to know the way back if case your equipment fails! the deeper you go the more valuable the treasure. map and treasure is randomly generated. the deeper you go the more valuable the treasure. try and fill up your treasure bar and live to tell the tale!
+map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity, strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). haven't had much chance to test multiplayer, so notes on balancing are appreciated.
 
-map is randomly generated. multiplayer is a bit buggy.  **if you connect to a game that's in progress you will crash the server**. no spaces or colons/ports in the ip address. game uses UDP on port 22122 for forwarding.
+no spaces or colons/ports in the ip address. game uses UDP, port 22122 for forwarding. testing was mostly done on localhost, so there may be some unknown bugs
 
 
-- **wasd** or **arrow keys** to move
-- **x** or return to select buttons
-- **esc** to go back/quit
-- **m** to mute music
+- **wasd**/**arrow keys**: move
+- **x**/**return**: taunt/select
+- **esc**: back/quit
+- **m**: mute music
+- **f1-f4**: change window scale
+- **r**: return to character select on end
 
+___
+
+todo:
+- mostly I'd just like to add some better tunes, but I'll have to practice making music more
+- maybe new tilesets/characters if I need an art project to keep me busy
+
+___
 
 other tools used:
 - aseprite (art)
@@ -28,4 +37,3 @@ löve libs used:
 - [sodapop](https://github.com/tesselode/sodapop)
 - [sock](https://github.com/camchenry/sock.lua)
 - [bitser](https://github.com/gvx/bitser)
-

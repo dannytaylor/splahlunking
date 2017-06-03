@@ -5,7 +5,9 @@ game made with löve in ~1 week (jam version ~3 days) for #divejam
 
 map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity, strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). haven't had much chance to test multiplayer, so notes on balancing are appreciated.
 
-no spaces or colons/ports in the ip address. game uses UDP, port 22122 for forwarding. testing was mostly done on localhost, so there may be some unknown bugs
+no spaces or colons/ports in the ip address. game uses UDP, port 22122 for forwarding. testing was mostly done on localhost, so there may be some unknown bugs that I couldn't catch.
+
+there are some color consistency issues and readability issues I know, poor initial planning. I think fixing this up would be more trouble than it's worth at this point.
 
 
 - **wasd**/**arrow keys**: move
@@ -20,6 +22,7 @@ ___
 todo:
 - mostly I'd just like to add some better tunes, but I'll have to practice making music more
 - maybe new tilesets/characters if I need an art project to keep me busy
+- some sfx additions and changes
 
 ___
 
@@ -37,3 +40,6 @@ löve libs used:
 - [sodapop](https://github.com/tesselode/sodapop)
 - [sock](https://github.com/camchenry/sock.lua)
 - [bitser](https://github.com/gvx/bitser)
+___
+
+special thanks to devin for the feedback and playtesting with me

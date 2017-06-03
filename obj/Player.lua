@@ -26,6 +26,7 @@ function Player:initialize(x,y,id,skin)
 	self.activeTreasure = nil
 
 	-- sprite info
+	self.connected = true
 	self.gamestate = 'dry'
 	self.palette = skin
 	self.currentAnim = 'idle_dry'
@@ -59,13 +60,13 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 35 -- higher linearly better
-		self.breathRate = 2 -- lower better
+		self.breathRate = 2.5-- lower better
 		self.speedMin = 0.80 -- max speed adjustment 
 		self.scoreMax = 80 -- min speed at score
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 42
-		self.breathRate = 2.4
+		self.breathRate = 2.8
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
 	elseif sp == 3 then
@@ -75,13 +76,13 @@ function Player:playerStats()
 		self.scoreMax = 100 -- min speed at score
 	elseif sp == 4 then
 		self.swimspeed = 32
-		self.breathRate = 1.8
+		self.breathRate = 2
 		self.speedMin = 0.90
 		self.tWater = 6
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 2.2
+		self.breathRate = 2.3
 		self.tWater = -6 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
@@ -109,17 +110,20 @@ function Player:draw()
 	-- 	love.graphics.rectangle('fill', self.x, self.y, tileSize-1, tileSize-1)
 	-- 	love.graphics.setColor(255, 255, 255)
 	-- end
-	if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
-	if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
+	if self.connected then
+		if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
+		if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
 
-	if self.splashtimer and splashx and mapsel ~= 3 then
-		self.splash:draw(splashx+4,0)
+		if self.splashtimer and splashx and mapsel ~= 3 then
+			self.splash:draw(splashx+4,0)
+		end
+		if self.gamestate == 'dry' then
+			self.sprite:draw(0,-3)
+		else
+			self.sprite:draw()
+		end
 	end
-	if self.gamestate == 'dry' then
-		self.sprite:draw(0,-3)
-	else
-		self.sprite:draw()
-	end
+
 end
 
 function Player:update(dt)

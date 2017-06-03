@@ -161,13 +161,13 @@ function UI:playerbar()
 		end
 		for i=1,nc do
 			local x = 54+(i-1)*9
-			love.graphics.draw(uiSheet, uiq2[players[i].palette], x, 0)
-			if topscore > 0 and topscore == pscore[i] then
+			if players[i].connected then love.graphics.draw(uiSheet, uiq2[players[i].palette], x, 0) end
+			if topscore > 0 and topscore == pscore[i] and players[i].connected then
 				love.graphics.draw(uiSheet, uiq.winning, x, 4)
-			elseif not players[i].alive then
+			elseif not players[i].alive and players[i].connected then
 				love.graphics.draw(uiSheet, uiq.dead, x, 4)
 			end
-			if players[i].win then
+			if players[i].win and players[i].connected then
 				love.graphics.draw(uiSheet, uiq.check, x, 0)
 			end
 			if i == pid then

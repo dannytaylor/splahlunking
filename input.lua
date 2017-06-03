@@ -65,6 +65,16 @@ function love.keypressed(key) -- key bindings
 				menu.currentScreen = menu.screens['char']
 
 				if server then
+					if numConnected ~=  server:getClientCount()+1 then
+						numConnected = server:getClientCount()+1
+						local cl = server:getClients() -- clientlist
+						for i=2,numConnected do
+							cl[i-1]:send("newpid",{
+								n = i
+								})
+						end
+					end
+
 					server:sendToAll('returntochar', {
 						num = numConnected,
 					})

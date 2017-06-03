@@ -60,7 +60,6 @@ end
 
 function serverUpdate(dt)
 	server:update()
-
 	tick = tick + dt
 	if tick >= tickRate then
 		tick = 0
@@ -90,6 +89,7 @@ function serverUpdate(dt)
 					tank = players[i].tank,
 
 					win = players[i].win,
+					connected = players[i].connected,
 
 					time = gametime,
 					ad = alldone,
@@ -106,6 +106,7 @@ function initServer()
 	server = sock.newServer('*', 22122,3)
 	local hostip = server:getSocketAddress()
 
+	clientlist = {}
 	hostip = string.sub(hostip, 1, string.find(hostip,':')-1)
 	print (hostip)
 	-- love.system.setClipboardText(hostip)
@@ -114,11 +115,15 @@ function initServer()
 	pid = 1
 
 	server:on("connect", function(data, client)
+
 		-- Send a message back to the connected client
 		if gamestate == 0 then
 			numConnected= server:getClientCount() + 1
+
+			clientlist[#clientlist+1] = {client:getConnectId(),numConnected,true}
+
 			client:send("pid",{
-				n = numConnected,
+				n = numConnected
 				})
 
 			client:send("map",{
@@ -164,6 +169,45 @@ function initServer()
 	server:on("charclient", function(data)
 		menu.screens['char'].currentChar[data.id] = data.char
 	end)
+	server:on("stillconnected", function(data)
+		
+	end)
+	server:on("disconnect", function(data, client)
+		if gamestate == 0 then
+			numConnected = server:getClientCount()+1
+			local cl = server:getClients() -- clientlist
+			for i=2,numConnected do
+				cl[i-1]:send("newpid",{
+					n = i
+					})
+			end
+		elseif gamestate == 1 then
+
+			for i=1,#clientlist do
+				clientlist[i][3] = false
+			end
+
+			local currentclients = server:getClients()
+			-- for each connected client keep them connected
+			for i=1, #currentclients do
+				local localclient = currentclients[i]
+				for i=1, #clientlist do
+					if clientlist[i][1] == localclient:getConnectId() then
+						clientlist[i][3]  = true
+					end
+				end
+			end
+
+			for i=1,#clientlist do
+				if clientlist[i][3]==false then
+					local dpid = clientlist[i][2]
+					players[dpid].connected = false
+					players[dpid].alive = false
+				end
+			end
+
+		end
+	end)
 end
 
 function initClient()
@@ -175,13 +219,12 @@ function initClient()
 	end
 
 	local ipcheck = string.match(ip_join,"%d+.%d+.%d+.%d+")
-	print (ipcheck)
 	if ipcheck == ip_join or ip_join == 'localhost' then
 		client = sock.newClient(ip_join, 22122)
 		client:setSerialization(bitser.dumps, bitser.loads)
 
 		client:on("connect", function(data)
-			print('connected')
+			
 		end)
 		client:on("notallowed", function(data)
 			client:disconnectNow()
@@ -225,6 +268,7 @@ function initClient()
 
 					local win           	= data[i].win
 					local surface           = data[i].surface
+					local connected         = data[i].connected
 
 
 					players[i].x            = x
@@ -242,12 +286,23 @@ function initClient()
 
 					players[i].surface      = surface
 					players[i].win       	= win
+					players[i].connected    = connected
 
 
 				end
 			end
 	end)
 	client:on('charserver', function(data)
+		numConnected = data.num
+		for i=1, numConnected do
+			if i ~= pid then
+				menu.screens['char'].currentChar[i] = data.chars[i]
+				mapsel = data.msel
+				menu.screens['char'].currentChar[i] = data.chars[i]
+			end
+		end
+	end)
+	client:on('updatecharcount', function(data)
 		numConnected = data.num
 		for i=1, numConnected do
 			if i ~= pid then
@@ -268,6 +323,24 @@ function initClient()
 		players = {}
 
 	end)
+	client:on('newpid', function(data)
+		local cc = menu.screens['char'].currentChar[pid] --current char
+		pid = data.n
+		menu.screens['char'].currentChar[pid] = cc
+		end)
+	client:on('disconnect', function(data)
+		gamestate = 0
+		-- reset everythin
+		numConnected = 1
+		players = {}
+		map = {}
+		ui = nil
+		gametime = 0
+		tankBubbler = nil
+		if currentsong then currentsong:stop() end
+		currentsong = song1
+		menu.currentScreen = menu.screens['title']
+		end)
 	else
 		connectmsg = '   BAD IP ADDRESS' 
 	end

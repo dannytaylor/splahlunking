@@ -1,6 +1,8 @@
 # [splahlunking](https://xhg.itch.io/splahlunking)
 ### (splash-spelunking)
 
+forewarning: this code is an uncommented mess of spaghetti code.
+
 game made with löve in ~1 week (jam version ~3 days) for #divejam
 
 map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity, strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). haven't had much chance to test multiplayer, so notes on balancing are appreciated.

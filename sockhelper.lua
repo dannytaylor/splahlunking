@@ -22,7 +22,6 @@ function clientUpdate(dt)
 			connectmsg = "TRYING CONNECTION..."
 		else
 			connectswitch = false
-			client = nil
 			connectmsg = "FAILED. TRY AGAIN"
 		end
 	end
@@ -49,6 +48,7 @@ function clientUpdate(dt)
 				breath = players[pid].breath,
 				alive = players[pid].alive,
 				tank = players[pid].tank,
+				connected = players[pid].connected,
 
 				surface = players[pid].surface,
 				win = players[pid].win,
@@ -101,6 +101,9 @@ function serverUpdate(dt)
 end
 
 function initServer()
+	menu.screens['char'].buttons[3].img = btq.c2
+	menu.screens['char'].buttons[3].imgActive = btq.c2a		
+	client = nil
 	ip_host = love.system.getClipboardText()
 	-- server = sock.newServer(ip_host, 22122,3)
 	server = sock.newServer('*', 22122,3)
@@ -147,6 +150,7 @@ function initServer()
 		local breath             = data.breath
 		local alive	             = data.alive
 		local tank	             = data.tank
+		local connected	         = data.connected
 
 		local surface      		= data.surface
 		local win      		 	= data.win
@@ -165,6 +169,7 @@ function initServer()
 
 		players[id].surface      = surface
 		players[id].win      	 = win
+		players[id].connected      	 = connected
 	end)
 	server:on("charclient", function(data)
 		menu.screens['char'].currentChar[data.id] = data.char
@@ -211,6 +216,7 @@ function initServer()
 end
 
 function initClient()
+	server = nil
 	if debug then
 		ip_join = 'localhost'
 		-- ip_join = love.system.getClipboardText()
@@ -228,6 +234,7 @@ function initClient()
 		end)
 		client:on("notallowed", function(data)
 			client:disconnectNow()
+			connectmsg = 'MATCH IN PROGRESS' 
 		end)
 		client:on("pid", function(data)
 			pid = data.n
@@ -339,9 +346,11 @@ function initClient()
 		tankBubbler = nil
 		if currentsong then currentsong:stop() end
 		currentsong = song1
-		menu.currentScreen = menu.screens['title']
+		-- client = nil
+		menu.currentScreen = menu.screens['multi']
+		connectmsg = '  BAD CONNECTION' 
 		end)
 	else
-		connectmsg = '   BAD IP ADDRESS' 
+		connectmsg = '   BAD IP FORMAT' 
 	end
 end 

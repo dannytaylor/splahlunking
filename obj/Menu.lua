@@ -20,7 +20,7 @@ function Menu:initialize()
 		  {1, 1, 16, 1, .2},
 		},
 	})
-	self:init()
+	self:init() 
 end
 	
 function Menu:init()
@@ -34,9 +34,9 @@ function Menu:draw()
 	self.currentScreen:draw()
 	if self.currentScreen == self.screens['title'] then 
 		titlebgSprite:draw()
-		if client then
-			love.graphics.print('NO HOST', 52, 7)
-		end
+		-- if client then
+		-- 	love.graphics.print('BAD HOST', 50, 8)
+		-- end
 	end
 
 	if self.currentScreen == self.screens['multi'] then 

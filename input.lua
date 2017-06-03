@@ -167,7 +167,7 @@ function menukeys(key)
 			end
 		end
 	elseif key == 'left' or key == 'a' then
-		if not client then
+		if not client or mcs~=menu.screens['char'] then
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
 			if #mcs.buttons > 1 then
@@ -181,8 +181,8 @@ function menukeys(key)
 				mcs.currentButton.active = true
 			end
 		end
-	elseif key == 'right' or key == 'd' and not client then
-		if not client then
+	elseif key == 'right' or key == 'd'then
+		if not client or mcs~=menu.screens['char'] then
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
 			if #mcs.buttons > 1 then

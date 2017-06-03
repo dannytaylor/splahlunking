@@ -126,7 +126,7 @@ function Player:draw()
 			self.sprite:draw()
 		end
 	else
-		love.graphics.draw(disconnectimg, self.x, self.y-4,0,1,1)
+		love.graphics.draw(disconnectimg, self.x, self.y-8,0,1,1)
 	end
 
 end

@@ -60,42 +60,45 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 35 -- higher linearly better
-		self.breathRate = 2.5-- lower better
+		self.breathRate = 3.6-- lower better
 		self.speedMin = 0.80 -- max speed adjustment 
 		self.scoreMax = 80 -- min speed at score
+		self.tWater = 0
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 42
-		self.breathRate = 2.8
+		self.breathRate = 4.4
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
+		self.tWater = 2
 	elseif sp == 3 then
 		self.swimspeed = 24
-		self.breathRate = 1.6
+		self.breathRate = 3
 		self.speedMin = 1
 		self.scoreMax = 100 -- min speed at score
+		self.tWater = 4
 	elseif sp == 4 then
 		self.swimspeed = 32
-		self.breathRate = 2
+		self.breathRate = 3.2
 		self.speedMin = 0.90
 		self.tWater = 6
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 2.3
-		self.tWater = -6 --higher break points
+		self.breathRate = 3.4
+		self.tWater = -8 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
 	elseif sp == 6 then
 		if debug then
 			self.swimspeed = 80
-			self.breathRate = 10
+			self.breathRate = 16
 			self.tWater = math.max(1,breakTime-2) --higher break points
 			self.speedMin = 1
 			self.scoreMax = 60 -- min speed at score
 		else
 			self.swimspeed = 60
-			self.breathRate = 5
+			self.breathRate = 6
 			self.tWater = breakTime/2 --higher break points
 			self.speedMin = 1
 			self.scoreMax = 60 -- min speed at score
@@ -122,6 +125,8 @@ function Player:draw()
 		else
 			self.sprite:draw()
 		end
+	else
+		love.graphics.draw(disconnectimg, self.x, self.y-4,0,1,1)
 	end
 
 end

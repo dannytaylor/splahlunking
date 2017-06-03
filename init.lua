@@ -71,8 +71,8 @@ function startMatch()
 	print('pid: '..pid..', numconnected: '.. numConnected)
 	for i=1,numConnected do
 		players[i] = Player(spawnx[i]*tileSize,7*tileSize+1,i,menu.screens['char'].currentChar[i])
-		if i > 2 then players[i].sprite.flipX = true end
-		if mapsel ~=3 and i > 2 then players[i].speedx = 14 end
+		if (i%2) == 0 then players[i].sprite.flipX = true end
+		if mapsel ~=3 and i > 2 then players[i].speedx = 12 end
 	end
 	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
 	cam:setScale(windowScale)
@@ -93,6 +93,14 @@ function initSounds()
 	sfx_bubble1 = love.audio.newSource("sfx/bubble1.ogg","static")
 	sfx_breath = love.audio.newSource("sfx/breath.ogg","static")
 	sfx_portal = love.audio.newSource("sfx/portal.ogg","static")
+	sfx_emote = {
+		love.audio.newSource("sfx/emote1.ogg","static"),
+		love.audio.newSource("sfx/emote2.ogg","static"),
+		love.audio.newSource("sfx/emote3.ogg","static"),
+		love.audio.newSource("sfx/emote4.ogg","static"),
+		love.audio.newSource("sfx/emote5.ogg","static"),
+		love.audio.newSource("sfx/emote6.ogg","static"),
+	}
 
 	song1 =  love.audio.newSource("sfx/song1.ogg")
 	song2 = love.audio.newSource("sfx/song2.ogg")
@@ -122,6 +130,8 @@ function initSprites() -- and quads
 	titlebg = love.graphics.newImage 'img/titlebg.png'
 	titlebg2 = love.graphics.newImage 'img/connectbg.png'
 	titlebg3 = love.graphics.newImage 'img/charbg.png'
+	disconnectimg = love.graphics.newImage 'img/disconnect.png'
+
 	camp = {
 		love.graphics.newImage 'img/camp1.png',
 		love.graphics.newImage 'img/camp2.png',

@@ -18,11 +18,16 @@ function love.keypressed(key) -- key bindings
 			windowScale = 4
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f3' and windowScale~=8 then 
+		elseif key == 'f3' and windowScale~=6 then 
+			windowScale = 6
+			windowW, windowH = viewW*windowScale, viewH*windowScale
+			love.window.setMode(windowW, windowH, {msaa = 0})
+		elseif key == 'f4' and windowScale~=8 then 
 			windowScale = 8
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
 		end
+
 		menukeys(key)
 	end
 	if gamestate == 1 then
@@ -99,6 +104,7 @@ function love.keypressed(key) -- key bindings
 		elseif key == 'x' or key == 'return'  then
 			if not players[pid].emoteTimer and gametime > 0 and players[pid].alive then
 				players[pid].emoteTimer = 0 
+				-- love.audio.play(sfx_emote[players[pid].palette])
 			end
 		end
 	end
@@ -107,11 +113,6 @@ end
 function menukeys(key)
 	local mcs = menu.currentScreen
 	if mcs == menu.screens['char'] then
-		if key == 'f4' then
-			menu.screens['char'].currentChar[pid] = 6
-			if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
-			love.audio.play(sfx_buttonClick)
-		end
 		if mcs.currentButton.name == 'char' then
 			if key == 'down' or key == 's' then
 				local cc = menu.screens['char'].currentChar[pid]

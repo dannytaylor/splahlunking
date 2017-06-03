@@ -8,7 +8,7 @@ floodThresh = 0.40
 waterLevel = 10
 maxTreasure = 90
 maxLargeTreasure = 12
-maxBreaths = 24
+maxBreaths = 20
 
 function Map:initialize(data)
 	if data then
@@ -623,14 +623,20 @@ function Map:getEmptyPoint() -- empty point no wall neighbors
 	local p1good = false
 
 	while not p1good do
-		x1,y1 = math.random(3,self.w-3), math.random(math.floor(self.h/4),self.h-3)
+		local ytop = math.random(waterLevel+10,math.floor(self.h/2))
+		x1,y1 = math.random(3,self.w-3), math.random(ytop,self.h-3)
 		p1good = true
-		for i = x1-1, x1+3 do
-			for j = y1-1, y1+3 do
+		for i = x1-1, x1+2 do
+			for j = y1-1, y1+2 do
 				if self.state[i][j] ~= 'floor' then
 					p1good = false
 				end
 			end
+		end
+	end
+	for i = x1-1, x1+2 do
+		for j = y1-1, y1+2 do
+			self.state[i][j] = 'breath'
 		end
 	end
 	return x1,y1

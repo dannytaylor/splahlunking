@@ -136,7 +136,8 @@ function Player:update(dt)
 				self.win = true
 				self.surface = true
 
-				if mapsel ~= 3 then love.audio.play(sfx_splash) end
+				if mapsel ~= 3 then love.audio.play(sfx_splash) 
+				else  love.audio.play(sfx_portal) end
 				self.splash:goToFrame(1)
 				splashx = self.x
 				self.splashtimer = 0
@@ -156,7 +157,8 @@ function Player:update(dt)
 					if self.gamestate == 'dry' then
 						self.gamestate = 'wet' 
 
-						if mapsel ~= 3 then love.audio.play(sfx_splash) end
+						if mapsel ~= 3 then love.audio.play(sfx_splash)
+						else  love.audio.play(sfx_portal) end
 						self.splash:goToFrame(1)
 						splashx = self.x
 						self.splashtimer = 0
@@ -306,7 +308,7 @@ function Player:update(dt)
 				self.breath = self.breath + breathPlus
 				if self.breath > 100 then self.breath = 100 end
 				if sfx_collect:isPlaying() then sfx_collect:stop() end
-				love.audio.play(sfx_collect)
+				love.audio.play(sfx_breath)
 			end
 			self.activeBreath.active = false
 		end

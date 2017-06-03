@@ -84,16 +84,18 @@ function startMatch()
 end
 	
 function initSounds()
-	sfx_button = love.audio.newSource("sfx/swap.wav","static")
-	sfx_buttonClick = love.audio.newSource("sfx/click.wav","static")
-	sfx_splash = love.audio.newSource("sfx/splash.wav","static")
-	sfx_explode = love.audio.newSource("sfx/explode.wav","static")
-	sfx_collect = love.audio.newSource("sfx/treasure.wav","static")
-	sfx_death = love.audio.newSource("sfx/death.wav","static")
-	sfx_bubble1 = love.audio.newSource("sfx/bubble1.wav","static")
+	sfx_button = love.audio.newSource("sfx/swap.ogg","static")
+	sfx_buttonClick = love.audio.newSource("sfx/click.ogg","static")
+	sfx_splash = love.audio.newSource("sfx/splash.ogg","static")
+	sfx_explode = love.audio.newSource("sfx/explode.ogg","static")
+	sfx_collect = love.audio.newSource("sfx/treasure.ogg","static")
+	sfx_death = love.audio.newSource("sfx/death.ogg","static")
+	sfx_bubble1 = love.audio.newSource("sfx/bubble1.ogg","static")
+	sfx_breath = love.audio.newSource("sfx/breath.ogg","static")
+	sfx_portal = love.audio.newSource("sfx/portal.ogg","static")
 
-	song1 =  love.audio.newSource("sfx/song1.wav")
-	song2 = love.audio.newSource("sfx/song2.wav")
+	song1 =  love.audio.newSource("sfx/song1.ogg")
+	song2 = love.audio.newSource("sfx/song2.ogg")
 	song3 = nil
 
 	currentsong = song1
@@ -128,6 +130,7 @@ function initSprites() -- and quads
 
 	sparklesheet = love.graphics.newImage 'img/sparklesheet.png'
 	splashsheet = love.graphics.newImage 'img/splash.png'
+	breathsheet = love.graphics.newImage 'img/breath.png'
 
 	moAni_sheets = {
 		love.graphics.newImage 'img/camp1_ani.png',

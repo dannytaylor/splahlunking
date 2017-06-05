@@ -16,7 +16,7 @@ function love.keypressed(key) -- key bindings
 			local comment = charnames[players[pid].palette]
 			if scoreBox.text ~= '' then 
 				local test = Dreamlo.add(scoreBox.text, players[pid].score, 0, comment ) 
-				if test == "OK" then submitmsg = 'SCORE SUBMITTED!'
+				if test == "OK" then submitmsg = '>SCORE SUBMITTED!'
 				else submitmsg = 				 ' SUBMIT FAILED' end
 			end
 			scoreBox.submitted = true

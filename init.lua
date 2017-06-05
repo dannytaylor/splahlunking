@@ -27,7 +27,7 @@ function init()
 	love.window.setIcon(icon)
 	love.graphics.setLineStyle('rough')
 
-	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>", 1)
+	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>@", 1)
 	love.graphics.setFont( font )
 
 	initSounds()

@@ -18,19 +18,21 @@ function Bubbler:draw()
 	if mapsel ~= 3 then
 		love.graphics.setColor(178, 220, 239)
 		for i=1,#self.bubbles do 
-			if self.bubbles[i].t < self.life*0.7 then
-				love.graphics.setPointSize(windowScale*2)
-				love.graphics.points({self.bubbles[i].x, self.bubbles[i].y})
-			elseif self.bubbles[i].t < self.life*0.94 then
-				love.graphics.rectangle('line',self.bubbles[i].x-1, self.bubbles[i].y-1,2,2)
-			else
-				love.graphics.setPointSize(windowScale)
-				love.graphics.points({
-					self.bubbles[i].x, self.bubbles[i].y-1,
-					self.bubbles[i].x+1, self.bubbles[i].y,
-					self.bubbles[i].x, self.bubbles[i].y+1,
-					self.bubbles[i].x-1, self.bubbles[i].y
-				})
+			if self.bubbles[i].y > waterLevel*tileSize then
+				if self.bubbles[i].t < self.life*0.7 then
+					love.graphics.setPointSize(windowScale*2)
+					love.graphics.points({self.bubbles[i].x, self.bubbles[i].y})
+				elseif self.bubbles[i].t < self.life*0.94 then
+					love.graphics.rectangle('line',self.bubbles[i].x-1, self.bubbles[i].y-1,2,2)
+				else
+					love.graphics.setPointSize(windowScale)
+					love.graphics.points({
+						self.bubbles[i].x, self.bubbles[i].y-1,
+						self.bubbles[i].x+1, self.bubbles[i].y,
+						self.bubbles[i].x, self.bubbles[i].y+1,
+						self.bubbles[i].x-1, self.bubbles[i].y
+					})
+				end
 			end
 		end
 	end

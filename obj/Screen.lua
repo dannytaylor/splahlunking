@@ -51,12 +51,18 @@ function Screen:draw()
 		--highlight local player
 		if self.buttonIndex == 1 then
 			love.graphics.setColor(247, 226, 107)
-			-- love.graphics.rectangle('line', 8+29*(pid-1), 12, 25, 33)
 			love.graphics.rectangle('line', 9+29*(pid-1), 13, 23, 31)
+			love.graphics.rectangle('line', 8+29*(pid-1), 12, 25, 33)
 			love.graphics.setColor(255, 255, 255)
 		elseif self.buttonIndex == 2 and not client then
 			love.graphics.setColor(247, 226, 107)
 			love.graphics.rectangle('line', 69, 55+8*(mapsel-1), 20, 5)
+			love.graphics.rectangle('line', 68, 54+8*(mapsel-1), 22, 7)
+			love.graphics.setColor(255, 255, 255)
+		elseif self.buttonIndex == 3 and not client then
+			love.graphics.setColor(247, 226, 107)
+			love.graphics.rectangle('line', 101, 62, 14, 9)
+			love.graphics.rectangle('line', 100, 61, 16, 11)
 			love.graphics.setColor(255, 255, 255)
 		end
 	end

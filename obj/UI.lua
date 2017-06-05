@@ -22,6 +22,7 @@ function UI:initialize()
 	scoreBox.active = false
 	scoreBox.submitted = false
 	scoreBox.text = ''
+	submitmsg = ''
 
 end
 
@@ -34,7 +35,7 @@ function UI:draw()
 	-- local lineend = math.max(0,math.floor(viewW*(gametimeMax-gametime)/gametimeMax))
 	-- love.graphics.line(0, viewH, lineend, viewH)
 	if players[pid].y < (waterLevel+2)*tileSize and players[pid].tWater < breakTime and gametime>8 then 
-		love.graphics.print('DIVE!', 60, 20)
+		love.graphics.print('DIVE!', 60, 22)
 	end
 	if not players[pid].win and players[pid].alive then self:breathbar() end
 	self:playerbar()
@@ -55,23 +56,23 @@ function UI:draw()
 	end
 	if not players[pid].alive then
 		-- love.graphics.draw(overlay_dead, 0, 0)
-		love.graphics.print('UR DEAD,BUD', 48, 12)
-		love.graphics.print('YOUR SCORE:'..players[pid].score, 45, 19)
+		if not server and not client then love.graphics.print('UR DEAD,BUD', 48, 22) end
+		love.graphics.print('YOUR SCORE:'..players[pid].score, 45, 15)
 
 		if not alldone then
 			if fid ~= pid and followtimer > deadtime then 
-				love.graphics.print('WATCHING P'..fid, 50, 56) 
+				love.graphics.print('WATCHING P'..fid, 50, 70) 
 			else
 				love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
 			end
 		end
 
 	elseif players[pid].surface then
-		love.graphics.draw(uiSheet,uiq.alivemsg,44,12)
-		love.graphics.print('YOUR SCORE:'..players[pid].score, 45, 19)
+		-- love.graphics.draw(uiSheet,uiq.alivemsg,44,12)
+		love.graphics.print('YOUR SCORE:'..players[pid].score, 45, 15)
 		if not alldone then
 			if fid ~= pid and followtimer > deadtime then 
-				love.graphics.print('WATCHING P'..fid, 50, 56) 
+				love.graphics.print('WATCHING P'..fid, 50, 70) 
 			else
 				love.graphics.draw(uiSheet,uiq.wait_msg,44,56)
 			end
@@ -90,9 +91,9 @@ function UI:draw()
 			love.graphics.setColor(224, 111, 139)
 			love.graphics.print('ENTER> ',scoreBox.x, scoreBox.y)
 			love.graphics.setColor(255,255,255)
-			love.graphics.print('LEADERBOARD', scoreBox.x+24, scoreBox.y)
+			love.graphics.print('SUBMIT SCORE', scoreBox.x+28, scoreBox.y)
 		elseif not scoreBox.active and scoreBox.submitted then
-			love.graphics.print('SCORE SUBMITTED!', scoreBox.x+6, scoreBox.y)
+			love.graphics.print(submitmsg, scoreBox.x+6, scoreBox.y)
 		else
 			love.graphics.setColor(224, 111, 139)
 			love.graphics.print('ENTER>>', scoreBox.x, scoreBox.y)
@@ -107,8 +108,8 @@ function UI:draw()
 end
 
 scoreBox = {
-    x = 33,
-    y = 26,
+    x = 31,
+    y = 22,
     text = '',
     active = false,
     submitted = false,
@@ -116,7 +117,8 @@ scoreBox = {
 
 function love.textinput (text)
     if scoreBox.active then
-    	local t = string.match(text,"%w+")
+    	-- local t = string.match(text,'@*%w*')
+    	local t = string.match(text,'%w+')
 		if t then 
 			t = string.upper(t)
 			if string.len(scoreBox.text) <= 11 then
@@ -129,7 +131,7 @@ end
 function UI:update(dt)
 	local bn = self.breathNum
 	self.breathNum = math.ceil((16*players[pid].breath/100))
-	self.scoreNum = math.min(math.ceil((8*players[pid].score/100)),8)
+	self.scoreNum = math.min(math.ceil((8*players[pid].score/150)),8)
 
 	if bn > self.breathNum and bn < 16 and bn > 1  and (bn%2) == 1 then
 		sfx_bubble1:play()
@@ -146,8 +148,8 @@ function UI:countdown()
 		
 		end
 		cd = 4-math.floor(gametime/2)
-		love.graphics.print('READY IN', 53, 14)
-		love.graphics.print(4-math.floor(gametime/2), 66, 20)
+		love.graphics.print('READY IN', 53, 15)
+		love.graphics.print(4-math.floor(gametime/2), 66, 22)
 	elseif cd == 1 or cd == 0 then 
 		sfx_countdown2:play()
 		cd = -1
@@ -225,9 +227,9 @@ function UI:playerbar()
 	if client or server then
 		if alldone and numConnected > 1 then
 			if topscore == 0 then 
-				love.graphics.print('NO WINNERS...', 48, 26)
+				love.graphics.print('NO WINNERS...', 48, 22)
 			else
-				love.graphics.print('WINNING SCORE:'..topscore, 40, 26)
+				love.graphics.print('WINNING SCORE:'..topscore, 40, 22)
 			end
 		end
 	end

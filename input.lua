@@ -14,7 +14,11 @@ function love.keypressed(key) -- key bindings
 				'sanic',
 			}
 			local comment = charnames[players[pid].palette]
-			Dreamlo.add(scoreBox.text, players[pid].score, 0, comment )
+			if scoreBox.text ~= '' then 
+				local test = Dreamlo.add(scoreBox.text, players[pid].score, 0, comment ) 
+				if test == "OK" then submitmsg = 'SCORE SUBMITTED!'
+				else submitmsg = 				 ' SUBMIT FAILED' end
+			end
 			scoreBox.submitted = true
 			scoreBox.active  = false
 		elseif key == "backspace" then
@@ -37,7 +41,9 @@ function love.keypressed(key) -- key bindings
 			end
 		end
 		if gamestate == 0 then
-			if key == 'f1' and windowScale~=2 then 
+			if key == 'q' and menu.currentScreen == menu.screens['title'] then
+				love.event.quit()
+			elseif key == 'f1' and windowScale~=2 then 
 				windowScale = 2
 				windowW, windowH = viewW*windowScale, viewH*windowScale
 				love.window.setMode(windowW, windowH, {msaa = 0})
@@ -238,7 +244,7 @@ function menukeys(key)
 			end
 		end
 	elseif key == 'left' or key == 'a' then
-		if not client or mcs~=menu.screens['char'] then
+		if (not client or mcs~=menu.screens['char'] ) and menu.currentScreen~=menu.screens['leaderboard'] then
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
 			if #mcs.buttons > 1 then
@@ -253,7 +259,7 @@ function menukeys(key)
 			end
 		end
 	elseif key == 'right' or key == 'd'then
-		if not client or mcs~=menu.screens['char'] then
+		if (not client or mcs~=menu.screens['char'] ) and menu.currentScreen~=menu.screens['leaderboard'] then
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
 			if #mcs.buttons > 1 then
@@ -270,8 +276,8 @@ function menukeys(key)
 	elseif key == 'up' or key == 'w' then
 	elseif key == 'down' or key == 's' then
 		
-	elseif key == 'return' or key == 'x' then
-		love.audio.play(sfx_buttonClick)
+	elseif (key == 'return' or key == 'x') and  menu.currentScreen~=menu.screens['leaderboard']  then
+		if (menu.currentScreen~=menu.screens['char'] or not client) then love.audio.play(sfx_buttonClick) end
 
 		mcs.currentButton.action()
 		if not client and mcs == menu.screens['char'] and mcs.buttonIndex ~=3 then

@@ -46,13 +46,14 @@ function Menu:draw()
 
 	if self.currentScreen == self.screens['leaderboard'] then 
 		if #leaderboard == 0 then 
-			love.graphics.print("CONNECTION",34,31)
-			love.graphics.print("FAILED",34,39)
+			love.graphics.print("CONNECTION FAILED",11,31)
 		else
+			love.graphics.setColor(224, 111, 139)
 			for i = 1, math.min(#leaderboard,5) do
-				love.graphics.print(leaderboard[i].score,17,31+(i-1)*8)
-				love.graphics.print(leaderboard[i].name,34,31+(i-1)*8)
-				love.graphics.print(leaderboard[i].char,87,31+(i-1)*8)
+				love.graphics.print(leaderboard[i].score,11,31+(i-1)*8)
+				love.graphics.print(leaderboard[i].name,38,31+(i-1)*8)
+				love.graphics.print(leaderboard[i].char,92,31+(i-1)*8)
+				love.graphics.setColor(255,255,255)
 			end
 		end
 	end
@@ -106,18 +107,20 @@ function Menu:ss_title()
 			connectswitch = false
 		end
 		),
-		Button('quit',80,48,btq.b3,btq.b3a,function () 
-			quote = Dreamlo:get(Dreamlo.DataTypes.PIPE)
+		Button('quit',80,48,btq.b3,btq.b3a,function () --actually now leaderboard button
+			self.currentScreen = self.screens['leaderboard']
+			quote = Dreamlo:getFromTo(0, 5, Dreamlo.DataTypes.PIPE)
 			leaderboard = {}
 			if quote then for line in quote:gmatch("([^\r\n]*)[\r\n]") do
 				local i = #leaderboard + 1
-				local nm,sc,ch = string.match(line, '(%w+)|(%d+)|%d+|(%w+)') --|%d+/%d+/%d+ %d+:%d+:%d+ %w+|%d+')
+				-- local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w+)') 
+				local nm,sc,ch = string.match(line, '(%w+)|(%d+)|%d+|(%w* *%w*)') 
 				print(nm,sc,ch)
-				ch = string.sub(string.upper(ch),1,8)
+				ch = string.sub(string.upper(ch),1,7)
 				leaderboard[i] = {name=nm,score=sc,char=ch}
 			end end
 
-			self.currentScreen = self.screens['leaderboard']
+			
 		end
 		),
 	}

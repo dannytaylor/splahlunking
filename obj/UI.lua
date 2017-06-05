@@ -1,6 +1,7 @@
 -- ui.lua
 -- player HUD 
 UI = class('UI')
+cd = 4
 function UI:initialize()
 	self.canvas = love.graphics.newCanvas(viewW*tileSize, viewH*tileSize,"normal",0)
 	self.canvas:setFilter("nearest", "nearest")
@@ -29,7 +30,7 @@ function UI:draw()
 	-- love.graphics.setColor(255, 255, 255)
 	-- local lineend = math.max(0,math.floor(viewW*(gametimeMax-gametime)/gametimeMax))
 	-- love.graphics.line(0, viewH, lineend, viewH)
-	if players[pid].y < (waterLevel+2)*tileSize and players[pid].tWater < breakTime and gametime>6 then 
+	if players[pid].y < (waterLevel+2)*tileSize and players[pid].tWater < breakTime and gametime>8 then 
 		love.graphics.print('DIVE!', 60, 20)
 	end
 	if not players[pid].win and players[pid].alive then self:breathbar() end
@@ -91,7 +92,7 @@ function UI:update(dt)
 	self.breathNum = math.ceil((16*players[pid].breath/100))
 	self.scoreNum = math.min(math.ceil((8*players[pid].score/100)),8)
 
-	if bn > self.breathNum and bn < 16 and bn > 1  then --and (bn%2) == 1
+	if bn > self.breathNum and bn < 16 and bn > 1  and (bn%2) == 1 then
 		sfx_bubble1:play()
 	end
 	if tankBubbler then
@@ -101,9 +102,16 @@ function UI:update(dt)
 end
 
 function UI:countdown()
-	if gametime <= 6 then
+	if gametime <= 8 then
+		if cd ~= 4-math.floor(gametime/2) and cd > 0 then sfx_countdown1:play()
+		
+		end
+		cd = 4-math.floor(gametime/2)
 		love.graphics.print('READY IN', 53, 14)
-		love.graphics.print(3-math.floor(gametime/2), 66, 20)
+		love.graphics.print(4-math.floor(gametime/2), 66, 20)
+	elseif cd == 1 or cd == 0 then 
+		sfx_countdown2:play()
+		cd = -1
 	end
 end
 

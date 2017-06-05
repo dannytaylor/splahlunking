@@ -23,9 +23,10 @@ function love.keypressed(key) -- key bindings
 			windowW, windowH = viewW*windowScale, viewH*windowScale
 			love.window.setMode(windowW, windowH, {msaa = 0})
 		elseif key == 'f4' and windowScale~=8 then 
-			windowScale = 8
+			love.window.setMode(windowW, windowH, {msaa = 0,fullscreen=true})
+			windowScale = math.min(love.graphics.getWidth()/viewW,love.graphics.getHeight()/viewH)
 			windowW, windowH = viewW*windowScale, viewH*windowScale
-			love.window.setMode(windowW, windowH, {msaa = 0})
+			love.window.setMode(windowW, windowH, {msaa = 0, fullscreen=true})
 		end
 
 		menukeys(key)
@@ -106,6 +107,38 @@ function love.keypressed(key) -- key bindings
 				players[pid].emoteTimer = 0 
 				-- love.audio.play(sfx_emote[players[pid].palette])
 			end
+		--dolphin powers
+		elseif key == 'p' then
+			if players[pid].emoteTimer and players[pid].emoteTimer>0 and gametime > 0 and players[pid].alive and not dolphinswitch then
+				dolphinswitch = true
+				-- local xflip = players[pid].sprite.flipX
+				players[pid]:spriteInit(7)
+				players[pid].dolphin = not players[pid].dolphin
+				if players[pid].dolphin then 
+					players[pid]:spriteInit(7)
+					players[pid].breathRate = players[pid].breathRate - 1
+					-- players[pid].speedx = players[pid].speedx + 10
+					-- players[pid].speedy = players[pid].speedy + 10
+				else 
+					players[pid]:spriteInit(players[pid].palette)
+					players[pid].breathRate = players[pid].breathRate + 1
+					-- players[pid].speedx = players[pid].speedx - 10
+					-- players[pid].speedy = players[pid].speedy - 10
+				end
+				players[pid].sprite:switch('emote')
+				if client then
+					client:send("dolphin",{
+						p = pid,
+						d = players[pid].dolphin 
+					})
+				elseif server then
+					server:sendToAll('dolphin', {
+						p = 1,
+						d = players[pid].dolphin 
+					})
+				end
+				sfx_countdown2:play()
+			end
 		end
 	end
 end
@@ -128,6 +161,9 @@ function menukeys(key)
 				menu.screens['char'].currentChar[pid] = cc
 				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
 				love.audio.play(sfx_buttonClick)
+			-- elseif key=='p' then 
+			-- 	menu.screens['char'].currentChar[pid] = 7
+			-- 	love.audio.play(sfx_countdown2)
 			end
 		elseif mcs.currentButton.name == 'map' and not client then
 			if key == 'down' or key == 's' then

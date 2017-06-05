@@ -177,6 +177,18 @@ function initServer()
 	server:on("stillconnected", function(data)
 		
 	end)
+	server:on("dolphin", function(data)
+		local id = data.p
+		local ctd = data.d --change to dolphin
+		if ctd then players[id]:spriteInit(7)
+		else players[id]:spriteInit(players[id].palette)
+		end
+		players[id].sprite:switch('emote')
+		server:sendToAll('dolphin',{
+			p = id,
+			d = ctd
+			})
+	end)
 	server:on("disconnect", function(data, client)
 		if gamestate == 0 then
 			numConnected = server:getClientCount()+1
@@ -238,6 +250,14 @@ function initClient()
 		end)
 		client:on("pid", function(data)
 			pid = data.n
+		end)
+		client:on("dolphin", function(data)
+			local id = data.p
+			local ctd = data.d --change to dolphin
+			if ctd then players[id]:spriteInit(7)
+			else players[id]:spriteInit(players[id].palette)
+			end
+			players[id].sprite:switch('emote')
 		end)
 		client:on("start", function(data)
 			gamestate = data.state

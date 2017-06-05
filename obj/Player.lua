@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 35
+breakTime = 32
 
 function Player:initialize(x,y,id,skin)
 	self.x = x 
@@ -34,11 +34,12 @@ function Player:initialize(x,y,id,skin)
 	self.sprite = 'idle_dry'
 	self.emoteTimer = nil
 	self.bubbler = Bubbler()
+	-- self.trail = Trail()
 
 	-- for UI
 	self.score = 0
 	self.breath = 100
-	self.breathRate = 1.5
+	self.breathRate = 4
 	self.tWater = 0
 
 	self.scoreMax = 100
@@ -52,7 +53,7 @@ function Player:initialize(x,y,id,skin)
 	self.deadtimer = 0
 	deadtime = 5
 
-	self:spriteInit()
+	self:spriteInit(self.palette)
 	self:playerStats()
 end
 
@@ -60,32 +61,32 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 35 -- higher linearly better
-		self.breathRate = 3.6-- lower better
-		self.speedMin = 0.80 -- max speed adjustment 
+		self.breathRate = 4.6-- lower better
+		self.speedMin = 0.75 -- max speed adjustment 
 		self.scoreMax = 80 -- min speed at score
 		self.tWater = 0
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 42
-		self.breathRate = 4.4
-		self.speedMin = 0.8
+		self.breathRate = 5
+		self.speedMin = 0.7
 		self.scoreMax = 60 -- min speed at score
 		self.tWater = 2
 	elseif sp == 3 then
-		self.swimspeed = 24
-		self.breathRate = 3
-		self.speedMin = 1
-		self.scoreMax = 100 -- min speed at score
+		self.swimspeed = 26
+		self.breathRate = 3.5
+		self.speedMin = .9
+		self.scoreMax = 80 -- min speed at score
 		self.tWater = 4
 	elseif sp == 4 then
 		self.swimspeed = 32
-		self.breathRate = 3.2
-		self.speedMin = 0.90
+		self.breathRate = 4
+		self.speedMin = 0.85
 		self.tWater = 6
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 3.4
+		self.breathRate = 4.2
 		self.tWater = -8 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
@@ -97,11 +98,11 @@ function Player:playerStats()
 			self.speedMin = 1
 			self.scoreMax = 60 -- min speed at score
 		else
-			self.swimspeed = 60
-			self.breathRate = 6
+			self.swimspeed = 55
+			self.breathRate = 7
 			self.tWater = breakTime/2 --higher break points
-			self.speedMin = 1
-			self.scoreMax = 60 -- min speed at score
+			self.speedMin = 0.9
+			self.scoreMax = 40 -- min speed at score
 		end
 	end
 	
@@ -114,6 +115,7 @@ function Player:draw()
 	-- 	love.graphics.setColor(255, 255, 255)
 	-- end
 	if self.connected then
+		-- self.trail:draw()
 		if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
 		if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
 
@@ -155,7 +157,7 @@ function Player:update(dt)
 				if currentsong then currentsong:stop() end
 				currentsong = song3
 			end
-			if self.alive and not self.win and not self.emoteTimer and (gametime > 6 or debug) then
+			if self.alive and not self.win and not self.emoteTimer and (gametime > 8 or debug) then
 
 				self.nextAnim = nil
 				if self.gamestate == 'dry' and mapsel ~= 3 then self.nextAnim = 'idle_dry' 
@@ -264,7 +266,10 @@ function Player:update(dt)
 							self.currentBreath = nil
 					 	end
 					end
+					
 				end
+				-- if self.gamestate == 'wet' and (dx ~= 0 or dy ~= 0) then self.trail:update(dt,true,self.x,self.y)
+				-- else self.trail:update(dt) end
 			end
 		end
 
@@ -286,6 +291,7 @@ function Player:update(dt)
 					self.breath = self.breath - dt*self.breathRate
 				elseif self.alive then
 					love.audio.play(sfx_death)
+					love.audio.play(sfx_death2)
 					currentsong:stop()
 					currentsong = song3
 					self.breath = 0
@@ -370,8 +376,9 @@ function Player:update(dt)
 		end
 
 		self.emoteTimer = self.emoteTimer + dt
-		if 
-			self.emoteTimer > 0.8 then self.emoteTimer = nil 
+		if self.emoteTimer > 0.8 then 
+			self.emoteTimer = nil 
+			dolphinswitch = false
 			if self.gamestate == 'dry' then
 				self.sprite:switch("idle_dry")
 				self.nextAnim = 'idle_dry'
@@ -414,7 +421,7 @@ end
 
 
 
-function Player:spriteInit()
+function Player:spriteInit(palette)
 	self.sprite  = sodapop.newAnimatedSprite()
 
 	self.sprite:setAnchor(function ()
@@ -426,7 +433,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{7, self.palette, 7, self.palette, .8},
+			{7, palette, 7, palette, .8},
 		},
 	})
 	-- in water
@@ -435,7 +442,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{1, self.palette, 2, self.palette, .8},
+			{1, palette, 2, palette, .8},
 		},
 	})
 
@@ -444,7 +451,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{3, self.palette, 4, self.palette, .4},
+			{3, palette, 4, palette, .4},
 		},
 	})
 	self.sprite:addAnimation('movey', {
@@ -452,7 +459,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{5, self.palette, 6, self.palette, .4},
+			{5, palette, 6, palette, .4},
 		},
 	})
 	
@@ -461,7 +468,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{8, self.palette, 11, self.palette, .4},
+			{8, palette, 11, palette, .4},
 		},
 	})
 	self.sprite:addAnimation('dead', {
@@ -469,7 +476,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{12, self.palette, 13, self.palette, .8},
+			{12, palette, 13, palette, .8},
 		},
 	})
 	self.sprite:addAnimation('emote', {
@@ -477,7 +484,7 @@ function Player:spriteInit()
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{14, self.palette, 21, self.palette, .1},
+			{14, palette, 21, palette, .1},
 		},
 	})
 

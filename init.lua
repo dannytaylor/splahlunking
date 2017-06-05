@@ -76,6 +76,7 @@ function startMatch()
 	end
 	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
 	cam:setScale(windowScale)
+	cam:setWindow(0,0,windowW,windowH)
 	cam:setPosition(players[pid].x, players[pid].y)
 
 	ui = UI()
@@ -89,18 +90,22 @@ function initSounds()
 	sfx_splash = love.audio.newSource("sfx/splash.ogg","static")
 	sfx_explode = love.audio.newSource("sfx/explode.ogg","static")
 	sfx_collect = love.audio.newSource("sfx/treasure.ogg","static")
+	sfx_collect:setVolume(0.75)
 	sfx_death = love.audio.newSource("sfx/death.ogg","static")
+	sfx_death2 = love.audio.newSource("sfx/death2.ogg","static")
 	sfx_bubble1 = love.audio.newSource("sfx/bubble1.ogg","static")
 	sfx_breath = love.audio.newSource("sfx/breath.ogg","static")
 	sfx_portal = love.audio.newSource("sfx/portal.ogg","static")
-	sfx_emote = {
-		love.audio.newSource("sfx/emote1.ogg","static"),
-		love.audio.newSource("sfx/emote2.ogg","static"),
-		love.audio.newSource("sfx/emote3.ogg","static"),
-		love.audio.newSource("sfx/emote4.ogg","static"),
-		love.audio.newSource("sfx/emote5.ogg","static"),
-		love.audio.newSource("sfx/emote6.ogg","static"),
-	}
+	sfx_countdown1 = love.audio.newSource("sfx/countdown1.ogg","static")
+	sfx_countdown2 = love.audio.newSource("sfx/countdown2.ogg","static")
+	-- sfx_emote = {
+	-- 	love.audio.newSource("sfx/emote1.ogg","static"),
+	-- 	love.audio.newSource("sfx/emote2.ogg","static"),
+	-- 	love.audio.newSource("sfx/emote3.ogg","static"),
+	-- 	love.audio.newSource("sfx/emote4.ogg","static"),
+	-- 	love.audio.newSource("sfx/emote5.ogg","static"),
+	-- 	love.audio.newSource("sfx/emote6.ogg","static"),
+	-- }
 
 	song1 =  love.audio.newSource("sfx/song1.ogg")
 	song2 = love.audio.newSource("sfx/song2.ogg")

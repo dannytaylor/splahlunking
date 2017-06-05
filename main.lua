@@ -27,6 +27,7 @@ require 'obj/Bubbler'
 require 'obj/Menu'
 require 'obj/Button'
 require 'obj/Screen'
+-- require 'obj/Trail'
 
 players = {}
 pid = nil

@@ -1,7 +1,7 @@
 # [splahlunking](https://xhg.itch.io/splahlunking)
 ### (splash-spelunking)
 
-forewarning: this code is an uncommented mess of spaghetti code.
+forewarning: this code is an uncommented mess of spaghetti jam-code.
 
 game made with löve in ~1 week (jam version ~3 days) for #divejam
 

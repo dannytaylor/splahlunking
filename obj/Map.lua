@@ -7,8 +7,8 @@ caveGen = 0.52
 floodThresh = 0.40
 waterLevel = 10
 maxTreasure = 100
-maxLargeTreasure = 12
-maxBreaths = 20
+maxLargeTreasure = 20
+maxBreaths = 24
 
 function Map:initialize(data)
 	if data then
@@ -21,9 +21,9 @@ function Map:initialize(data)
 		self.treasurePoints = data.t
 		self.breathPoints = data.b
 	else
-		maxTreasure = 100*(1+(numConnected)/4)
-		maxLargeTreasure = 16*(1+(numConnected)/4)
-		maxBreaths = 24*(1+numConnected/4)
+		maxTreasure = 100*(1+(numConnected-1)/4)
+		maxLargeTreasure = 16*(1+(numConnected-1)/4)
+		maxBreaths = 24*(1+(numConnected-1)/4)
 		self.w, self.h = 0,0
 		self.attempts = 0 
 		self.state = {}

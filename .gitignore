@@ -1,3 +1,4 @@
 *.love
 *.zip
 *.exe
+lib/dreamlo_secret.lua

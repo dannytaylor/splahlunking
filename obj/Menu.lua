@@ -44,6 +44,19 @@ function Menu:draw()
 		-- love.graphics.print("ESC TO CANCEL", 40, 10)
 	end
 
+	if self.currentScreen == self.screens['leaderboard'] then 
+		if #leaderboard == 0 then 
+			love.graphics.print("CONNECTION",34,31)
+			love.graphics.print("FAILED",34,39)
+		else
+			for i = 1, math.min(#leaderboard,5) do
+				love.graphics.print(leaderboard[i].score,17,31+(i-1)*8)
+				love.graphics.print(leaderboard[i].name,34,31+(i-1)*8)
+				love.graphics.print(leaderboard[i].char,87,31+(i-1)*8)
+			end
+		end
+	end
+
 	love.graphics.setCanvas()
 	love.graphics.draw(self.canvas, 0, 0, 0, windowScale/menuscale, windowScale/menuscale)
 end
@@ -61,12 +74,14 @@ function Menu:initScreens()
 		['multi'] = Screen(),
 		['join'] = Screen(),
 		['char'] = Screen(),
+		['leaderboard'] = Screen(),
 	}
 
 	-- screen setups
 	self:ss_title()
 	self:ss_multi()
 	self:ss_char()
+	self:ss_leaderboard()
 
 
 	self.currentScreen = self.screens['title']
@@ -92,7 +107,17 @@ function Menu:ss_title()
 		end
 		),
 		Button('quit',80,48,btq.b3,btq.b3a,function () 
-			love.event.quit() 
+			quote = Dreamlo:get(Dreamlo.DataTypes.PIPE)
+			leaderboard = {}
+			if quote then for line in quote:gmatch("([^\r\n]*)[\r\n]") do
+				local i = #leaderboard + 1
+				local nm,sc,ch = string.match(line, '(%w+)|(%d+)|%d+|(%w+)') --|%d+/%d+/%d+ %d+:%d+:%d+ %w+|%d+')
+				print(nm,sc,ch)
+				ch = string.sub(string.upper(ch),1,8)
+				leaderboard[i] = {name=nm,score=sc,char=ch}
+			end end
+
+			self.currentScreen = self.screens['leaderboard']
 		end
 		),
 	}
@@ -163,4 +188,10 @@ function Menu:ss_char()
 	ss['char'].buttonIndex =  1
 	ss['char'].currentButton =  ss['char'].buttons[1]
 	ss['char'].currentButton.active = true
+end
+
+function Menu:ss_leaderboard()
+	local ss = self.screens
+
+	ss['leaderboard'].bgImg = leaderboardbg
 end

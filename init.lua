@@ -15,6 +15,9 @@ fid = 1
 followtimer = 0
 
 
+Dreamlo.setSecretCode(dreamlo_secret)
+Dreamlo.setPublicCode('593513e8758d1503445e8fbf')
+
 function init()
 	windowW, windowH = viewW*windowScale, viewH*windowScale
 	love.window.setMode(windowW, windowH, {msaa = 0})
@@ -24,7 +27,7 @@ function init()
 	love.window.setIcon(icon)
 	love.graphics.setLineStyle('rough')
 
-	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!='\"+", 1)
+	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>", 1)
 	love.graphics.setFont( font )
 
 	initSounds()
@@ -98,6 +101,7 @@ function initSounds()
 	sfx_portal = love.audio.newSource("sfx/portal.ogg","static")
 	sfx_countdown1 = love.audio.newSource("sfx/countdown1.ogg","static")
 	sfx_countdown2 = love.audio.newSource("sfx/countdown2.ogg","static")
+	sfx_dolphin = love.audio.newSource("sfx/dolphin.ogg","static")
 	-- sfx_emote = {
 	-- 	love.audio.newSource("sfx/emote1.ogg","static"),
 	-- 	love.audio.newSource("sfx/emote2.ogg","static"),
@@ -135,6 +139,7 @@ function initSprites() -- and quads
 	titlebg = love.graphics.newImage 'img/titlebg.png'
 	titlebg2 = love.graphics.newImage 'img/connectbg.png'
 	titlebg3 = love.graphics.newImage 'img/charbg.png'
+	leaderboardbg = love.graphics.newImage 'img/leaderboard.png'
 	disconnectimg = love.graphics.newImage 'img/disconnect.png'
 
 	camp = {
@@ -148,7 +153,7 @@ function initSprites() -- and quads
 	breathsheet = love.graphics.newImage 'img/breath.png'
 
 	moAni_sheets = {
-		love.graphics.newImage 'img/camp1_ani.png',
+		love.graphics.newImage 'img/camp3_ani.png',
 		love.graphics.newImage 'img/camp3_ani.png',
 		love.graphics.newImage 'img/camp3_ani.png'
 	}
@@ -255,6 +260,10 @@ function initSprites() -- and quads
 		d34 = love.graphics.newQuad(12*tileSize,  4*tileSize, tileSize, tileSize, tilesetW, tilesetH),
 	}
 
+	eeq = {
+			love.graphics.newQuad(64,   40, 4*8,3*8, tilesetW, tilesetH),
+			love.graphics.newQuad(96, 	40, 4*8,3*8, tilesetW, tilesetH),
+	}
 	tilesetW, tilesetH = uiSheet:getWidth(), uiSheet:getHeight()
 	uiq = { -- ui quads
 		bubble_s   = love.graphics.newQuad(0*tileSize,  0*tileSize, tileSize, tileSize, tilesetW, tilesetH),
@@ -371,4 +380,6 @@ function initSprites() -- and quads
 		love.graphics.newQuad(176,  4*32, 5*16,2*16, tilesetW, tilesetH),
 		love.graphics.newQuad(176,  5*32, 5*16,2*16, tilesetW, tilesetH),
 	}
+
+
 end

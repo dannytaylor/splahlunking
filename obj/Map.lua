@@ -178,6 +178,9 @@ function Map:setCanvas()
 		end
 	end
 	love.graphics.draw(camp[mapsel], 48*tileSize, 0)
+
+	-- self:drawEE()
+
 	love.graphics.setCanvas()
 	self.tileCanvas:setFilter("nearest", "nearest")
 end
@@ -654,5 +657,57 @@ function Map:spawnBreaths()
 	end
 end
 
+function Map:drawEE()
+	local x1,y1 = self:getEEPoint()
+	local ee = lume.randomchoice({eeq[1],eeq[2]})
+	love.graphics.draw(tiles[1],ee,(x1-1)*tileSize,y1*tileSize)
+end
 
 
+function Map:getEEPoint()
+	local x1,y1 = 3,self.h-3
+	local p1good = false
+
+	local attempts = 0
+	while not p1good and attempts<500 do
+		x1,y1 = math.random(3,self.w-5), math.random(self.h*4/5,self.h-3)
+		p1good = true
+		for i = x1, x1+3 do
+			if self.state[i][y1+1] ~= 'wall' then
+				p1good = false
+			end
+			if self.state[i][y1] ~= 'floor' then
+				p1good = false
+			end
+		end
+		attempts = attempts + 1
+	end
+	return x1,y1
+end
+
+function mapoverlay_init()
+	local framerate = 0.2
+	if mapsel == 1 then framerate = 0.4 end
+	moAni  = sodapop.newAnimatedSprite(64*tileSize,12*tileSize)
+		moAni:addAnimation('default', {
+			image       = moAni_sheets[mapsel],
+			frameWidth  = 64,
+			frameHeight = 64,
+			frames      = {
+				{1, 1, 4, 1, framerate},
+			},
+		})
+
+end
+
+
+function mapoverlay_update(dt)
+	--update animations
+	if mapsel == 3 then moAni:update(dt) end
+end
+
+function mapoverlay_draw()
+
+	-- animations here
+	if mapsel == 3 then moAni:draw() end
+end

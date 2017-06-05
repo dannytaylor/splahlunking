@@ -1,143 +1,178 @@
 -- input.lua
 
 function love.keypressed(key) -- key bindings
-	if key == 'm' then 
-		mute = not mute
-		if currentsong then
-			if mute then currentsong:stop()
-			else currentsong:play()
-			end
-		end
-	end
-	if gamestate == 0 then
-		if key == 'f1' and windowScale~=2 then 
-			windowScale = 2
-			windowW, windowH = viewW*windowScale, viewH*windowScale
-			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f2' and windowScale~=4 then 
-			windowScale = 4
-			windowW, windowH = viewW*windowScale, viewH*windowScale
-			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f3' and windowScale~=6 then 
-			windowScale = 6
-			windowW, windowH = viewW*windowScale, viewH*windowScale
-			love.window.setMode(windowW, windowH, {msaa = 0})
-		elseif key == 'f4' and windowScale~=8 then 
-			love.window.setMode(windowW, windowH, {msaa = 0,fullscreen=true})
-			windowScale = math.min(love.graphics.getWidth()/viewW,love.graphics.getHeight()/viewH)
-			windowW, windowH = viewW*windowScale, viewH*windowScale
-			love.window.setMode(windowW, windowH, {msaa = 0, fullscreen=true})
-		end
-
-		menukeys(key)
-	end
-	if gamestate == 1 then
+	if scoreBox.active then
 		if key == 'escape' then
-			gamestate = 0
+			scoreBox.active  = false
+		elseif key == 'return' then
+			local charnames = {
+				'dive classic',
+				'diva',
+				'top dive',
+				'mr dive',
+				'evid',
+				'sanic',
+			}
+			local comment = charnames[players[pid].palette]
+			Dreamlo.add(scoreBox.text, players[pid].score, 0, comment )
+			scoreBox.submitted = true
+			scoreBox.active  = false
+		elseif key == "backspace" then
+			-- get the byte offset to the last UTF-8 character in the string.
+			local byteoffset = utf8.offset(scoreBox.text, -1)
 
-			-- reset everythin
-			numConnected = 1
-			players = {}
-			map = {}
-			ui = nil
-			gametime = 0
-			tankBubbler = nil
-			if currentsong then currentsong:stop() end
-			currentsong = song1
-			matchinprogress = true
-
-			menu.screens['char'].buttons[3].img = btq.c2
-			menu.screens['char'].buttons[3].imgActive = btq.c2a
-
-			if client then 
-				client:disconnect() 
-				client = nil
+			if byteoffset then
+				-- remove the last UTF-8 character.
+				-- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
+				scoreBox.text = string.sub(scoreBox.text, 1, byteoffset - 1)
 			end
-			if server then 
-				server:destroy()
-				server = nil
+		end
+	else
+		if key == 'm' then 
+			mute = not mute
+			if currentsong then
+				if mute then currentsong:stop()
+				else currentsong:play()
+				end
 			end
-			menu.currentScreen = menu.screens['title']
-			-- love.event.quit()
+		end
+		if gamestate == 0 then
+			if key == 'f1' and windowScale~=2 then 
+				windowScale = 2
+				windowW, windowH = viewW*windowScale, viewH*windowScale
+				love.window.setMode(windowW, windowH, {msaa = 0})
+			elseif key == 'f2' and windowScale~=4 then 
+				windowScale = 4
+				windowW, windowH = viewW*windowScale, viewH*windowScale
+				love.window.setMode(windowW, windowH, {msaa = 0})
+			elseif key == 'f3' and windowScale~=6 then 
+				windowScale = 6
+				windowW, windowH = viewW*windowScale, viewH*windowScale
+				love.window.setMode(windowW, windowH, {msaa = 0})
+			elseif key == 'f4' and windowScale~=8 then 
+				love.window.setMode(windowW, windowH, {msaa = 0,fullscreen=true})
+				windowScale = math.min(love.graphics.getWidth()/viewW,love.graphics.getHeight()/viewH)
+				windowW, windowH = viewW*windowScale, viewH*windowScale
+				love.window.setMode(windowW, windowH, {msaa = 0, fullscreen=true})
+			end
 
-		-- return to char sel
-		elseif key == 'r' then
-			if alldone and not client then -- and match == over then
+			menukeys(key)
+		end
+		if gamestate == 1 then
+			if key == 'escape' then
 				gamestate = 0
-				tankBubbler = nil
 
+				-- reset everythin
+				numConnected = 1
+				players = {}
+				map = {}
+				ui = nil
+				gametime = 0
+				tankBubbler = nil
 				if currentsong then currentsong:stop() end
 				currentsong = song1
-				menu.currentScreen = menu.screens['char']
+				matchinprogress = true
 
-				if server then
-					if numConnected ~=  server:getClientCount()+1 then
-						numConnected = server:getClientCount()+1
-						local cl = server:getClients() -- clientlist
-						for i=2,numConnected do
-							cl[i-1]:send("newpid",{
-								n = i
-								})
+				menu.screens['char'].buttons[3].img = btq.c2
+				menu.screens['char'].buttons[3].imgActive = btq.c2a
+
+				if client then 
+					client:disconnect() 
+					client = nil
+				end
+				if server then 
+					server:destroy()
+					server = nil
+				end
+				menu.currentScreen = menu.screens['title']
+				-- love.event.quit()
+
+			-- return to char sel
+			elseif key == 'r' then
+				if alldone and not client then -- and match == over then
+					gamestate = 0
+					tankBubbler = nil
+
+					if currentsong then currentsong:stop() end
+					currentsong = song1
+					menu.currentScreen = menu.screens['char']
+
+					if server then
+						if numConnected ~=  server:getClientCount()+1 then
+							numConnected = server:getClientCount()+1
+							local cl = server:getClients() -- clientlist
+							for i=2,numConnected do
+								cl[i-1]:send("newpid",{
+									n = i
+									})
+							end
 						end
+
+						server:sendToAll('returntochar', {
+							num = numConnected,
+						})
+
+						map = Map()
+						mapdata = map:packageData()
+						binary_map = bitser.dumps(mapdata)
+
+						server:sendToAll("map",{
+							m = binary_map,
+							n = numConnected
+						})
 					end
-
-					server:sendToAll('returntochar', {
-						num = numConnected,
-					})
-
-					map = Map()
-					mapdata = map:packageData()
-					binary_map = bitser.dumps(mapdata)
-
-					server:sendToAll("map",{
-						m = binary_map,
-						n = numConnected
-					})
 				end
-			end
-		elseif key == 'q' and debug then
-			cam:setScale(cam:getScale()*2)
-		elseif key == 'e' and debug then
-			cam:setScale(cam:getScale()/2)
-		elseif key == 'g' and debug  then
-			map = Map()
-			world:add('player', players[pid].x,players[pid].y,tileSize,tileSize)
-		elseif key == 'x' or key == 'return'  then
-			if not players[pid].emoteTimer and gametime > 0 and players[pid].alive then
-				players[pid].emoteTimer = 0 
-				-- love.audio.play(sfx_emote[players[pid].palette])
-			end
-		--dolphin powers
-		elseif key == 'p' then
-			if players[pid].emoteTimer and players[pid].emoteTimer>0 and gametime > 0 and players[pid].alive and not dolphinswitch then
-				dolphinswitch = true
-				-- local xflip = players[pid].sprite.flipX
-				players[pid]:spriteInit(7)
-				players[pid].dolphin = not players[pid].dolphin
-				if players[pid].dolphin then 
+			elseif key == 'q' and debug then
+				cam:setScale(cam:getScale()*2)
+			elseif key == 'e' and debug then
+				cam:setScale(cam:getScale()/2)
+			elseif key == 'g' and debug  then
+				map = Map()
+				world:add('player', players[pid].x,players[pid].y,tileSize,tileSize)
+
+			elseif key == 'return' and players[pid].surface and players[pid].win and not client and not server and not scoreBox.submitted then 
+				scoreBox.active = true
+				scoreBox.text = ''
+			elseif key == 'x' or key == 'return'  then
+				if not players[pid].emoteTimer and gametime > 0 and players[pid].alive then
+					players[pid].emoteTimer = 0 
+					-- love.audio.play(sfx_emote[players[pid].palette])
+				end
+			--dolphin powers
+			elseif key == 'p' then
+				if players[pid].emoteTimer and players[pid].emoteTimer>0 and gametime > 0 and players[pid].alive and not dolphinswitch then
+					dolphinswitch = true
+
+					-- local xflip = players[pid].sprite.flipX
 					players[pid]:spriteInit(7)
-					players[pid].breathRate = players[pid].breathRate - 1
-					-- players[pid].speedx = players[pid].speedx + 10
-					-- players[pid].speedy = players[pid].speedy + 10
-				else 
-					players[pid]:spriteInit(players[pid].palette)
-					players[pid].breathRate = players[pid].breathRate + 1
-					-- players[pid].speedx = players[pid].speedx - 10
-					-- players[pid].speedy = players[pid].speedy - 10
+					players[pid].currentAnim = 'poof'
+					players[pid].nextAnim = 'poof'
+					players[pid].dolphin = not players[pid].dolphin
+					if players[pid].dolphin then 
+						players[pid]:spriteInit(7)
+						players[pid].breathRate = players[pid].breathRate - 1
+						-- players[pid].speedx = players[pid].speedx + 10
+						-- players[pid].speedy = players[pid].speedy + 10
+					else 
+						players[pid]:spriteInit(players[pid].palette)
+						players[pid].breathRate = players[pid].breathRate + 1
+						-- players[pid].speedx = players[pid].speedx - 10
+						-- players[pid].speedy = players[pid].speedy - 10
+					end
+					players[pid].sprite:switch('poof')
+					if client then
+						client:send("dolphin",{
+							p = pid,
+							d = players[pid].dolphin 
+						})
+					elseif server then
+						server:sendToAll('dolphin', {
+							p = 1,
+							d = players[pid].dolphin 
+						})
+					end
+					sfx_dolphin:play()
 				end
-				players[pid].sprite:switch('emote')
-				if client then
-					client:send("dolphin",{
-						p = pid,
-						d = players[pid].dolphin 
-					})
-				elseif server then
-					server:sendToAll('dolphin', {
-						p = 1,
-						d = players[pid].dolphin 
-					})
-				end
-				sfx_countdown2:play()
 			end
 		end
 	end

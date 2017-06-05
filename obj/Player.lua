@@ -487,6 +487,14 @@ function Player:spriteInit(palette)
 			{14, palette, 21, palette, .1},
 		},
 	})
+	self.sprite:addAnimation('poof', {
+		image       = uiSheet,
+		frameWidth  = 16,
+		frameHeight = 24,
+		frames      = {
+			{5, 1, 8, 1, .2},
+		},
+	})
 
 	self.splash  = sodapop.newAnimatedSprite(0,8*tileSize+6)
 	self.splash:addAnimation('default', {

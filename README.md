@@ -43,6 +43,8 @@ löve libs used:
 - [sodapop](https://github.com/tesselode/sodapop) (sprite animations)
 - [sock](https://github.com/camchenry/sock.lua) (networking)
 - [bitser](https://github.com/gvx/bitser) (serialization)
+
+[cell automata method](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels) for map gen
 ___
 
 special thanks to devin for the feedback and playtesting with me

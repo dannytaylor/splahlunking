@@ -183,7 +183,7 @@ function initServer()
 		if ctd then players[id]:spriteInit(7)
 		else players[id]:spriteInit(players[id].palette)
 		end
-		players[id].sprite:switch('emote')
+		players[id].sprite:switch('poof')
 		server:sendToAll('dolphin',{
 			p = id,
 			d = ctd
@@ -253,11 +253,13 @@ function initClient()
 		end)
 		client:on("dolphin", function(data)
 			local id = data.p
-			local ctd = data.d --change to dolphin
-			if ctd then players[id]:spriteInit(7)
-			else players[id]:spriteInit(players[id].palette)
+			if id ~= pid then
+				local ctd = data.d --change to dolphin
+				if ctd then players[id]:spriteInit(7)
+				else players[id]:spriteInit(players[id].palette)
+				end
+				players[id].sprite:switch('poof')
 			end
-			players[id].sprite:switch('emote')
 		end)
 		client:on("start", function(data)
 			gamestate = data.state

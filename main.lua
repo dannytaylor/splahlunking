@@ -8,15 +8,17 @@ gamera  = require 'lib/gamera'
 bump    = require 'lib/bump'		-- collisions 				https://github.com/kikito/bump.lua
 sodapop = require 'lib/sodapop'		-- sprite anim 				https://github.com/tesselode/sodapop
 sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock.lua
+Dreamlo = require "lib/dreamlo"			-- leaderboards				
+require "lib/dreamlo_secret"			-- private leaderboard code				
 
 bitser  = require "lib/bitser"
 -- binser  = require "lib/binser"
-
+utf8 = require("utf8")
 
 require 'init'
 require 'input'
 require 'sockhelper'
-require 'mapoverlay'
+
 
 require 'obj/Map'
 require 'obj/Player'

@@ -19,6 +19,9 @@ function UI:initialize()
 			{1, 1, 5, 1, .4},
 		},
 	})
+	scoreBox.active = false
+	scoreBox.submitted = false
+	scoreBox.text = ''
 
 end
 
@@ -81,10 +84,46 @@ function UI:draw()
 		self.tankmsg:draw()
 	end
 
+	
+	if not client and not server and players[pid].win and players[pid].score ~= 0 then
+		if not scoreBox.active and not scoreBox.submitted then
+			love.graphics.setColor(224, 111, 139)
+			love.graphics.print('ENTER> ',scoreBox.x, scoreBox.y)
+			love.graphics.setColor(255,255,255)
+			love.graphics.print('LEADERBOARD', scoreBox.x+24, scoreBox.y)
+		elseif not scoreBox.active and scoreBox.submitted then
+			love.graphics.print('SCORE SUBMITTED!', scoreBox.x+6, scoreBox.y)
+		else
+			love.graphics.setColor(224, 111, 139)
+			love.graphics.print('ENTER>>', scoreBox.x, scoreBox.y)
+			love.graphics.setColor(255,255,255)
+			love.graphics.print(scoreBox.text, scoreBox.x+28, scoreBox.y)
+		end
+	end
 
 
 	love.graphics.setCanvas()
 	love.graphics.draw(self.canvas, 0, 0, 0, windowScale, windowScale)
+end
+
+scoreBox = {
+    x = 33,
+    y = 26,
+    text = '',
+    active = false,
+    submitted = false,
+}
+
+function love.textinput (text)
+    if scoreBox.active then
+    	local t = string.match(text,"%w+")
+		if t then 
+			t = string.upper(t)
+			if string.len(scoreBox.text) <= 11 then
+	        	scoreBox.text = scoreBox.text .. t
+    		end	
+        end
+    end
 end
 
 function UI:update(dt)

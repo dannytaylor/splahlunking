@@ -50,6 +50,10 @@ function Player:initialize(x,y,id,skin)
 	self.win = false
 	self.surface = false
 
+	self.pu = nil
+	self.puTimer = 0
+	self.pooftimer = 1
+
 	self.deadtimer = 0
 	deadtime = 5
 
@@ -134,10 +138,60 @@ function Player:draw()
 end
 
 function Player:update(dt)
+	self.pooftimer = self.pooftimer + dt
+	if self.pooftimer > pooftime and self.sprite.current == self.sprite.animations['poof'] then 
+		if self.surface then 
+			self.nextAnim = 'idle'
+			self.currentAnim = self.nextAnim
+			self.sprite:switch(self.currentAnim)
+		elseif not self.alive then 
+			self.nextAnim = 'dead' 
+			self.currentAnim = self.nextAnim
+			self.sprite:switch(self.currentAnim)
+		end
+	end
+
 	if pid == self.id then
 
 		gametime = gametime + dt
-	
+		
+		if self.pu then
+			self.puTimer = self.puTimer + dt
+			if self.puTimer >= puMaxTime then
+				self.puTimer = 0
+				if self.pu == 'dolphin' then
+					self.speedx = self.speedx - dolphinspeed
+					self.speedy = self.speedy - dolphinspeed
+					love.audio.play(sfx_dolphin)
+				elseif self.pu == 'walrus' then
+					self.breathRate = self.breathRate*walrusbreath
+					love.audio.play(sfx_walrus)
+				end
+
+				self.pu = nil
+				self:spriteInit(self.palette)
+
+				if client then
+					client:send("changeShape",{
+						p = pid,
+						skin = nil,
+						swap = true
+					})
+				elseif server then
+					server:sendToAll('changeShape', {
+						p = 1,
+						skin = nil,
+						swap = true
+					})
+				end
+				self.currentAnim = 'poof'
+				self.nextAnim = 'poof'
+				self.sprite:switch('poof')
+				self.pooftimer = 0
+
+			end
+		end
+
 		if not self.win then
 			-- if gametime > gametimeMax then
 			-- 	self.win = true
@@ -226,7 +280,7 @@ function Player:update(dt)
 					self.sprite.flipY = false
 				end
 
-				if self.nextAnim ~= self.currentAnim then
+				if self.nextAnim ~= self.currentAnim and self.pooftimer > pooftime  then
 					self.currentAnim = self.nextAnim
 					self.sprite:switch(self.currentAnim)
 				end
@@ -241,6 +295,8 @@ function Player:update(dt)
 							return 'cross'
 						elseif other:sub(1,4) == 'brea'  then
 							return 'cross'
+						elseif other:sub(1,4) == 'powe'  then
+							return 'cross'
 						elseif other:sub(1,4) == 'wall'  then
 							return 'slide'
 						else
@@ -252,7 +308,7 @@ function Player:update(dt)
 					self.x, self.x = self.x + dx, self.y + dy
 
 
-					cam:setPosition(players[pid].x, players[pid].y)
+					cam:setPosition(self.x, self.y)
 					for i=1, cols_len do
 						local other = cols[i].other
 						if other:sub(1,4) == 'trea'  then
@@ -264,6 +320,11 @@ function Player:update(dt)
 							self.currentBreath = other
 						else 
 							self.currentBreath = nil
+					 	end
+					 	if other:sub(1,4) == 'powe'  then
+							self.currentPU = other
+						else 
+							self.currentPU = nil
 					 	end
 					end
 					
@@ -305,6 +366,8 @@ function Player:update(dt)
 			end
 		end
 
+
+		-- local player collisions
 		if self.currentTreasure then
 			self.activeTreasure = treasureAt(world:getRect(self.currentTreasure))
 
@@ -326,6 +389,64 @@ function Player:update(dt)
 				love.audio.play(sfx_breath)
 			end
 			self.activeBreath.active = false
+		elseif self.currentPU and self.alive then
+			local px,py = world:getRect(self.currentPU)
+			self.activePU = puAt(px,py)
+			if self.activePU.active then
+				local putype = self.activePU.type
+				if self.pu == nil or self.pu == putype then 
+					if putype == 'dolphin' then
+						if self.pu == nil then 
+							self.speedx = self.speedx + dolphinspeed
+							self.speedy = self.speedy + dolphinspeed
+						end
+						love.audio.play(sfx_dolphin)
+					elseif putype == 'walrus' then
+						if self.pu == nil then
+							self.breathRate = self.breathRate/walrusbreath
+						end
+						love.audio.play(sfx_walrus)
+					end
+					if self.pu == nil then
+						if putype == 'dolphin' then
+							self:spriteInit(7)
+						elseif putype == 'walrus' then
+							self:spriteInit(8)
+						end
+						self.currentAnim = 'poof'
+						self.nextAnim = 'poof'
+						self.sprite:switch('poof')
+						self.pooftimer = 0
+					end
+
+					local sk,sw = nil,nil
+					if putype =='dolphin' then sk =7
+					elseif putype =='walrus' then sk =8 end
+					if self.pu == nil then sw = true end
+
+					if client then
+						client:send("changeShape",{
+							p = pid,
+							skin = sk,
+							swap = sw,
+							x = px,
+							y = py,
+						})
+					elseif server then
+						server:sendToAll('changeShape', {
+							p = 1,
+							skin = sk,
+							swap = sw,
+							x = px,
+							y = py,
+						})
+					end
+					self.puTimer = 0
+					self.pu = putype
+					self.activePU.active = false
+					self.activePU.sprite:switch(putype..'2')
+				end
+			end
 		end
 
 
@@ -368,7 +489,7 @@ function Player:update(dt)
 		end
 	end
 
-	if self.emoteTimer and self.alive then
+	if self.emoteTimer and self.alive and self.pooftimer > pooftime then
 		if self.emoteTimer == 0 then
 			self.sprite:switch('emote')
 			self.nextAnim = 'emote'
@@ -389,7 +510,11 @@ function Player:update(dt)
 				self.currentAnim = 'idle'
 			end
 		end
-	elseif self.nextAnim and self.nextAnim ~= self.currentAnim then
+	elseif self.nextAnim and self.nextAnim ~= self.currentAnim and self.pooftimer > pooftime then
+		if currentAnim == 'poof' then
+			if self.alive then self.nextAnim = 'idle'
+			else self.nextAnim = 'dead'end
+		end
 		self.currentAnim = self.nextAnim
 		self.sprite:switch(self.currentAnim)
 	end
@@ -415,6 +540,13 @@ end
 function breathAt(x,y) -- gets the breath at x,y
 	for i = 1, #map.breaths do
 		if map.breaths[i].x == x and map.breaths[i].y == y then return map.breaths[i] end
+	end
+	return nil
+end
+
+function puAt(x,y) -- gets the breath at x,y
+	for i = 1, #map.powerups do
+		if map.powerups[i].x == x and map.powerups[i].y == y then return map.powerups[i] end
 	end
 	return nil
 end
@@ -492,7 +624,7 @@ function Player:spriteInit(palette)
 		frameWidth  = 16,
 		frameHeight = 24,
 		frames      = {
-			{5, 1, 8, 1, .2},
+			{5, 1, 8, 1, .1},
 		},
 	})
 

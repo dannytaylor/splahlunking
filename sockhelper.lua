@@ -177,16 +177,35 @@ function initServer()
 	server:on("stillconnected", function(data)
 		
 	end)
-	server:on("dolphin", function(data)
+	server:on("changeShape", function(data)
 		local id = data.p
-		local ctd = data.d --change to dolphin
-		if ctd then players[id]:spriteInit(7)
-		else players[id]:spriteInit(players[id].palette)
+		local sk = data.skin
+		local sw = data.swap
+		local px,py = data.x,data.y
+		if sw then
+			if sk then players[id]:spriteInit(sk)
+			else players[id]:spriteInit(players[id].palette)
+			end
+			players[id].sprite:switch('poof')
+			players[id].pooftimer = 0
+			players[id].currentAnim = 'poof'
+			players[id].nextAnim = 'poof'
 		end
-		players[id].sprite:switch('poof')
-		server:sendToAll('dolphin',{
+
+		local puSwap = puAt(px,py)
+		if puSwap and puSwap.active then 
+			puSwap.active = false
+			if sk then
+				if sk == 7 then puSwap.sprite:switch('dolphin2')
+				elseif sk == 8 then puSwap.sprite:switch('walrus2') 
+				end
+			end
+		end
+
+		server:sendToAll('changeShape',{
 			p = id,
-			d = ctd
+			skin = sk,
+			swap = sw
 			})
 	end)
 	server:on("disconnect", function(data, client)
@@ -251,14 +270,32 @@ function initClient()
 		client:on("pid", function(data)
 			pid = data.n
 		end)
-		client:on("dolphin", function(data)
+		client:on("changeShape", function(data)
 			local id = data.p
 			if id ~= pid then
-				local ctd = data.d --change to dolphin
-				if ctd then players[id]:spriteInit(7)
-				else players[id]:spriteInit(players[id].palette)
+				local px = data.x
+				local py = data.y
+				local sk = data.skin
+				local sw = data.swap
+				local puSwap = puAt(px,py)
+				if puSwap and puSwap.active then 
+					puSwap.active = false
+					if sk then
+						if sk == 7 then puSwap.sprite:switch('dolphin2')
+						elseif sk == 8 then puSwap.sprite:switch('walrus2') 
+						end
+					end
 				end
-				players[id].sprite:switch('poof')
+						
+				if sw then
+					if sk then players[id]:spriteInit(sk)
+					else players[id]:spriteInit(players[id].palette)
+					end
+					players[id].currentAnim = 'poof'
+					players[id].nextAnim = 'poof'
+					players[id].sprite:switch('poof')
+					players[id].pooftimer = 0
+				end
 			end
 		end)
 		client:on("start", function(data)

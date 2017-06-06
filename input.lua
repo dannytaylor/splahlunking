@@ -144,42 +144,53 @@ function love.keypressed(key) -- key bindings
 					players[pid].emoteTimer = 0 
 					-- love.audio.play(sfx_emote[players[pid].palette])
 				end
-			--dolphin powers
-			elseif key == 'p' then
-				if players[pid].emoteTimer and players[pid].emoteTimer>0 and gametime > 0 and players[pid].alive and not dolphinswitch then
-					dolphinswitch = true
-
-					-- local xflip = players[pid].sprite.flipX
-					players[pid]:spriteInit(7)
+			elseif key == 'y' and not client and not server then
+				if players[pid].gamestate == 'dry' and love.keyboard.isDown('p') then 
+					sfx_dolphin:play()	
+					local rand = lume.randomchoice({7,players[pid].palette})
+					players[pid]:spriteInit(rand)
 					players[pid].currentAnim = 'poof'
 					players[pid].nextAnim = 'poof'
-					players[pid].dolphin = not players[pid].dolphin
-					if players[pid].dolphin then 
-						players[pid]:spriteInit(7)
-						players[pid].breathRate = players[pid].breathRate - 1
-						-- players[pid].speedx = players[pid].speedx + 10
-						-- players[pid].speedy = players[pid].speedy + 10
-					else 
-						players[pid]:spriteInit(players[pid].palette)
-						players[pid].breathRate = players[pid].breathRate + 1
-						-- players[pid].speedx = players[pid].speedx - 10
-						-- players[pid].speedy = players[pid].speedy - 10
-					end
 					players[pid].sprite:switch('poof')
-					if client then
-						client:send("dolphin",{
-							p = pid,
-							d = players[pid].dolphin 
-						})
-					elseif server then
-						server:sendToAll('dolphin', {
-							p = 1,
-							d = players[pid].dolphin 
-						})
-					end
-					sfx_dolphin:play()
+					players[pid].pooftimer = 0
 				end
 			end
+			--dolphin powers
+				-- elseif key == 'p' then
+				-- 	if players[pid].emoteTimer and players[pid].emoteTimer>0 and gametime > 0 and players[pid].alive and not dolphinswitch then
+				-- 		dolphinswitch = true
+
+				-- 		-- local xflip = players[pid].sprite.flipX
+				-- 		players[pid]:spriteInit(7)
+				-- 		players[pid].currentAnim = 'poof'
+				-- 		players[pid].nextAnim = 'poof'
+				-- 		players[pid].dolphin = not players[pid].dolphin
+				-- 		if players[pid].dolphin then 
+				-- 			players[pid]:spriteInit(7)
+				-- 			players[pid].breathRate = players[pid].breathRate - 1
+				-- 			-- players[pid].speedx = players[pid].speedx + 10
+				-- 			-- players[pid].speedy = players[pid].speedy + 10
+				-- 		else 
+				-- 			players[pid]:spriteInit(players[pid].palette)
+				-- 			players[pid].breathRate = players[pid].breathRate + 1
+				-- 			-- players[pid].speedx = players[pid].speedx - 10
+				-- 			-- players[pid].speedy = players[pid].speedy - 10
+				-- 		end
+				-- 		players[pid].sprite:switch('poof')
+				-- 		if client then
+				-- 			client:send("dolphin",{
+				-- 				p = pid,
+				-- 				d = players[pid].dolphin 
+				-- 			})
+				-- 		elseif server then
+				-- 			server:sendToAll('dolphin', {
+				-- 				p = 1,
+				-- 				d = players[pid].dolphin 
+				-- 			})
+				-- 		end
+				-- 		sfx_dolphin:play()
+				-- 	end
+				-- end
 		end
 	end
 end

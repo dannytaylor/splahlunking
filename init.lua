@@ -27,7 +27,7 @@ function init()
 	love.window.setIcon(icon)
 	love.graphics.setLineStyle('rough')
 
-	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>@", 1)
+	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>@_", 1)
 	love.graphics.setFont( font )
 
 	initSounds()
@@ -102,6 +102,7 @@ function initSounds()
 	sfx_countdown1 = love.audio.newSource("sfx/countdown1.ogg","static")
 	sfx_countdown2 = love.audio.newSource("sfx/countdown2.ogg","static")
 	sfx_dolphin = love.audio.newSource("sfx/dolphin.ogg","static")
+	sfx_walrus = love.audio.newSource("sfx/walrus.ogg","static")
 	-- sfx_emote = {
 	-- 	love.audio.newSource("sfx/emote1.ogg","static"),
 	-- 	love.audio.newSource("sfx/emote2.ogg","static"),

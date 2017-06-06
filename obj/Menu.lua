@@ -114,8 +114,8 @@ function Menu:ss_title()
 			if quote then for line in quote:gmatch("([^\r\n]*)[\r\n]") do
 				local i = #leaderboard + 1
 				-- local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w+)') 
-				local nm,sc,ch = string.match(line, '(%w+)|(%d+)|%d+|(%w* *%w*)') 
-				print(nm,sc,ch)
+				local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w* *%w*)') 
+				-- print(nm,sc,ch)
 				ch = string.sub(string.upper(ch),1,7)
 				leaderboard[i] = {name=nm,score=sc,char=ch}
 			end end

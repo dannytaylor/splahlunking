@@ -99,6 +99,7 @@ function UI:draw()
 			love.graphics.print('ENTER>>', scoreBox.x, scoreBox.y)
 			love.graphics.setColor(255,255,255)
 			love.graphics.print(scoreBox.text, scoreBox.x+28, scoreBox.y)
+			-- love.graphics.print(scoreBox.error, scoreBox.x+14, scoreBox.y+7)
 		end
 	end
 
@@ -113,12 +114,14 @@ scoreBox = {
     text = '',
     active = false,
     submitted = false,
+    -- error = '',
 }
 
 function love.textinput (text)
     if scoreBox.active then
-    	-- local t = string.match(text,'@*%w*')
-    	local t = string.match(text,'%w+')
+    	local t = ''
+    	if string.len(scoreBox.text) == 0 then t = string.match(text,'%w*@*')
+    	else  t = string.match(text,'%w*') end
 		if t then 
 			t = string.upper(t)
 			if string.len(scoreBox.text) <= 11 then

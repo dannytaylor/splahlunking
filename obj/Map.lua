@@ -9,6 +9,7 @@ waterLevel = 10
 maxTreasure = 100
 maxLargeTreasure = 20
 maxBreaths = 24
+maxPU = 2
 
 function Map:initialize(data)
 	if data then
@@ -18,12 +19,15 @@ function Map:initialize(data)
 		self.tileState = data.ts
 		self.treasure = {}
 		self.breaths = {}
+		self.powerups = {}
 		self.treasurePoints = data.t
 		self.breathPoints = data.b
+		self.powerPoints = data.p
 	else
 		maxTreasure = 100*(1+(numConnected-1)/4)
 		maxLargeTreasure = 16*(1+(numConnected-1)/4)
 		maxBreaths = 24*(1+(numConnected-1)/4)
+		maxPU = math.max(2,numConnected)
 		self.w, self.h = 0,0
 		self.attempts = 0 
 		self.state = {}
@@ -33,6 +37,8 @@ function Map:initialize(data)
 		self.treasurePoints = {}
 		self.breaths = {}
 		self.breathPoints = {}
+		self.powerups = {}
+		self.powerPoints = {}
 
 	 	-- build random map
 		self:init()
@@ -43,11 +49,13 @@ function Map:initialize(data)
 
 		self:getTreasures()
 		self:getBreaths()
+		self:getPU()
 	end
 
 	self:bumpBuild()
 	self:spawnTreasures()
 	self:spawnBreaths()
+	self:spawnPU()
 
 	self.playerlight  = sodapop.newAnimatedSprite()
 	self.playerlight:setAnchor(function ()
@@ -121,12 +129,17 @@ function Map:draw()
 
 	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
 
+
 	for i=1,#self.treasure do
 		self.treasure[i]:draw()
 	end
 	for i,b in ipairs(self.breaths) do
 		b:draw()
 	end
+	for i,p in ipairs(self.powerups) do
+		p:draw()
+	end
+
 	love.graphics.setColor(255, 255, 255)
 
 	if mapsel ~=3 
@@ -158,6 +171,9 @@ function Map:update(dt)
 	for i,b in ipairs(self.breaths) do
 		b:update(dt)
 	end
+	for i,p in ipairs(self.powerups) do
+		p:update(dt)
+	end
 
 	self.playerlight:update(dt)
 end
@@ -186,7 +202,8 @@ function Map:setCanvas()
 end
 
 function Map:setColor(x,y)
-	if self.state[x][y] == 'floor' or self.state[x][y] == 'treasure' or self.state[x][y] == 'breath' then
+	local ss = self.state[x][y]
+	if ss== 'floor' or ss== 'treasure' or ss== 'breath' or ss== 'PU' then
 		if mapsel == 3 then love.graphics.setColor(0,0,0)
 		else
 			if y < waterLevel then -- above water line
@@ -611,6 +628,7 @@ function Map:packageData()
 		s 	= self.state,
 		t 	= self.treasurePoints,
 		b 	= self.breathPoints,
+		p 	= self.powerPoints,
 		ts 	= ts
 	}
 	return mapdata
@@ -626,12 +644,14 @@ function Map:getBreaths()
 	end
 end
 
-function Map:getEmptyPoint() -- empty point no wall neighbors
+function Map:getEmptyPoint(upper1,upper2) -- empty point no wall neighbors
 	local x1,y1 = 3,3
 	local p1good = false
+	local upper1 = upper1 or waterLevel+10
+	local upper2 = upper2 or math.floor(self.h/2)
 
 	while not p1good do
-		local ytop = math.random(waterLevel+10,math.floor(self.h/2))
+		local ytop = math.random(upper1,upper2)
 		x1,y1 = math.random(3,self.w-3), math.random(ytop,self.h-3)
 		p1good = true
 		for i = x1-1, x1+2 do
@@ -657,57 +677,71 @@ function Map:spawnBreaths()
 	end
 end
 
-function Map:drawEE()
-	local x1,y1 = self:getEEPoint()
-	local ee = lume.randomchoice({eeq[1],eeq[2]})
-	love.graphics.draw(tiles[1],ee,(x1-1)*tileSize,y1*tileSize)
-end
-
-
-function Map:getEEPoint()
-	local x1,y1 = 3,self.h-3
-	local p1good = false
-
-	local attempts = 0
-	while not p1good and attempts<500 do
-		x1,y1 = math.random(3,self.w-5), math.random(self.h*4/5,self.h-3)
-		p1good = true
-		for i = x1, x1+3 do
-			if self.state[i][y1+1] ~= 'wall' then
-				p1good = false
-			end
-			if self.state[i][y1] ~= 'floor' then
-				p1good = false
-			end
-		end
-		attempts = attempts + 1
+function Map:getPU()
+	local pup = self.powerPoints
+	for i=1,maxPU do
+		local a,b = self:getEmptyPoint()
+		self.state[a][b] = 'PU'
+		local type = lume.randomchoice({'dolphin','walrus'})
+		pup[#pup+1] = {x=a,y=b,t=type}
 	end
-	return x1,y1
+	self.powerPoints = pup
 end
 
-function mapoverlay_init()
-	local framerate = 0.2
-	if mapsel == 1 then framerate = 0.4 end
-	moAni  = sodapop.newAnimatedSprite(64*tileSize,12*tileSize)
-		moAni:addAnimation('default', {
-			image       = moAni_sheets[mapsel],
-			frameWidth  = 64,
-			frameHeight = 64,
-			frames      = {
-				{1, 1, 4, 1, framerate},
-			},
-		})
-
+function Map:spawnPU()
+	local pup = self.powerPoints
+	for i=1,#pup do
+		self.powerups[#self.powerups+1] = Powerup(pup[i].x,pup[i].y,pup[i].t,i)
+	end
 end
 
+-- easteregg decos
+	function Map:drawEE()
+		local x1,y1 = self:getEEPoint()
+		local ee = lume.randomchoice({eeq[1],eeq[2]})
+		love.graphics.draw(tiles[1],ee,(x1-1)*tileSize,y1*tileSize)
+	end
+	function Map:getEEPoint()
+		local x1,y1 = 3,self.h-3
+		local p1good = false
 
-function mapoverlay_update(dt)
-	--update animations
-	if mapsel == 3 then moAni:update(dt) end
-end
+		local attempts = 0
+		while not p1good and attempts<500 do
+			x1,y1 = math.random(3,self.w-5), math.random(self.h*4/5,self.h-3)
+			p1good = true
+			for i = x1, x1+3 do
+				if self.state[i][y1+1] ~= 'wall' then
+					p1good = false
+				end
+				if self.state[i][y1] ~= 'floor' then
+					p1good = false
+				end
+			end
+			attempts = attempts + 1
+		end
+		return x1,y1
+	end
 
-function mapoverlay_draw()
+-- map overlay drawing
+	function mapoverlay_init()
+		local framerate = 0.2
+		if mapsel == 1 then framerate = 0.4 end
+		moAni  = sodapop.newAnimatedSprite(64*tileSize,12*tileSize)
+			moAni:addAnimation('default', {
+				image       = moAni_sheets[mapsel],
+				frameWidth  = 64,
+				frameHeight = 64,
+				frames      = {
+					{1, 1, 4, 1, framerate},
+				},
+			})
+	end
+	function mapoverlay_update(dt)
+		--update animations
+		if mapsel == 3 then moAni:update(dt) end
+	end
+	function mapoverlay_draw()
 
-	-- animations here
-	if mapsel == 3 then moAni:draw() end
-end
+		-- animations here
+		if mapsel == 3 then moAni:draw() end
+	end

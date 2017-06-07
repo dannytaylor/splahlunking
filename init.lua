@@ -26,6 +26,7 @@ function init()
 
 	love.window.setIcon(icon)
 	love.graphics.setLineStyle('rough')
+	-- love.graphics.setLineJoin('miter')
 
 	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>@_", 1)
 	love.graphics.setFont( font )

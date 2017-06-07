@@ -55,6 +55,9 @@ function Player:initialize(x,y,id,skin)
 	self.puTimer = 0
 	self.pooftimer = 1
 
+	-- self.tail = {self.x,self.y}
+	-- self.tailtimer = nil
+
 	self.deadtimer = 0
 	deadtime = 5
 
@@ -120,7 +123,14 @@ function Player:draw()
 	-- 	love.graphics.setColor(255, 255, 255)
 	-- end
 	if self.connected then
-		-- self.trail:draw()
+		-- if self.tail and #self.tail>=4 then 
+		-- 	if self.tailtimer < 20 then love.graphics.setColor(0, 0, 0)
+		-- 	else love.graphics.setColor(49, 162, 242) end
+		-- 	love.graphics.setLineWidth(2)
+		-- 	love.graphics.line(self.tail) 
+		-- 	love.graphics.setLineWidth(1)
+		-- 	love.graphics.setColor(255, 255,255)
+		-- end
 		if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
 		if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
 
@@ -140,6 +150,18 @@ end
 
 function Player:update(dt)
 	self.pooftimer = self.pooftimer + dt
+	-- if self.tailtimer then 
+	-- 	self.tailtimer = self.tailtimer + dt
+	-- 	if self.pu == 'squid' then
+	-- 		self.tail[#self.tail+1] = self.x+4
+	-- 		self.tail[#self.tail+1] = self.y+5
+	-- 	end
+	-- 	if self.tailtimer > 24 then
+	-- 		self.tailtimer  = nil 
+	-- 		self.tail = nil
+	-- 	end
+	-- end
+
 	if self.pooftimer > pooftime and self.sprite.current == self.sprite.animations['poof'] then 
 		if self.surface then 
 			self.nextAnim = 'idle'
@@ -170,6 +192,8 @@ function Player:update(dt)
 				elseif self.pu == 'squid' then
 					love.audio.play(sfx_squid)
 					self.scoreMult = 1
+				elseif self.pu == 'nerd' then
+					do end
 				end
 
 				self.pu = nil
@@ -420,6 +444,8 @@ function Player:update(dt)
 						love.audio.play(sfx_walrus)
 					elseif putype == 'squid' then
 						self.scoreMult = 1.5
+						-- self.tailtimer = 0
+						-- if putype ~= self.pu then self.tail = {self.x+4,self.y+5,self.x+4,self.y+5} end
 						love.audio.play(sfx_squid)
 					end
 					if self.pu == nil then

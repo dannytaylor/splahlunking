@@ -9,7 +9,19 @@ bump    = require 'lib/bump'		-- collisions 				https://github.com/kikito/bump.l
 sodapop = require 'lib/sodapop'		-- sprite anim 				https://github.com/tesselode/sodapop
 sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock.lua
 Dreamlo = require "lib/dreamlo"			-- leaderboards				
-require "lib/dreamlo_secret"			-- private leaderboard code				
+
+function loadrequire(module)
+    local function requiref(module)
+        require(module)
+    end
+    res = pcall(requiref,module)
+    if not(res) then
+        dreamlo_secret = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        print('no dreamlo code')
+    end
+end
+loadrequire("lib/dreamlo_secret") -- private leaderboard code					
+	
 
 bitser  = require "lib/bitser"
 -- binser  = require "lib/binser"
@@ -129,3 +141,4 @@ function love.draw()
 
 
 end
+

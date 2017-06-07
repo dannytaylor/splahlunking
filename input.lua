@@ -5,6 +5,7 @@ function love.keypressed(key) -- key bindings
 		if key == 'escape' then
 			scoreBox.active  = false
 		elseif key == 'return' then
+			local submitted = false
 			local charnames = {
 				'dive classic',
 				'diva',
@@ -15,11 +16,24 @@ function love.keypressed(key) -- key bindings
 			}
 			local comment = charnames[players[pid].palette]
 			if scoreBox.text ~= '' then 
-				local test = Dreamlo.add(scoreBox.text, players[pid].score, 0, comment ) 
-				if test == "OK" then submitmsg = '>SCORE SUBMITTED!'
-				else submitmsg = 				 ' SUBMIT FAILED' end
+				-- local test = Dreamlo:getPlayer(scoreBox.text)
+				-- local nm,sc,ch = nil
+				-- if test ~= '' then 
+				-- 	nm,sc,ch = string.match(test, '(@*%w*)|(%d+)|%d+|(%w* *%w*)') 
+				-- 	sc = tonumber(sc)
+				-- 	print (sc)
+				-- end
+
+				local send = Dreamlo.add(scoreBox.text, players[pid].score, 0, comment )
+				if send and send == "OK" then 
+					-- if test == '' then 
+						submitmsg = '>SCORE SUBMITTED!'
+					-- elseif players[pid].score <= sc then submitmsg = '>SCORE TOO LOW' 
+					
+				else submitmsg = ' SUBMIT FAILED' end
+				submitted = true
 			end
-			scoreBox.submitted = true
+			scoreBox.submitted = submitted
 			scoreBox.active  = false
 		elseif key == "backspace" then
 			-- get the byte offset to the last UTF-8 character in the string.

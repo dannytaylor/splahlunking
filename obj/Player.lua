@@ -38,6 +38,7 @@ function Player:initialize(x,y,id,skin)
 
 	-- for UI
 	self.score = 0
+	self.scoreMult = 1
 	self.breath = 100
 	self.breathRate = 4
 	self.tWater = 0
@@ -168,8 +169,7 @@ function Player:update(dt)
 					love.audio.play(sfx_walrus)
 				elseif self.pu == 'squid' then
 					love.audio.play(sfx_squid)
-					self.speedx = self.speedx - dolphinspeed/3
-					self.speedy = self.speedy - dolphinspeed/3
+					self.scoreMult = 1
 				end
 
 				self.pu = nil
@@ -381,7 +381,7 @@ function Player:update(dt)
 			self.activeTreasure = treasureAt(world:getRect(self.currentTreasure))
 
 			if self.activeTreasure.active then 
-				self.score = self.score + self.activeTreasure.value
+				self.score = self.score + math.ceil(self.activeTreasure.value*self.scoreMult)
 				if self.score <= self.scoreMax and self.gamestate == 'wet' then
 					self.weight = math.max(self.speedMin, 1-self.speedMin*self.score/self.scoreMax)
 				end
@@ -419,8 +419,7 @@ function Player:update(dt)
 						end
 						love.audio.play(sfx_walrus)
 					elseif putype == 'squid' then
-						self.speedx = self.speedx + dolphinspeed/3
-						self.speedy = self.speedy + dolphinspeed/3
+						self.scoreMult = 1.5
 						love.audio.play(sfx_squid)
 					end
 					if self.pu == nil then

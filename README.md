@@ -11,7 +11,7 @@ see [devlog](https://xhg.itch.io/splahlunking/devlog) for specific changelogs.
 
 map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity (breathrate), strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). breath bubbles are more likely to spawn lower. haven't had much chance to test multiplayer, so notes on balancing are appreciated. powerups increase your speed, reduce your breathing rate, or improve your vision and revert when they run out.
 
-full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric with the first character allowed to be '@'. scores will likely get reset on major scoring/balance changes. note that the unique leaderboard code is gitignored, so you'll have to supply a fake or alternative code to run the game from source. 
+full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric with the first character allowed to be '@'. scores will likely get reset on major scoring/balance changes. when entering a score with an existing name the high score will be taken.
 
 no spaces or colons/ports in the copied ip address. game uses UDP, port 22122 for forwarding. testing was mostly done on localhost, so there may be some unknown bugs that I didn't catch.
 

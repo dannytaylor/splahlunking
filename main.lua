@@ -11,14 +11,14 @@ sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock
 Dreamlo = require "lib/dreamlo"			-- leaderboards				
 
 function loadrequire(module)
-    local function requiref(module)
-        require(module)
-    end
-    res = pcall(requiref,module)
-    if not(res) then
-        dreamlo_secret = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        print('no dreamlo code')
-    end
+	local function requiref(module)
+		require(module)
+	end
+	res = pcall(requiref,module)
+	if not(res) then
+		dreamlo_secret = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+		print('no dreamlo code')
+	end
 end
 loadrequire("lib/dreamlo_secret") -- private leaderboard code					
 	

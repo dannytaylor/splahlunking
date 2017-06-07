@@ -206,7 +206,9 @@ function initServer()
 		server:sendToAll('changeShape',{
 			p = id,
 			skin = sk,
-			swap = sw
+			swap = sw,
+			x = px,
+			y = py,
 			})
 	end)
 	server:on("disconnect", function(data, client)

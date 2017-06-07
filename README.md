@@ -9,7 +9,7 @@ game made with löve in ~10 days (jam version ~3 days) for #divejam.
 
 see [devlog](https://xhg.itch.io/splahlunking/devlog) for specific changelogs.
 
-map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity (breathrate), strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). breath bubbles are more likely to spawn lower. haven't had much chance to test multiplayer, so notes on balancing are appreciated. powerups increase your speed, reduce your breathing rate, or improve your vision and revert when they run out.
+map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity (breathrate), strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). breath bubbles are more likely to spawn lower. haven't had much chance to test multiplayer, so notes on balancing are appreciated. powerups increase your speed, reduce your breathing rate, or increase your treasure bounty and revert when they run out.
 
 full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric with the first character allowed to be '@'. scores will likely get reset on major scoring/balance changes. when entering a score with an existing name the high score will be taken.
 

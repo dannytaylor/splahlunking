@@ -2,45 +2,45 @@
 
 Map = class('Map')
 
-cellIter = 4
-caveGen = 0.52
-floodThresh = 0.35
-waterLevel = 10
-maxTreasure = 120
-maxLargeTreasure = 20
-maxBreaths = 24
-maxPU = 3
+cellIter              = 4
+caveGen               = 0.52
+floodThresh           = 0.35
+waterLevel            = 10
+startMaxTreasure      = 120
+startMaxLargeTreasure = 16
+startMaxBreaths       = 24
+startMaxPU            = 3
 
-maxAttempts = 50000
+maxAttempts           = 50000
 
 function Map:initialize(data)
 	if data then
-		self.w, self.h = data.w,data.h
-		self.state = data.s
-		self.caveState = {}
-		self.tileState = data.ts
-		self.treasure = {}
-		self.breaths = {}
-		self.powerups = {}
+		self.w, self.h      = data.w,data.h
+		self.state          = data.s
+		self.caveState      = {}
+		self.tileState      = data.ts
+		self.treasure       = {}
+		self.breaths        = {}
+		self.powerups       = {}
 		self.treasurePoints = data.t
-		self.breathPoints = data.b
-		self.powerPoints = data.p
+		self.breathPoints   = data.b
+		self.powerPoints    = data.p
 	else
-		maxTreasure = 120*(1+(numConnected-1)/8)
-		maxLargeTreasure = 16*(1+(numConnected-1)/8)
-		maxBreaths = 24*(1+(numConnected-1)/8)
-		maxPU = math.max(3,numConnected+1)
-		self.w, self.h = 0,0
-		self.attempts = 0 
-		self.state = {}
-		self.caveState = {}
-		self.tileState = {}
-		self.treasure = {}
+		maxTreasure         = startMaxTreasure*(1+(numConnected-1)/8)
+		maxLargeTreasure    = startMaxLargeTreasure*(1+(numConnected-1)/8)
+		maxBreaths          = startMaxBreaths*(1+(numConnected-1)/8)
+		maxPU               = math.max(startMaxPU,numConnected+1)
+		self.w, self.h      = 0,0
+		self.attempts       = 0
+		self.state          = {}
+		self.caveState      = {}
+		self.tileState      = {}
+		self.treasure       = {}
 		self.treasurePoints = {}
-		self.breaths = {}
-		self.breathPoints = {}
-		self.powerups = {}
-		self.powerPoints = {}
+		self.breaths        = {}
+		self.breathPoints   = {}
+		self.powerups       = {}
+		self.powerPoints    = {}
 
 	 	-- build random map
 		self:init()

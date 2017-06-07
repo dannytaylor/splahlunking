@@ -5,7 +5,7 @@
 Powerup = class('Powerup')
 
 puMaxTime = 12
-dolphinspeed = 10
+dolphinspeed = 12
 walrusbreath = 2
 
 pooftime = 0.4

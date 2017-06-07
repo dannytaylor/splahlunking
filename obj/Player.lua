@@ -90,7 +90,7 @@ function Player:playerStats()
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 4.5
+		self.breathRate = 3.8
 		self.tWater = -8 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
@@ -168,6 +168,8 @@ function Player:update(dt)
 					love.audio.play(sfx_walrus)
 				elseif self.pu == 'squid' then
 					love.audio.play(sfx_squid)
+					self.speedx = self.speedx - dolphinspeed/3
+					self.speedy = self.speedy - dolphinspeed/3
 				end
 
 				self.pu = nil
@@ -417,6 +419,8 @@ function Player:update(dt)
 						end
 						love.audio.play(sfx_walrus)
 					elseif putype == 'squid' then
+						self.speedx = self.speedx + dolphinspeed/3
+						self.speedy = self.speedy + dolphinspeed/3
 						love.audio.play(sfx_squid)
 					end
 					if self.pu == nil then

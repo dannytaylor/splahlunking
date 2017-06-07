@@ -147,7 +147,6 @@ function Map:draw()
 	if mapsel ~=3 
 		-- and players[pid].gamestate == 'wet' 
 		and cpy > waterLevel*tileSize+28
-		and players[pid].palette ~=5 
 		-- and players[pid].alive 
 		and not players[pid].surface 
 		and players[pid].deadtimer < deadtime then

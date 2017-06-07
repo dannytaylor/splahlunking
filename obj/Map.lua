@@ -9,9 +9,9 @@ waterLevel = 10
 maxTreasure = 120
 maxLargeTreasure = 20
 maxBreaths = 24
-maxPU = 2
+maxPU = 3
 
-maxAttempts = 25000
+maxAttempts = 50000
 
 function Map:initialize(data)
 	if data then
@@ -29,7 +29,7 @@ function Map:initialize(data)
 		maxTreasure = 120*(1+(numConnected-1)/8)
 		maxLargeTreasure = 16*(1+(numConnected-1)/8)
 		maxBreaths = 24*(1+(numConnected-1)/8)
-		maxPU = math.max(2,numConnected)
+		maxPU = math.max(3,numConnected+1)
 		self.w, self.h = 0,0
 		self.attempts = 0 
 		self.state = {}
@@ -157,7 +157,9 @@ function Map:draw()
 				love.graphics.setColor(27, 38, 50)
 			end
 			-- local ls = self.lscale
-			love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1,1 )
+			if not players[pid].pu or players[pid].pu ~= 'squid' then 
+				love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1,1 )
+			end
 			love.graphics.setColor(255,255,255)
 	end
 end
@@ -716,7 +718,7 @@ function Map:getPU()
 	for i=1,maxPU do
 		local a,b = self:getEmptyPoint()
 		self.state[a][b] = 'PU'
-		local type = lume.randomchoice({'dolphin','walrus'})
+		local type = lume.randomchoice({'dolphin','walrus','squid'})
 		pup[#pup+1] = {x=a,y=b,t=type}
 	end
 	self.powerPoints = pup

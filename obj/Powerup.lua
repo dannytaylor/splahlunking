@@ -4,7 +4,7 @@
 
 Powerup = class('Powerup')
 
-puMaxTime = 10
+puMaxTime = 12
 dolphinspeed = 10
 walrusbreath = 2
 
@@ -51,9 +51,27 @@ function Powerup:initialize(x,y,type,num)
 		},
 		stopAtEnd = true,
 	})
+	self.sprite:addAnimation('squid1', {
+		image        = breathsheet,
+		frameWidth   = 16,
+		frameHeight  = 16,
+		frames       = {
+		  {1, 4, 6, 4, .1},
+		},
+	})
+	self.sprite:addAnimation('squid2', {
+		image        = breathsheet,
+		frameWidth   = 16,
+		frameHeight  = 16,
+		frames       = {
+		  {7, 4, 12, 4, .1},
+		},
+		stopAtEnd = true,
+	})
 
 	if self.type == 'dolphin' then self.sprite:switch('dolphin1')
 	elseif self.type == 'walrus' then self.sprite:switch('walrus1')
+	elseif self.type == 'squid' then self.sprite:switch('squid1')
 	end
 end
 

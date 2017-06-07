@@ -198,6 +198,7 @@ function initServer()
 			if sk then
 				if sk == 7 then puSwap.sprite:switch('dolphin2')
 				elseif sk == 8 then puSwap.sprite:switch('walrus2') 
+				elseif sk == 9 then puSwap.sprite:switch('squid2') 
 				end
 			end
 		end
@@ -282,7 +283,8 @@ function initClient()
 					puSwap.active = false
 					if sk then
 						if sk == 7 then puSwap.sprite:switch('dolphin2')
-						elseif sk == 8 then puSwap.sprite:switch('walrus2') 
+						elseif sk == 8 then puSwap.sprite:switch('walrus2')
+						elseif sk == 9 then puSwap.sprite:switch('squid2') 
 						end
 					end
 				end

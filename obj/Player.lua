@@ -166,6 +166,8 @@ function Player:update(dt)
 				elseif self.pu == 'walrus' then
 					self.breathRate = self.breathRate*walrusbreath
 					love.audio.play(sfx_walrus)
+				elseif self.pu == 'squid' then
+					love.audio.play(sfx_squid)
 				end
 
 				self.pu = nil
@@ -327,6 +329,11 @@ function Player:update(dt)
 							self.currentPU = nil
 					 	end
 					end
+					if cols_len == 0 then
+						self.currentTreasure = nil
+						self.currentBreath = nil
+						self.currentPU = nil
+					end
 					
 				end
 				-- if self.gamestate == 'wet' and (dx ~= 0 or dy ~= 0) then self.trail:update(dt,true,self.x,self.y)
@@ -404,14 +411,21 @@ function Player:update(dt)
 					elseif putype == 'walrus' then
 						if self.pu == nil then
 							self.breathRate = self.breathRate/walrusbreath
+							if self.tank then
+								self.tWater = self.tWater - 5
+							end
 						end
 						love.audio.play(sfx_walrus)
+					elseif putype == 'squid' then
+						love.audio.play(sfx_squid)
 					end
 					if self.pu == nil then
 						if putype == 'dolphin' then
 							self:spriteInit(7)
 						elseif putype == 'walrus' then
 							self:spriteInit(8)
+						elseif putype == 'squid' then
+							self:spriteInit(9)
 						end
 						self.currentAnim = 'poof'
 						self.nextAnim = 'poof'
@@ -421,7 +435,8 @@ function Player:update(dt)
 
 					local sk,sw = nil,nil
 					if putype =='dolphin' then sk =7
-					elseif putype =='walrus' then sk =8 end
+					elseif putype =='walrus' then sk =8 
+					elseif putype =='squid' then sk =9 end
 					if self.pu == nil then sw = true end
 
 					if client then
@@ -445,6 +460,7 @@ function Player:update(dt)
 					self.pu = putype
 					self.activePU.active = false
 					self.activePU.sprite:switch(putype..'2')
+				else self.activePU = nil
 				end
 			end
 		end
@@ -577,24 +593,43 @@ function Player:spriteInit(palette)
 			{1, palette, 2, palette, .8},
 		},
 	})
-
-	self.sprite:addAnimation('movex', {
-		image       = playerSheet,
-		frameWidth  = 16,
-		frameHeight = 24,
-		frames      = {
-			{3, palette, 4, palette, .4},
-		},
-	})
-	self.sprite:addAnimation('movey', {
-		image       = playerSheet,
-		frameWidth  = 16,
-		frameHeight = 24,
-		frames      = {
-			{5, palette, 6, palette, .4},
-		},
-	})
-	
+	if palette < 9 then
+		self.sprite:addAnimation('movex', {
+			image       = playerSheet,
+			frameWidth  = 16,
+			frameHeight = 24,
+			frames      = {
+				{3, palette, 4, palette, .4},
+			},
+		})
+		self.sprite:addAnimation('movey', {
+			image       = playerSheet,
+			frameWidth  = 16,
+			frameHeight = 24,
+			frames      = {
+				{5, palette, 6, palette, .4},
+			},
+		})
+	else
+		self.sprite:addAnimation('movex', {
+			image       = playerSheet,
+			frameWidth  = 16,
+			frameHeight = 24,
+			frames      = {
+				{3, palette, 3, palette, .2},
+				{4, palette, 4, palette, .8},
+			},
+		})
+		self.sprite:addAnimation('movey', {
+			image       = playerSheet,
+			frameWidth  = 16,
+			frameHeight = 24,
+			frames      = {
+				{5, palette, 5, palette, .2},
+				{6, palette, 6, palette, .8},
+			},
+		})
+	end
 	self.sprite:addAnimation('movex_dry', {
 		image       = playerSheet,
 		frameWidth  = 16,

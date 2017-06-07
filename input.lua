@@ -133,10 +133,11 @@ function love.keypressed(key) -- key bindings
 			elseif key == 'e' and debug then
 				cam:setScale(cam:getScale()/2)
 			elseif key == 'g' and debug  then
+				
 				map = Map()
 				world:add('player', players[pid].x,players[pid].y,tileSize,tileSize)
 
-			elseif key == 'return' and players[pid].surface and players[pid].win and not client and not server and not scoreBox.submitted then 
+			elseif key == 'return' and players[pid].surface and players[pid].win and players[pid].score>0  and not client and not server and not scoreBox.submitted then 
 				scoreBox.active = true
 				scoreBox.text = ''
 			elseif key == 'x' or key == 'return'  then

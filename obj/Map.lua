@@ -2,14 +2,16 @@
 
 Map = class('Map')
 
-cellIter = 12
+cellIter = 4
 caveGen = 0.52
-floodThresh = 0.40
+floodThresh = 0.35
 waterLevel = 10
-maxTreasure = 100
+maxTreasure = 120
 maxLargeTreasure = 20
 maxBreaths = 24
 maxPU = 2
+
+maxAttempts = 25000
 
 function Map:initialize(data)
 	if data then
@@ -24,9 +26,9 @@ function Map:initialize(data)
 		self.breathPoints = data.b
 		self.powerPoints = data.p
 	else
-		maxTreasure = 100*(1+(numConnected-1)/4)
-		maxLargeTreasure = 16*(1+(numConnected-1)/4)
-		maxBreaths = 24*(1+(numConnected-1)/4)
+		maxTreasure = 120*(1+(numConnected-1)/8)
+		maxLargeTreasure = 16*(1+(numConnected-1)/8)
+		maxBreaths = 24*(1+(numConnected-1)/8)
 		maxPU = math.max(2,numConnected)
 		self.w, self.h = 0,0
 		self.attempts = 0 
@@ -259,7 +261,12 @@ function Map:buildCave()
 	local floodPercent = numFlood/caveArea
 	if floodPercent < floodThresh then
 		self.attempts = self.attempts + 1
-		if self.attempts > 10000 then love.event.quit() end
+		if self.attempts > 4000 then 
+			self.attempts = 0
+			caveGen = caveGen + 0.05
+			floodThresh = floodThresh - 0.05
+			self:initialize()
+		end
 		self:buildCave()
 		return false
 	end -- redo if not enough filled
@@ -339,7 +346,8 @@ end
 function Map:floodFill()
 	numFlood = 0
 	local testx, testy = math.floor(lume.random(3 , caveW - 2)), math.floor(lume.random(3 , caveH- 2))
-	while self.caveState[testx][testy] ~= 0 do
+	local attempts = 0
+	while self.caveState[testx][testy] ~= 0 and attempts < maxAttempts do
 		testx, testy = math.floor(lume.random(3 , caveW - 2)), math.floor(lume.random(3 , caveH- 2))
 	end
 	self:floodRec(testx,testy)
@@ -373,7 +381,7 @@ end
 
 function Map:drillHole(x,y)
 	self.state[x][y] = 'floor'
-	if self.state[x][y+1] == 'wall' then
+	if self.state[x][y+1] == 'wall' and y<self.h-2 then
 		self:drillHole(x,y+1)
 	end
 end
@@ -544,20 +552,25 @@ end
 function Map:getFloorPoint(weighted)
 	local x1,y1,x2,y2 = 2,2,2,2
 	local p1good,p2good = false,false
-
-	while not p1good do
+	local attempts1 = 0
+	while not p1good and attempts1 < maxAttempts do
 		x1,y1 = math.random(3,self.w-2), math.random(waterLevel+1,self.h-2)
 		if self.state[x1][y1] == 'floor' and  self.state[x1][y1+1] == 'wall' then
 			p1good = true
 		end
+		attempts1 = attempts1 + 1
 	end
+	if attempts1 >= maxAttempts then return x1,math.random(self.h,self.h*4),1 end
 	if weighted then
-		while not p2good do
+		local attempts2 = 0
+		while not p2good and attempts2 < maxAttempts do
 			x2,y2 = math.random(3,self.w-2), math.random(waterLevel+1,self.h-2)
 			if self.state[x2][y2] == 'floor' and  self.state[x2][y2+1] == 'wall' then
 				p2good = true
 			end
+			attempts2 = attempts2 + 1
 		end
+		if attempts2 >= maxAttempts then return x1,math.random(self.h,self.h*4),1 end
 
 		local d1,d2 = lume.distance(x1,y1,self.w/2,0), lume.distance(x2,y2,self.w/2,0)
 		local p = lume.weightedchoice({[{x1,y1}] = d1, [{x2,y2}] = d2})
@@ -573,15 +586,32 @@ function Map:getLargeFloorPoint()
 	local x1,y1 = 2,2
 	local p1good = false
 
-	while not p1good do
+	local attempts = 0
+	while not p1good and attempts < maxAttempts do
 		x1,y1 = math.random(3,self.w-2), math.random(math.floor(self.h/3),self.h-2)
-		if  self.state[x1][y1] == 'floor' and  
-			self.state[x1][y1+1] == 'wall' and  
-			self.state[x1+1][y1+1] == 'wall' and  
-			self.state[x1+1][y1] == 'floor' and
-			self.state[x1][y1-1] == 'floor' and  
-			self.state[x1+1][y1-1] == 'floor'  then
-			p1good = true
+		p1good = true
+		-- if  self.state[x1][y1] == 'floor' and  
+		-- 	self.state[x1][y1+1] == 'wall' and  
+		-- 	self.state[x1+1][y1+1] == 'wall' and  
+		-- 	self.state[x1+1][y1] == 'floor' and
+		-- 	self.state[x1][y1-1] == 'floor' and  
+		-- 	self.state[x1+1][y1-1] == 'floor'  then
+		-- 	p1good = true
+		-- end
+		for i = 0,1 do
+			for j = 0,1 do
+				if self.state[x1+i][y1-i] ~= 'floor' then p1good = false end
+			end
+		end
+		for i = 0,1 do
+			if self.state[x1+i][y1+1] ~= 'wall' then p1good = false end
+		end
+		attempts = attempts + 1
+	end
+	if attempts >= maxAttempts then return x1,math.random(self.h,self.h*4),12 end
+	for i = 0,1 do
+		for j = 0,1 do
+			self.state[x1+i][y1-j] = 'treasure'
 		end
 	end
 	return x1,y1,14
@@ -591,25 +621,27 @@ function Map:getXLFloorPoint()
 	local x1,y1 = 2,2
 	local p1good = false
 
-	while not p1good do
+	local attempts = 0
+	while not p1good and attempts<maxAttempts do
 		x1,y1 = math.random(3,self.w-4), math.random(math.floor(self.h*3/4),self.h-2)
 		p1good = true
-		for i=1,4 do
-			if self.state[x1+i-1][y1+1] == 'floor' then p1good = false end
+		for i=0,3 do
+			if self.state[x1+i][y1+1] ~= 'wall' then p1good = false end
 		end
-		for i=1,4 do
-			for j=1,4 do
-				if self.state[x1+i-1][y1-j+1] == 'wall' then p1good = false end
+		for i=0,3 do
+			for j=0,3 do
+				if self.state[x1+i][y1-j] ~= 'floor' then p1good = false end
 			end
 		end
-
+		attempt = attempts + 1
 	end
-	for i=0,4 do
-		for j=0,4 do
+	if attempts >= maxAttempts then return x1,math.random(self.h,self.h*4),32 end
+	for i=0,3 do
+		for j=0,3 do
 			self.state[x1+i][y1-j] = 'treasure'
 		end
 	end
-	return x1,y1,24
+	return x1,y1-2,32
 end
 
 function Map:packageData()
@@ -649,8 +681,8 @@ function Map:getEmptyPoint(upper1,upper2) -- empty point no wall neighbors
 	local p1good = false
 	local upper1 = upper1 or waterLevel+10
 	local upper2 = upper2 or math.floor(self.h/2)
-
-	while not p1good do
+	local attempts = 0
+	while not p1good and attempts < maxAttempts do
 		local ytop = math.random(upper1,upper2)
 		x1,y1 = math.random(3,self.w-3), math.random(ytop,self.h-3)
 		p1good = true
@@ -661,7 +693,9 @@ function Map:getEmptyPoint(upper1,upper2) -- empty point no wall neighbors
 				end
 			end
 		end
+		attempts = attempts + 1
 	end
+	if attempts >= maxAttempts then return x1,math.random(self.h,self.h*4) end
 	for i = x1-1, x1+2 do
 		for j = y1-1, y1+2 do
 			self.state[i][j] = 'breath'
@@ -696,31 +730,31 @@ function Map:spawnPU()
 end
 
 -- easteregg decos
-	function Map:drawEE()
-		local x1,y1 = self:getEEPoint()
-		local ee = lume.randomchoice({eeq[1],eeq[2]})
-		love.graphics.draw(tiles[1],ee,(x1-1)*tileSize,y1*tileSize)
-	end
-	function Map:getEEPoint()
-		local x1,y1 = 3,self.h-3
-		local p1good = false
+	-- function Map:drawEE()
+	-- 	local x1,y1 = self:getEEPoint()
+	-- 	local ee = lume.randomchoice({eeq[1],eeq[2]})
+	-- 	love.graphics.draw(tiles[1],ee,(x1-1)*tileSize,y1*tileSize)
+	-- end
+	-- function Map:getEEPoint()
+	-- 	local x1,y1 = 3,self.h-3
+	-- 	local p1good = false
 
-		local attempts = 0
-		while not p1good and attempts<500 do
-			x1,y1 = math.random(3,self.w-5), math.random(self.h*4/5,self.h-3)
-			p1good = true
-			for i = x1, x1+3 do
-				if self.state[i][y1+1] ~= 'wall' then
-					p1good = false
-				end
-				if self.state[i][y1] ~= 'floor' then
-					p1good = false
-				end
-			end
-			attempts = attempts + 1
-		end
-		return x1,y1
-	end
+	-- 	local attempts = 0
+	-- 	while not p1good and attempts<500 do
+	-- 		x1,y1 = math.random(3,self.w-5), math.random(self.h*4/5,self.h-3)
+	-- 		p1good = true
+	-- 		for i = x1, x1+3 do
+	-- 			if self.state[i][y1+1] ~= 'wall' then
+	-- 				p1good = false
+	-- 			end
+	-- 			if self.state[i][y1] ~= 'floor' then
+	-- 				p1good = false
+	-- 			end
+	-- 		end
+	-- 		attempts = attempts + 1
+	-- 	end
+	-- 	return x1,y1
+	-- end
 
 -- map overlay drawing
 	function mapoverlay_init()

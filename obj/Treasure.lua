@@ -51,10 +51,11 @@ function Treasure:draw()
 			end
 			self.bubbler:draw()
 		else
-			love.graphics.draw(ts,trq.txl1,self.x, self.y-16)
+			love.graphics.draw(ts,trq.txl1,self.x, self.y)
 			self.bubbler:draw()
+			-- love.graphics.rectangle('fill', self.x, self.y, tileSize*self.size, tileSize*self.size)
 		end
-		self.sparkle:draw()
+		self.sparkle:draw((self.size-1)*4,(self.size-1)*2)
 	end
 
 end

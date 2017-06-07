@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 32
+breakTime = 36
 
 function Player:initialize(x,y,id,skin)
 	self.x = x 
@@ -65,7 +65,7 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 35 -- higher linearly better
-		self.breathRate = 4.6-- lower better
+		self.breathRate = 4.3-- lower better
 		self.speedMin = 0.75 -- max speed adjustment 
 		self.scoreMax = 80 -- min speed at score
 		self.tWater = 0
@@ -90,7 +90,7 @@ function Player:playerStats()
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 4.2
+		self.breathRate = 4.5
 		self.tWater = -8 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
@@ -105,7 +105,7 @@ function Player:playerStats()
 			self.swimspeed = 55
 			self.breathRate = 7
 			self.tWater = breakTime/2 --higher break points
-			self.speedMin = 0.9
+			self.speedMin = 1
 			self.scoreMax = 40 -- min speed at score
 		end
 	end

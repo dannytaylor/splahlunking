@@ -3,8 +3,8 @@
 Map = class('Map')
 
 cellIter              = 4
-caveGen               = 0.52
-floodThresh           = 0.35
+caveGen               = 0.524
+floodThresh           = 0.37
 waterLevel            = 10
 startMaxTreasure      = 120
 startMaxLargeTreasure = 16
@@ -59,19 +59,6 @@ function Map:initialize(data)
 	self:spawnBreaths()
 	self:spawnPU()
 
-	self.playerlight  = sodapop.newAnimatedSprite()
-	self.playerlight:setAnchor(function ()
-		return players[pid].x+2,players[pid].y+2
-	end)
-	self.playerlight:addAnimation('default', {
-		image       = playerLightSheet,
-		frameWidth  = 80,
-		frameHeight = 80,
-		frames      = {
-			{3, 1, 3, 1, 2},
-		},
-	})
-	
 
 
 
@@ -79,6 +66,14 @@ function Map:initialize(data)
 	self:setCanvas()
 	-- self.lscale = 2
 	-- self:setDecorations()
+
+	love.graphics.setCanvas(pcirc)
+	love.graphics.clear(0,0,0,0) 
+	love.graphics.setColor(49, 162, 242, 255)
+	love.graphics.circle('fill', viewW/2+6, viewH/2+2, viewH/2.62)
+	love.graphics.setColor(255, 255, 255,255)
+	love.graphics.setBlendMode("alpha")
+	love.graphics.setCanvas()
 
 end
 
@@ -115,6 +110,9 @@ function Map:init()
 
 
 
+
+
+
 end
 
 function Map:draw()
@@ -127,7 +125,10 @@ function Map:draw()
 	love.graphics.rectangle('fill', 0,0, self.w*tileSize, self.h*tileSize)
 	love.graphics.setColor(255, 255, 255)
 
-	if mapsel ~=3 then self:playertracker() end
+	if mapsel ~=3 then 
+		love.graphics.draw(pcirc, players[pid].x-68,players[pid].y-40,0,1,1)
+	end
+
 	if mapsel == 1 then love.graphics.setColor(0, 0, 0)
 	elseif mapsel ==2 then love.graphics.setColor(27, 38, 50)
 	elseif mapsel == 3 then love.graphics.setColor(47, 72, 78) end
@@ -162,10 +163,6 @@ function Map:draw()
 			else
 				love.graphics.setColor(27, 38, 50)
 			end
-			-- local ls = self.lscale
-			if not players[pid].pu or players[pid].pu ~= 'squid' then 
-				-- love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1,1 )
-			end
 			love.graphics.setColor(255,255,255)
 	end
 end
@@ -185,7 +182,6 @@ function Map:update(dt)
 		p:update(dt)
 	end
 
-	self.playerlight:update(dt)
 end
 
 function Map:setCanvas()
@@ -236,14 +232,6 @@ function Map:setColor(x,y)
 	end
 end
 
-function Map:playertracker()
-	love.graphics.setColor(49, 162, 242)
-	-- love.graphics.circle('fill', players[pid].x, players[pid].y, viewH/2)
-	self.playerlight:draw()
-	love.graphics.setColor(255, 255, 255)
-end
-
-
 -- http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels
 function Map:buildCave()
 	caveW, caveH = self.w, self.h - 12
@@ -259,6 +247,11 @@ function Map:buildCave()
 			-- 1 = wall, 0 = floor
 		end
 	end
+	-- for i = 10,self.w/2-10 do
+	-- 	for j = math.floor(self.h/2), math.floor(self.h/2)+1 do
+	-- 		self.caveState[i][j] = 0
+	-- 	end
+	-- end
 
 
 	for i=1, cellIter do
@@ -271,7 +264,7 @@ function Map:buildCave()
 	local floodPercent = numFlood/caveArea
 	if floodPercent < floodThresh then
 		self.attempts = self.attempts + 1
-		if self.attempts > 4000 then 
+		if self.attempts > 40000 then 
 			self.attempts = 0
 			caveGen = caveGen + 0.05
 			floodThresh = floodThresh - 0.05

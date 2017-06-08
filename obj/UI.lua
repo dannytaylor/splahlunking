@@ -147,7 +147,7 @@ end
 
 function UI:countdown()
 	if gametime <= 8 then
-		if cd ~= 4-math.floor(gametime/2) and cd > 0 then sfx_countdown1:play()
+		if cd ~= 4-math.floor(gametime/2) and cd > 0 and cd ~= 5 then sfx_countdown1:play()
 		
 		end
 		cd = 4-math.floor(gametime/2)

@@ -173,24 +173,16 @@ function lmdraw()
 		elseif mapsel == 2 then love.graphics.clear(27, 38, 50,255) end
 		love.graphics.setBlendMode("replace")
 		love.graphics.setColor(0, 0, 0, 0)
-		love.graphics.circle('fill', viewW/2+2, viewH/2+2, viewH/1.8+viewH*lmtimer/1.8)
+		love.graphics.circle('fill', viewW/2+2, viewH/2+2, viewH/1.7+viewH*lmtimer/2.4)
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.setBlendMode("alpha")
 		love.graphics.setCanvas()
 
-		-- love.graphics.setCanvas(lcanvas2)
-		-- -- love.graphics.setColor(255, 0, 255)
-		-- love.graphics.draw(lcanvas, 0,0,0,1,1)
-		-- -- love.graphics.setColor(255, 255, 255)
-		-- love.graphics.setBlendMode("alpha")
-		-- love.graphics.setCanvas()
-
 		love.graphics.draw(lcanvas, 0,0,0,windowScale,windowScale)
-		-- love.graphics.setBlendMode("alpha")
 	end
 end
 
 lcanvas = love.graphics.newCanvas(128, 80)
 lcanvas:setFilter("nearest", "nearest")
-lcanvas2 = love.graphics.newCanvas(128, 80)
-lcanvas2:setFilter("nearest", "nearest")
+pcirc = love.graphics.newCanvas(128, 80)
+pcirc:setFilter("nearest", "nearest")

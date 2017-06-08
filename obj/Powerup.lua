@@ -39,7 +39,7 @@ function Powerup:initialize(x,y,type,num)
 		frameWidth   = 16,
 		frameHeight  = 16,
 		frames       = {
-		  {1, 3, 6, 3, .1},
+		  {1, 3, 6, 3, .2},
 		},
 	})
 	self.sprite:addAnimation('walrus2', {
@@ -56,7 +56,7 @@ function Powerup:initialize(x,y,type,num)
 		frameWidth   = 16,
 		frameHeight  = 16,
 		frames       = {
-		  {1, 4, 6, 4, .1},
+		  {1, 4, 6, 4, .2},
 		},
 	})
 	self.sprite:addAnimation('squid2', {

@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 36
+breakTime = 40
 
 function Player:initialize(x,y,id,skin)
 	self.x = x 
@@ -69,32 +69,32 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 35 -- higher linearly better
-		self.breathRate = 4.3-- lower better
+		self.breathRate = 4.2-- lower better
 		self.speedMin = 0.75 -- max speed adjustment 
 		self.scoreMax = 80 -- min speed at score
 		self.tWater = 0
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 42
-		self.breathRate = 5
+		self.breathRate = 4.8
 		self.speedMin = 0.7
 		self.scoreMax = 60 -- min speed at score
 		self.tWater = 2
 	elseif sp == 3 then
 		self.swimspeed = 26
-		self.breathRate = 3.5
+		self.breathRate = 3.4
 		self.speedMin = .9
 		self.scoreMax = 80 -- min speed at score
 		self.tWater = 4
 	elseif sp == 4 then
 		self.swimspeed = 32
-		self.breathRate = 4
+		self.breathRate = 3.8
 		self.speedMin = 0.85
 		self.tWater = 6
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 3.8
+		self.breathRate = 4
 		self.tWater = -8 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
@@ -106,9 +106,9 @@ function Player:playerStats()
 			self.speedMin = 1
 			self.scoreMax = 60 -- min speed at score
 		else
-			self.swimspeed = 55
-			self.breathRate = 7
-			self.tWater = breakTime/2 --higher break points
+			self.swimspeed = 52
+			self.breathRate = 6.4
+			self.tWater = math.floor(breakTime/3) --higher break points
 			self.speedMin = 1
 			self.scoreMax = 40 -- min speed at score
 		end
@@ -131,8 +131,8 @@ function Player:draw()
 		-- 	love.graphics.setLineWidth(1)
 		-- 	love.graphics.setColor(255, 255,255)
 		-- end
-		if self.y > (waterLevel + 2)*tileSize and self.alive then self.bubbler:draw()	end
-		if tankBubbler and self.y > (waterLevel + 2)*tileSize then tankBubbler:draw() end
+		if self.alive then self.bubbler:draw()	end
+		if tankBubbler then tankBubbler:draw() end
 
 		if self.splashtimer and splashx and mapsel ~= 3 then
 			self.splash:draw(splashx+4,0)
@@ -176,14 +176,17 @@ function Player:update(dt)
 
 	if pid == self.id then
 
-		if self.pu == 'squid' 
-			or not self.alive 
+		if self.pu ~= nil
 			or fid ~= pid
 			or (self.gamestate == 'wet' and self.y < (waterLevel+2)*tileSize and lmtimer < 2) then
-			
-			lmdt = 1
-		elseif self.pu ~= 'squid' and self.gamestate == 'wet' and self.y > (waterLevel+2)*tileSize and lmtimer > 0  then
+				lmdt = 1
+
+		elseif self.pu == nil and self.gamestate == 'wet' and self.y > (waterLevel+2)*tileSize and lmtimer > 0 then
 			lmdt = -1
+		end
+
+		if not self.alive and lmtimer < 2 then
+			 lmdt = 0.2
 		end
 
 		gametime = gametime + dt

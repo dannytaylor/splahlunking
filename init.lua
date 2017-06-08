@@ -83,7 +83,7 @@ function startMatch()
 	cam = gamera.new(-64,0,map.w*tileSize+128,map.h*tileSize+80)
 	cam:setScale(windowScale)
 	cam:setWindow(0,0,windowW,windowH)
-	cam:setPosition(players[pid].x, players[pid].y)
+	cam:setPosition(players[pid].x+2, players[pid].y)
 
 	ui = UI()
 	matchinprogress = true
@@ -137,8 +137,7 @@ function initSprites() -- and quads
 	titlebuttons     = love.graphics.newImage 'img/titlebuttons.png'
 	charsheet        = love.graphics.newImage 'img/charsheet.png'
 
-	playerLightSheet = love.graphics.newImage 'img/playerLightSheet.png'
-	lightMask        = love.graphics.newImage 'img/light_mask.png'
+
 	overlay_dead     = love.graphics.newImage 'img/overlay_dead.png'
 
 	titlebg          = love.graphics.newImage 'img/titlebg.png'

@@ -68,6 +68,8 @@ function startMatch()
 	map:setCanvas()
 	mapoverlay_init()
 
+	lmdt = 0 
+	lmtimer = 1
 	gametime = 0
 	fid = pid
 	-- init players
@@ -78,7 +80,7 @@ function startMatch()
 		if (i%2) == 0 then players[i].sprite.flipX = true end
 		if mapsel ~=3 and i > 2 then players[i].speedx = 12 end
 	end
-	cam = gamera.new(0,0,map.w*tileSize,map.h*tileSize)
+	cam = gamera.new(-64,0,map.w*tileSize+128,map.h*tileSize+80)
 	cam:setScale(windowScale)
 	cam:setWindow(0,0,windowW,windowH)
 	cam:setPosition(players[pid].x, players[pid].y)

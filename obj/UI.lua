@@ -212,7 +212,7 @@ function UI:playerbar()
 			end
 		end
 		for i=1,nc do
-			local x = 54+(i-1)*9
+			local x = 48+(i-1)*9
 			if players[i].connected then love.graphics.draw(uiSheet, uiq2[players[i].palette], x, 0) end
 			if topscore > 0 and topscore == pscore[i] and players[i].connected then
 				love.graphics.draw(uiSheet, uiq.winning, x, 4)
@@ -230,7 +230,7 @@ function UI:playerbar()
 	if client or server then
 		if alldone and numConnected > 1 then
 			if topscore == 0 then 
-				love.graphics.print('NO WINNERS...', 48, 22)
+				love.graphics.print('NO WINNERS...', 50, 22)
 			else
 				love.graphics.print('WINNING SCORE:'..topscore, 40, 22)
 			end

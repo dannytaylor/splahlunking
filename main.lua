@@ -113,13 +113,18 @@ function love.update(dt)
 		map:update(dt)
 		mapoverlay_update(dt)
 
+		lmupdate(dt)
+
 	end
 
 end
 
 
+
 function love.draw()
 	love.graphics.clear()
+
+
 	
 	if gamestate == 0 then
 		menu:draw()
@@ -133,12 +138,59 @@ function love.draw()
 
 			mapoverlay_draw()
 		end)
-
-
-
+		lmdraw()
 		ui:draw()
 	end
 
-
 end
 
+
+lmdt = 0 
+lmtimer = 1
+
+function lmupdate(dt)
+	if lmdt ~= 0 then
+		if lmdt < 0 and lmtimer >= 0 then
+			lmtimer = lmtimer + dt*lmdt*2
+			if lmtimer <= 0 then
+				lmtimer = 0
+				lmdt = 0
+			end
+		elseif lmdt > 0 and lmtimer <= 1 then
+			lmtimer = lmtimer + dt*lmdt*2
+			if lmtimer >= 1 then
+				lmtimer = 1
+				lmdt = 0
+			end
+		end
+	end
+end
+
+function lmdraw()
+	if mapsel ~= 3 then
+		love.graphics.setCanvas(lcanvas)
+		if mapsel == 1 then love.graphics.clear(0,0,0,255) 
+		elseif mapsel == 2 then love.graphics.clear(27, 38, 50,255) end
+		love.graphics.setBlendMode("replace")
+		love.graphics.setColor(0, 0, 0, 0)
+		love.graphics.circle('fill', viewW/2+2, viewH/2+2, viewH/1.8+viewH*lmtimer/1.8)
+		love.graphics.setColor(255, 255, 255)
+		love.graphics.setBlendMode("alpha")
+		love.graphics.setCanvas()
+
+		-- love.graphics.setCanvas(lcanvas2)
+		-- -- love.graphics.setColor(255, 0, 255)
+		-- love.graphics.draw(lcanvas, 0,0,0,1,1)
+		-- -- love.graphics.setColor(255, 255, 255)
+		-- love.graphics.setBlendMode("alpha")
+		-- love.graphics.setCanvas()
+
+		love.graphics.draw(lcanvas, 0,0,0,windowScale,windowScale)
+		-- love.graphics.setBlendMode("alpha")
+	end
+end
+
+lcanvas = love.graphics.newCanvas(128, 80)
+lcanvas:setFilter("nearest", "nearest")
+lcanvas2 = love.graphics.newCanvas(128, 80)
+lcanvas2:setFilter("nearest", "nearest")

@@ -176,6 +176,16 @@ function Player:update(dt)
 
 	if pid == self.id then
 
+		if self.pu == 'squid' 
+			or not self.alive 
+			or fid ~= pid
+			or (self.gamestate == 'wet' and self.y < (waterLevel+2)*tileSize and lmtimer < 2) then
+			
+			lmdt = 1
+		elseif self.pu ~= 'squid' and self.gamestate == 'wet' and self.y > (waterLevel+2)*tileSize and lmtimer > 0  then
+			lmdt = -1
+		end
+
 		gametime = gametime + dt
 		
 		if self.pu then
@@ -247,6 +257,7 @@ function Player:update(dt)
 
 				local dx, dy = 0, 0
 				if self.y > (waterLevel-1)*tileSize then
+					
 					if self.gamestate == 'dry' then
 						self.gamestate = 'wet' 
 

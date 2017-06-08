@@ -9,7 +9,7 @@ waterLevel            = 10
 startMaxTreasure      = 120
 startMaxLargeTreasure = 16
 startMaxBreaths       = 24
-startMaxPU            = 3
+startMaxPU            = 50
 
 maxAttempts           = 50000
 
@@ -61,7 +61,7 @@ function Map:initialize(data)
 
 	self.playerlight  = sodapop.newAnimatedSprite()
 	self.playerlight:setAnchor(function ()
-		return players[pid].x+4,players[pid].y+4
+		return players[pid].x+2,players[pid].y+2
 	end)
 	self.playerlight:addAnimation('default', {
 		image       = playerLightSheet,
@@ -128,6 +128,13 @@ function Map:draw()
 	love.graphics.setColor(255, 255, 255)
 
 	if mapsel ~=3 then self:playertracker() end
+	if mapsel == 1 then love.graphics.setColor(0, 0, 0)
+	elseif mapsel ==2 then love.graphics.setColor(27, 38, 50)
+	elseif mapsel == 3 then love.graphics.setColor(47, 72, 78) end
+	love.graphics.rectangle('fill', -64, 0, 64,self.h*tileSize+40)
+	love.graphics.rectangle('fill', self.w*tileSize, 0, 64, self.h*tileSize+40)
+	love.graphics.rectangle('fill', 0, self.h*tileSize, self.w*tileSize, 40)
+	love.graphics.setColor(255,255,255)
 
 	love.graphics.draw(self.tileCanvas, 0, 0, 0, 1, 1)
 
@@ -157,7 +164,7 @@ function Map:draw()
 			end
 			-- local ls = self.lscale
 			if not players[pid].pu or players[pid].pu ~= 'squid' then 
-				love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1,1 )
+				-- love.graphics.draw(lightMask, players[pid].x-124, cpy-76, 0, 1,1 )
 			end
 			love.graphics.setColor(255,255,255)
 	end
@@ -184,6 +191,8 @@ end
 function Map:setCanvas()
 	self.tileCanvas = love.graphics.newCanvas(self.w*tileSize, self.h*tileSize,"normal",0)
 	love.graphics.setCanvas(self.tileCanvas)
+
+
 
 	for i=1, self.w do
 		for j=1, self.h do

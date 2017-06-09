@@ -2,7 +2,7 @@
 
 Breath = class('Breath')
 
-breathPlus = 20
+breathPlus = 32
 
 function Breath:initialize(x,y,num)
 	self.x,self.y = (x-1)*tileSize,(y-1)*tileSize

@@ -2,7 +2,7 @@
 
 Player = class('Player')
 
-breakTime = 40
+breakTime = 42
 
 function Player:initialize(x,y,id,skin)
 	self.x = x 
@@ -69,32 +69,32 @@ function Player:playerStats()
 	local sp = self.palette
 	if sp == 1 then
 		self.swimspeed = 35 -- higher linearly better
-		self.breathRate = 4.2-- lower better
+		self.breathRate = 4.0-- lower better
 		self.speedMin = 0.75 -- max speed adjustment 
 		self.scoreMax = 80 -- min speed at score
 		self.tWater = 0
 		-- self.tWater = -x --higher break points
 	elseif sp == 2 then
 		self.swimspeed = 42
-		self.breathRate = 4.8
+		self.breathRate = 4.4
 		self.speedMin = 0.7
 		self.scoreMax = 60 -- min speed at score
 		self.tWater = 2
 	elseif sp == 3 then
 		self.swimspeed = 26
-		self.breathRate = 3.4
+		self.breathRate = 3.2
 		self.speedMin = .9
 		self.scoreMax = 80 -- min speed at score
 		self.tWater = 4
 	elseif sp == 4 then
 		self.swimspeed = 32
-		self.breathRate = 3.8
+		self.breathRate = 3.6
 		self.speedMin = 0.85
 		self.tWater = 6
 		self.scoreMax = 50 -- min speed at score
 	elseif sp == 5 then
 		self.swimspeed = 28
-		self.breathRate = 4
+		self.breathRate = 3.8
 		self.tWater = -8 --higher break points
 		self.speedMin = 0.8
 		self.scoreMax = 60 -- min speed at score
@@ -107,7 +107,7 @@ function Player:playerStats()
 			self.scoreMax = 60 -- min speed at score
 		else
 			self.swimspeed = 52
-			self.breathRate = 6.4
+			self.breathRate = 6
 			self.tWater = math.floor(breakTime/3) --higher break points
 			self.speedMin = 1
 			self.scoreMax = 40 -- min speed at score
@@ -404,7 +404,6 @@ function Player:update(dt)
 					currentsong = song3
 					self.breath = 0
 					self.alive = false
-					self.bubbler = nil
 					self.sprite.flipY = false
 					self.currentAnim = 'dead'
 					self.nextAnim = 'dead'
@@ -578,7 +577,7 @@ function Player:update(dt)
 		self.sprite:switch(self.currentAnim)
 	end
 
-	if self.alive and not self.surface then self.bubbler:update(dt, self.x+4, self.y-2) end
+	self.bubbler:update(dt, self.x+4, self.y-2)
 	if tankBubbler then tankBubbler:update(dt, self.x+4, self.y-2) end
 	if self.splashtimer then
 		self.splashtimer = self.splashtimer + dt

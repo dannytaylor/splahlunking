@@ -83,7 +83,7 @@ function startMatch()
 	cam = gamera.new(-64,0,map.w*tileSize+128,map.h*tileSize+80)
 	cam:setScale(windowScale)
 	cam:setWindow(0,0,windowW,windowH)
-	cam:setPosition(players[pid].x+2, players[pid].y)
+	cam:setPosition(players[pid].x, players[pid].y)
 
 	ui = UI()
 	matchinprogress = true

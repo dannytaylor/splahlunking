@@ -173,7 +173,7 @@ function lmdraw()
 		elseif mapsel == 2 then love.graphics.clear(27, 38, 50,255) end
 		love.graphics.setBlendMode("replace")
 		love.graphics.setColor(0, 0, 0, 0)
-		love.graphics.circle('fill', viewW/2+2, viewH/2+2, viewH/1.7+viewH*lmtimer/2.4)
+		love.graphics.circle('fill', viewW/2+3, viewH/2+2, viewH/1.7+viewH*lmtimer/2.4)
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.setBlendMode("alpha")
 		love.graphics.setCanvas()

@@ -6,10 +6,12 @@ cellIter              = 4
 caveGen               = 0.524
 floodThresh           = 0.37
 waterLevel            = 10
+
 startMaxTreasure      = 120
 startMaxLargeTreasure = 16
-startMaxBreaths       = 24
-startMaxPU            = 50
+startMaxBreaths       = 16
+if debug then startMaxPU = 50
+else startMaxPU = 4 end
 
 maxAttempts           = 50000
 
@@ -29,7 +31,7 @@ function Map:initialize(data)
 		maxTreasure         = startMaxTreasure*(1+(numConnected-1)/8)
 		maxLargeTreasure    = startMaxLargeTreasure*(1+(numConnected-1)/8)
 		maxBreaths          = startMaxBreaths*(1+(numConnected-1)/8)
-		maxPU               = math.max(startMaxPU,numConnected+1)
+		maxPU               = math.max(startMaxPU,numConnected*2)
 		self.w, self.h      = 0,0
 		self.attempts       = 0
 		self.state          = {}
@@ -70,7 +72,7 @@ function Map:initialize(data)
 	love.graphics.setCanvas(pcirc)
 	love.graphics.clear(0,0,0,0) 
 	love.graphics.setColor(49, 162, 242, 255)
-	love.graphics.circle('fill', viewW/2+6, viewH/2+2, viewH/2.62)
+	love.graphics.circle('fill', viewW/2+7, viewH/2+2, viewH/2.62)
 	love.graphics.setColor(255, 255, 255,255)
 	love.graphics.setBlendMode("alpha")
 	love.graphics.setCanvas()

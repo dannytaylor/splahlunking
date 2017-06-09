@@ -1,7 +1,7 @@
 
 socket = require 'socket'
-sock = require 'lib.sock'
-bitser  = require "lib.bitser"
+sock = require 'lib/sock'
+bitser  = require "lib/bitser"
 
 function initMMServer()
 	mmserver = sock.newServer('*', 22123)

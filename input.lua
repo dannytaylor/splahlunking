@@ -101,6 +101,8 @@ function love.keypressed(key) -- key bindings
 					client = nil
 				end
 				if server then 
+					mmclient:disconnect()
+					mmclient = nil
 					server:destroy()
 					server = nil
 				end
@@ -265,6 +267,8 @@ function menukeys(key)
 				client = nil
 			end
 			if server then 
+				mmclient:disconnect()
+				mmclient = nil
 				server:destroy()
 				server = nil
 			end

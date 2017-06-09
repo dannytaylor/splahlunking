@@ -115,11 +115,15 @@ function initServer()
 
 	local externalip = http.request('http://myip.dnsomatic.com/')
 	if debug then mmclient = sock.newClient('localhost',22123)
-	else mmclient = sock.newClient('http://splahrver.herokuapp.com',22123) end
+	else mmclient = sock.newClient('104.236.160.48',22123) end
 	mmclient:setSerialization(bitser.dumps, bitser.loads)
 	mmclient:on("connect", function()
-		print('connected')
-		mmclient:send("connectIP", externalip)
+		print('mm server connected')
+		mmclient:send("connectIP", {
+			ip = externalip,
+			name = 'testname'
+			}
+			)
 		end)
 	mmclient:connect()
 

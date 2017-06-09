@@ -2,6 +2,7 @@ debug = true
 
 -- main.lua
 
+http	= require 'socket.http'
 class 	= require 'lib/middleclass'
 lume    = require 'lib/lume'    	-- basic helper functions   https://github.com/rxi/lume/
 gamera  = require 'lib/gamera'
@@ -60,7 +61,10 @@ end
 
 function love.update(dt)
 	if client then clientUpdate(dt) end
-	if server then serverUpdate(dt) end
+	if server then 
+		serverUpdate(dt) 
+		mmclient:update()
+	end
 
 	if not mute and currentsong then
 		if not currentsong:isPlaying() then

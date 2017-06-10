@@ -6,6 +6,7 @@ else
 	mmServer = 'http://splahrver.herokuapp.com/'
 	mmdebug = ''
 end
+externalip = ''
 
 function mmGetList()
 	return http.request(mmServer .. 'l?'..dreamlo_secret)
@@ -38,10 +39,10 @@ lobbytimer = 0
 
 hostBox = {
     x = 18,
-    y = 32,
+    y = 30,
     bg = love.graphics.newImage 'img/hostbox.png',
     tx = 24,
-    ty = 47,
+    ty = 45,
     text = '',
     active = false,
 }

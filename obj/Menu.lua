@@ -208,7 +208,7 @@ function Menu:ss_char()
 			
 			if server then 
 				numConnected = server:getClientCount() + 1
-				mmRemoveLobby()
+				if hostBox.text ~= '' then  mmRemoveLobby() end
 				server:sendToAll('start', {
 					state = 1,
 					num = numConnected,

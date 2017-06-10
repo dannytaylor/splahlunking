@@ -74,19 +74,19 @@ function love.keypressed(key) -- key bindings
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
 		elseif key == 'return' then
-			local submitted = false
+			if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+			love.audio.play(sfx_buttonClick)
+
 			if hostBox.text ~= '' then 
-				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
-				love.audio.play(sfx_buttonClick)
 				externalip = http.request('http://myip.dnsomatic.com/')
 				mmAddLobby(hostBox.text)
-				hostBox.active  = false
-
-				initServer()
-				initMap()
-				menu.currentScreen = menu.screens['char']
-
 			end
+			hostBox.active  = false
+
+			initServer()
+			initMap()
+			menu.currentScreen = menu.screens['char']
+
 		elseif key == "backspace" then
 			local byteoffset = utf8.offset(hostBox.text, -1)
 			if byteoffset then hostBox.text = string.sub(hostBox.text, 1, byteoffset - 1) end
@@ -243,7 +243,7 @@ function love.keypressed(key) -- key bindings
 									})
 							end
 						end
-						mmAddLobby(hostBox.text)
+						if hostBox.text ~= '' then mmAddLobby(hostBox.text) end
 						server:sendToAll('returntochar', {
 							num = numConnected,
 						})

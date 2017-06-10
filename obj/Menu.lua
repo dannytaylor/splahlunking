@@ -40,8 +40,38 @@ function Menu:draw()
 	end
 
 	if self.currentScreen == self.screens['multi'] then 
-		if connectmsg then love.graphics.print(connectmsg, 32, 4) end
-		-- love.graphics.print("ESC TO CANCEL", 40, 10)
+		if hostBox.active then
+			love.graphics.draw(hostBox.bg, hostBox.x, hostBox.y)
+			love.graphics.print(hostBox.text, hostBox.tx, hostBox.ty)
+		elseif lobbyBox.active then
+			love.graphics.draw(lobbyBox.bg, lobbyBox.x, lobbyBox.y)
+			if #lobbyList>0 then
+				local sy = 0
+				for i = lobbyBox.top, math.min(lobbyBox.top+3,#lobbyList) do
+					if i == lobbyBox.index then love.graphics.setColor(224, 111, 139)
+					else love.graphics.setColor(255,255,255) end
+					love.graphics.print(lobbyList[i].name,		lobbyBox.tx,			lobbyBox.ty+8*sy)
+					love.graphics.print(lobbyList[i].num..'/4',	lobbyBox.tx+58,			lobbyBox.ty+8*sy)
+					sy = sy+1
+				end
+				love.graphics.setColor(255,255,255)
+			else 
+				love.graphics.print('NO LOBBIES FOUND-',	lobbyBox.tx,lobbyBox.ty)
+				-- love.graphics.print('CONNECT VIA IP',	lobbyBox.tx,lobbyBox.ty+12)
+				-- love.graphics.print('FROM CLIPBOARD',	lobbyBox.tx,lobbyBox.ty+20)
+			end
+			if lobbyBox.ipbutton and not ipBox.active then
+				love.graphics.rectangle('line', lobbyBox.x+36,  lobbyBox.y+50, 24, 7)
+			elseif not ipBox.active then
+				love.graphics.rectangle('line', lobbyBox.x+36+27,  lobbyBox.y+50, 24, 7)
+			end
+			if ipBox.active then
+				love.graphics.draw(ipBox.bg, ipBox.x, ipBox.y)
+				love.graphics.print(ipBox.text, ipBox.tx, ipBox.ty)
+			end
+		elseif connectmsg then 
+			love.graphics.print(connectmsg, 32, 4)
+		end
 	end
 
 	if self.currentScreen == self.screens['leaderboard'] then 
@@ -113,7 +143,7 @@ function Menu:ss_title()
 			leaderboard = {}
 			if quote then for line in quote:gmatch("([^\r\n]*)[\r\n]") do
 				local i = #leaderboard + 1
-				-- local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w+)') 
+				-- local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w+)')
 				local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w* *%w*)') 
 				-- print(nm,sc,ch)
 				ch = string.sub(string.upper(ch),1,7)
@@ -135,18 +165,23 @@ function Menu:ss_multi()
 	ss['multi'].bgImg = titlebg2
 	ss['multi'].buttons = {
 		Button('host', 24,24,btq.m1,btq.m1a,function ()
-			initServer()
-			initMap()
-			print(pid)
-			self.currentScreen = self.screens['char']
+			hostBox.text = ''
+			hostBox.active  = true
 		end
 		),
 		Button('join',72,24, btq.m2,btq.m2a,function ()
-			initClient()
-			if client and not connectswitch then
-				client:connect()
-				connectswitch = true
-				connectmsg = "TRYING CONNECTION..."
+			lobbyList = {}
+			local ll = mmGetList()
+			if ll and string.match(ll,'(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')then 
+				for line in ll:gmatch("([^\r\n]*)[\r\n]") do
+					local i = #lobbyList + 1
+					local name,ip,num = string.match(line, '(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')
+					lobbyList[i] = {name=name,ip=ip,num=num}
+				end 
+			end
+			lobbyBox.active = true
+			if #lobbyList == 0 then
+				lobbyBox.ipbutton = true
 			end
 		end),
 	}
@@ -173,6 +208,7 @@ function Menu:ss_char()
 			
 			if server then 
 				numConnected = server:getClientCount() + 1
+				mmRemoveLobby()
 				server:sendToAll('start', {
 					state = 1,
 					num = numConnected,

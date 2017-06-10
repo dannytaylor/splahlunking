@@ -5,34 +5,30 @@
 
 forewarning: this code is an uncommented mess of spaghetti jam-code.
 
-game made with löve in ~10 days (jam version ~3 days) for #divejam.
+game made with löve2d over 2 weeks (jam version in ~3 days) for #divejam. 128x80 pixels, 16 colours.
 
-see [devlog](https://xhg.itch.io/splahlunking/devlog) for specific changelogs.
+see [devlog](https://xhg.itch.io/splahlunking/devlog) for specific changelogs. I haven't had much chance to test multiplayer with other people, so notes on balancing and bug reports are appreciated. 
 
-map is randomly generated with higher value treasures weighted lower on the map. player stats are speed, lung capacity (breathrate), strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). breath bubbles are more likely to spawn lower. haven't had much chance to test multiplayer, so notes on balancing are appreciated. powerups increase your speed, reduce your breathing rate, or increase your treasure bounty and revert when they run out.
+map is randomly generated with higher value treasures weighted lower on the map. breath bubbles are more likely to spawn lower. player stats are speed, lung capacity (breathrate), strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). powerups increase your speed, reduce your breathing rate, or increase your treasure bounties and revert when they run out. all powerups increase your vision (except in space).
 
-full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric with the first character allowed to be '@'. scores will likely get reset on major scoring/balance changes. when entering a score with an existing name the high score will be taken.
+the lobby list is using heroku which shouldn't break or go down, but connecting directly by IP should still work if it does go down. uses UDP on port 22122 for multiplayer. full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric (first character can be '@'). 
 
-no spaces or colons/ports in the copied ip address. game uses UDP, port 22122 for forwarding. testing was mostly done on localhost, so there may be some unknown bugs that I didn't catch.
-
-there are some color consistency issues and readability issues I know, poor initial planning. I think fixing this up would be more trouble than it's worth at this point.
+there are some color consistency issues and readability issues I know, poor initial planning. I think fixing this up would be more trouble than it's worth at this point. I've tried making new music, but I'm not very good at music so it probably won't get changed.
 
 
 - **wasd**/**arrow keys**: move
 - **x**/**return**: taunt/select
 - **esc**: back/quit
+- **r**: return to character select on end
 - **m**: mute music
 - **f1-f4**: change window scale/fullscreen
-- **r**: return to character select on end
 
 ___
 
 tools:
 - aseprite (art)
-- [arne's colour palette](https://androidarts.com/palette/16pal.htm)
 - bfxr.net (sfx)
 - beepbox.co (tunes)
-- dreamlo.com (leaderboard)
 
 löve libs used:
 - [middleclass](https://github.com/kikito/middleclass) (oop)
@@ -44,11 +40,11 @@ löve libs used:
 - [bitser](https://github.com/gvx/bitser) (serialization)
 - [dreamlo.lua](https://github.com/LucyLucyy97/Dreamlo-Lua) (leaderboard)
 
-[cell automata method](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels) for map gen
-
-todo:
-- mostly I'd just like to add some better tunes, but I'll have to practice making music more
-- maybe new tilesets/characters
+other:
+- [dreamlo](http://dreamlo.com/) (leaderboard)
+- [cell automata method](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels) (map gen)
+- heroku, [xavante](https://keplerproject.github.io/xavante/), and [lua buildpack](https://github.com/leafo/heroku-buildpack-lua) (lobby server)
+- [arne's colour palette](https://androidarts.com/palette/16pal.htm)
 
 ___
 

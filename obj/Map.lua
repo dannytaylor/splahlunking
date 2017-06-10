@@ -10,7 +10,7 @@ waterLevel            = 10
 startMaxTreasure      = 120
 startMaxLargeTreasure = 16
 startMaxBreaths       = 16
-if debug then startMaxPU = 50
+if debug then startMaxPU = 25
 else startMaxPU = 4 end
 
 maxAttempts           = 50000
@@ -31,7 +31,7 @@ function Map:initialize(data)
 		maxTreasure         = startMaxTreasure*(1+(numConnected-1)/8)
 		maxLargeTreasure    = startMaxLargeTreasure*(1+(numConnected-1)/8)
 		maxBreaths          = startMaxBreaths*(1+(numConnected-1)/8)
-		maxPU               = math.max(startMaxPU,numConnected*2)
+		maxPU               = startMaxPU + numConnected
 		self.w, self.h      = 0,0
 		self.attempts       = 0
 		self.state          = {}

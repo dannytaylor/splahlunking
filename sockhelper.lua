@@ -56,6 +56,9 @@ function clientUpdate(dt)
 		end
 	end
 
+	if client:isDisconnected() then
+		client = nil
+	end
 end
 
 function serverUpdate(dt)
@@ -105,36 +108,10 @@ function initServer()
 	menu.screens['char'].buttons[3].imgActive = btq.c2a		
 	client = nil
 	ip_host = love.system.getClipboardText()
-	-- server = sock.newServer(ip_host, 22122,3)
-	server = sock.newServer('*', 22122,3)
-	local hostip = server:getSocketAddress()
-
-
-
-
-
-	local externalip = http.request('http://myip.dnsomatic.com/')
-	if debug then mmclient = sock.newClient('localhost',22123)
-	else mmclient = sock.newClient('104.236.160.48',22123) end
-	mmclient:setSerialization(bitser.dumps, bitser.loads)
-	mmclient:on("connect", function()
-		print('mm server connected')
-		mmclient:send("connectIP", {
-			ip = externalip,
-			name = 'testname'
-			}
-			)
-		end)
-	mmclient:connect()
-
-
-
+	server = sock.newServer('*', 22122,5)
 
 
 	clientlist = {}
-	hostip = string.sub(hostip, 1, string.find(hostip,':')-1)
-	print (hostip)
-	-- love.system.setClipboardText(hostip)
 	server:setSerialization(bitser.dumps, bitser.loads)
 
 	pid = 1
@@ -143,17 +120,23 @@ function initServer()
 
 		-- Send a message back to the connected client
 		if gamestate == 0 then
-			numConnected= server:getClientCount() + 1
-
-			clientlist[#clientlist+1] = {client:getConnectId(),numConnected,true}
-
-			client:send("pid",{
-				n = numConnected
+			if numConnected >=4 then
+				client:send("serverfull",{
 				})
+			else
+				numConnected= server:getClientCount() + 1
+				mmAddLobby(hostBox.text)
 
-			client:send("map",{
-				m = binary_map,
-				})
+				clientlist[#clientlist+1] = {client:getConnectId(),numConnected,true}
+
+				client:send("pid",{
+					n = numConnected
+					})
+
+				client:send("map",{
+					m = binary_map,
+					})
+			end
 		else
 			client:send("notallowed",{
 				})
@@ -236,6 +219,7 @@ function initServer()
 	server:on("disconnect", function(data, client)
 		if gamestate == 0 then
 			numConnected = server:getClientCount()+1
+			mmAddLobby(hostBox.text)
 			local cl = server:getClients() -- clientlist
 			for i=2,numConnected do
 				cl[i-1]:send("newpid",{
@@ -273,15 +257,26 @@ end
 
 function initClient()
 	server = nil
-	if debug then
-		ip_join = 'localhost'
-		-- ip_join = love.system.getClipboardText()
-	else
-		ip_join = love.system.getClipboardText()
+	-- if debug then
+	ip_join = ''
+	-- else
+	if ipBox.active then 
+		ip_join = ipBox.text
+		if ip_join == 'LOCALHOST' then ip_join = 'localhost' end
+	else 
+		if #lobbyList>0 then ip_join = lobbyList[lobbyBox.index].ip
+		else ip_join = ':(' end
 	end
+	lobbyBox.active  = false
+	lobbyBox.index = 1
+	lobbyList = {}
+	ipBox.active = false
+	ipBox.text = ''
+	-- end
 
 	local ipcheck = string.match(ip_join,"%d+.%d+.%d+.%d+")
 	if ipcheck == ip_join or ip_join == 'localhost' then
+		print(ip_join)
 		client = sock.newClient(ip_join, 22122)
 		client:setSerialization(bitser.dumps, bitser.loads)
 
@@ -291,6 +286,10 @@ function initClient()
 		client:on("notallowed", function(data)
 			client:disconnectNow()
 			connectmsg = 'MATCH IN PROGRESS' 
+		end)
+		client:on("serverfull", function(data)
+			client:disconnectNow()
+			connectmsg = '    SERVER FULL' 
 		end)
 		client:on("pid", function(data)
 			pid = data.n
@@ -433,7 +432,7 @@ function initClient()
 		currentsong = song1
 		-- client = nil
 		menu.currentScreen = menu.screens['multi']
-		connectmsg = '  BAD CONNECTION' 
+		connectmsg = '   DISCONNECTED' 
 		end)
 	else
 		connectmsg = '   BAD IP FORMAT' 

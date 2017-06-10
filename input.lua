@@ -1,5 +1,35 @@
 -- input.lua
 
+function love.textinput (text)
+    if scoreBox.active then
+    	local t = ''
+    	if string.len(scoreBox.text) == 0 then t = string.match(text,'%w*@*')
+    	else  t = string.match(text,'%w*') end
+		if t then 
+			t = string.upper(t)
+			if string.len(scoreBox.text) <= 11 then
+	        	scoreBox.text = scoreBox.text .. t
+    		end	
+        end
+    elseif hostBox.active then
+    	local t = string.match(text,'%w*')
+		if t then 
+			t = string.upper(t)
+			if string.len(hostBox.text) <= 11 then
+	        	hostBox.text = hostBox.text .. t
+    		end	
+        end
+    elseif ipBox.active then
+    	local t = string.match(text,'%w*%.*')
+		if t then 
+			t = string.upper(t)
+			if string.len(ipBox.text) <= 14 then
+	        	ipBox.text = ipBox.text .. t
+    		end	
+        end
+    end
+end
+
 function love.keypressed(key) -- key bindings
 	if scoreBox.active then
 		if key == 'escape' then
@@ -16,13 +46,6 @@ function love.keypressed(key) -- key bindings
 			}
 			local comment = charnames[players[pid].palette]
 			if scoreBox.text ~= '' then 
-				-- local test = Dreamlo:getPlayer(scoreBox.text)
-				-- local nm,sc,ch = nil
-				-- if test ~= '' then 
-				-- 	nm,sc,ch = string.match(test, '(@*%w*)|(%d+)|%d+|(%w* *%w*)') 
-				-- 	sc = tonumber(sc)
-				-- 	print (sc)
-				-- end
 
 				local send = Dreamlo.add(scoreBox.text, players[pid].score, 0, comment )
 				if send and send == "OK" then 
@@ -43,6 +66,97 @@ function love.keypressed(key) -- key bindings
 				-- remove the last UTF-8 character.
 				-- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
 				scoreBox.text = string.sub(scoreBox.text, 1, byteoffset - 1)
+			end
+		end
+	elseif hostBox.active then
+		if key == 'escape' then
+			hostBox.active  = false
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+		elseif key == 'return' then
+			local submitted = false
+			if hostBox.text ~= '' then 
+				if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+				love.audio.play(sfx_buttonClick)
+				externalip = http.request('http://myip.dnsomatic.com/')
+				mmAddLobby(hostBox.text)
+				hostBox.active  = false
+
+				initServer()
+				initMap()
+				menu.currentScreen = menu.screens['char']
+
+			end
+		elseif key == "backspace" then
+			local byteoffset = utf8.offset(hostBox.text, -1)
+			if byteoffset then hostBox.text = string.sub(hostBox.text, 1, byteoffset - 1) end
+		end
+	elseif ipBox.active then
+		if key == 'escape' then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			ipBox.active  = false
+			ipBox.text = ''
+		elseif key == 'return'  then
+			if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+			love.audio.play(sfx_buttonClick)
+			initClient()
+			if client and not connectswitch then
+				client:connect()
+				connectswitch = true
+				connectmsg = "TRYING CONNECTION..."
+			end
+
+		elseif key == "backspace" then
+			local byteoffset = utf8.offset(ipBox.text, -1)
+			if byteoffset then ipBox.text = string.sub(ipBox.text, 1, byteoffset - 1) end
+		end
+	elseif lobbyBox.active then
+		if key == 'escape' then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			lobbyBox.active  = false
+			lobbyBox.index = 1 
+		elseif key == 'up' or key == 'w' then
+			if lobbyBox.index>1 then
+				if sfx_button:isPlaying() then sfx_button:stop() end
+				love.audio.play(sfx_button)
+				if lobbyBox.top == lobbyBox.index then lobbyBox.top = lobbyBox.top -1 end
+				lobbyBox.index = lobbyBox.index - 1
+			end
+
+		elseif key == 'down' or key == 's' then
+
+			if lobbyBox.index<#lobbyList then
+				if sfx_button:isPlaying() then sfx_button:stop() end
+				love.audio.play(sfx_button)
+				if lobbyBox.top < lobbyBox.index - 2 then lobbyBox.top = lobbyBox.top + 1 end
+				lobbyBox.index = lobbyBox.index + 1
+			end
+		elseif (key == 'left' or key == 'right' or key == 'a' or key == 'd' ) and #lobbyList > 0 then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			lobbyBox.ipbutton = not	lobbyBox.ipbutton 
+
+
+		elseif key == 'return'  or key == 'x' then
+			if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
+			love.audio.play(sfx_buttonClick)
+			if not lobbyBox.ipbutton then
+				initClient()
+				if client and not connectswitch then
+					client:connect()
+					connectswitch = true
+					connectmsg = "TRYING CONNECTION..."
+				end
+			elseif lobbyBox.ipbutton then
+				local clipboard = love.system.getClipboardText()
+				local iptest = string.match(clipboard,"%d+.%d+.%d+.%d+")
+				if clipboard == iptest then
+					ipBox.text = clipboard
+				end
+
+				ipBox.active = true
 			end
 		end
 	else
@@ -101,8 +215,7 @@ function love.keypressed(key) -- key bindings
 					client = nil
 				end
 				if server then 
-					mmclient:disconnect()
-					mmclient = nil
+					mmRemoveLobby()
 					server:destroy()
 					server = nil
 				end
@@ -120,6 +233,7 @@ function love.keypressed(key) -- key bindings
 					menu.currentScreen = menu.screens['char']
 
 					if server then
+						
 						if numConnected ~=  server:getClientCount()+1 then
 							numConnected = server:getClientCount()+1
 							local cl = server:getClients() -- clientlist
@@ -129,7 +243,7 @@ function love.keypressed(key) -- key bindings
 									})
 							end
 						end
-
+						mmAddLobby(hostBox.text)
 						server:sendToAll('returntochar', {
 							num = numConnected,
 						})
@@ -261,17 +375,14 @@ function menukeys(key)
 			menu.currentScreen = menu.screens['title']
 			menu.screens['char'].buttons[3].img = btq.c2
 			menu.screens['char'].buttons[3].imgActive = btq.c2a
-			numConnected = 1
 			if client then 
-				if client:isConnected() then client:disconnect() end 
-				client = nil
+				client:disconnect()
 			end
 			if server then 
-				mmclient:disconnect()
-				mmclient = nil
-				server:destroy()
+				mmRemoveLobby()
 				server = nil
 			end
+			numConnected = 1
 		end
 	elseif key == 'left' or key == 'a' then
 		if (not client or mcs~=menu.screens['char'] ) and menu.currentScreen~=menu.screens['leaderboard'] then

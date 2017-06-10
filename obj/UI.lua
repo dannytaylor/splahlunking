@@ -117,19 +117,6 @@ scoreBox = {
     -- error = '',
 }
 
-function love.textinput (text)
-    if scoreBox.active then
-    	local t = ''
-    	if string.len(scoreBox.text) == 0 then t = string.match(text,'%w*@*')
-    	else  t = string.match(text,'%w*') end
-		if t then 
-			t = string.upper(t)
-			if string.len(scoreBox.text) <= 11 then
-	        	scoreBox.text = scoreBox.text .. t
-    		end	
-        end
-    end
-end
 
 function UI:update(dt)
 	local bn = self.breathNum

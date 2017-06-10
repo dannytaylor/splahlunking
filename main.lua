@@ -21,7 +21,7 @@ function loadrequire(module)
 		print('no dreamlo code')
 	end
 end
-loadrequire("lib/dreamlo_secret") -- private leaderboard code					
+loadrequire("splahrver/dreamlo_secret") -- private leaderboard code					
 	
 
 bitser  = require "lib/bitser"
@@ -31,6 +31,7 @@ utf8 = require("utf8")
 require 'init'
 require 'input'
 require 'sockhelper'
+require 'mmhelper'
 
 
 require 'obj/Map'
@@ -62,8 +63,10 @@ end
 function love.update(dt)
 	if client then clientUpdate(dt) end
 	if server then 
-		serverUpdate(dt) 
-		mmclient:update()
+		serverUpdate(dt)
+		if gamestate == 0 then
+			lobbyUpdate(dt)
+		end
 	end
 
 	if not mute and currentsong then
@@ -177,7 +180,7 @@ function lmdraw()
 		elseif mapsel == 2 then love.graphics.clear(27, 38, 50,255) end
 		love.graphics.setBlendMode("replace")
 		love.graphics.setColor(0, 0, 0, 0)
-		love.graphics.circle('fill', viewW/2+3, viewH/2+2, viewH/1.7+viewH*lmtimer/2.4)
+		love.graphics.circle('fill', viewW/2+3, viewH/2+2, viewH*(1+lmtimer)/1.7)
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.setBlendMode("alpha")
 		love.graphics.setCanvas()

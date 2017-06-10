@@ -28,7 +28,7 @@ function init()
 	love.graphics.setLineStyle('rough')
 	-- love.graphics.setLineJoin('miter')
 
-	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>@_", 1)
+	font = love.graphics.newImageFont("img/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,:;!?='\"+-<>@_/", 1)
 	love.graphics.setFont( font )
 
 	initSounds()
@@ -73,12 +73,12 @@ function startMatch()
 	gametime = 0
 	fid = pid
 	-- init players
-		local spawnx = { map.w/2-5, map.w/2+4.5, map.w/2-7,map.w/2+6.5}
+	local spawnx = { map.w/2-3.75, map.w/2+2.5, map.w/2-5,map.w/2+4}
 	print('pid: '..pid..', numconnected: '.. numConnected)
 	for i=1,numConnected do
 		players[i] = Player(spawnx[i]*tileSize,7*tileSize+1,i,menu.screens['char'].currentChar[i])
 		if (i%2) == 0 then players[i].sprite.flipX = true end
-		if mapsel ~=3 and i > 2 then players[i].speedx = 12 end
+		if mapsel ~=3 and i > 2 then players[i].speedx = 14 end
 	end
 	cam = gamera.new(-64,0,map.w*tileSize+128,map.h*tileSize+80)
 	cam:setScale(windowScale)

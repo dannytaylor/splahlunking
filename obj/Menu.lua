@@ -40,6 +40,7 @@ function Menu:draw()
 	end
 
 	if self.currentScreen == self.screens['multi'] then 
+		love.graphics.print(connectmsg, 32, 4)
 		if hostBox.active then
 			love.graphics.draw(hostBox.bg, hostBox.x, hostBox.y)
 			love.graphics.print(hostBox.text, hostBox.tx, hostBox.ty)
@@ -69,8 +70,7 @@ function Menu:draw()
 				love.graphics.draw(ipBox.bg, ipBox.x, ipBox.y)
 				love.graphics.print(ipBox.text, ipBox.tx, ipBox.ty)
 			end
-		elseif connectmsg then 
-			love.graphics.print(connectmsg, 32, 4)
+
 		end
 	end
 
@@ -165,13 +165,17 @@ function Menu:ss_multi()
 	ss['multi'].bgImg = titlebg2
 	ss['multi'].buttons = {
 		Button('host', 24,24,btq.m1,btq.m1a,function ()
+			connectmsg = '' 
 			hostBox.text = ''
 			hostBox.active  = true
 		end
 		),
 		Button('join',72,24, btq.m2,btq.m2a,function ()
+
+			connectmsg = '' 
 			lobbyList = {}
 			local ll = mmGetList()
+			connectmsg = '' 
 			if ll and string.match(ll,'(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')then 
 				for line in ll:gmatch("([^\r\n]*)[\r\n]") do
 					local i = #lobbyList + 1

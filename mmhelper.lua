@@ -7,14 +7,17 @@ else
 	mmdebug = ''
 end
 externalip = ''
+connectmsg = '' 
 
 function mmGetList()
+    connectmsg = 'FETCHING LOBBIES...' 
 	return http.request(mmServer .. 'l?'..dreamlo_secret)
 end
 
 function mmAddLobby(name)
 	lobby = true
 	lobbytimer = 0
+    connectmsg = 'STARTING LOBBY...' 
 	return http.request(mmServer .. 'a?secret='..dreamlo_secret..'&name='..name.. '&ip='..externalip .. '&num=' .. numConnected .. '&' .. mmdebug)
 end
 

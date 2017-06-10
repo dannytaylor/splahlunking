@@ -70,6 +70,7 @@ function love.keypressed(key) -- key bindings
 		end
 	elseif hostBox.active then
 		if key == 'escape' then
+			connectmsg = '' 
 			hostBox.active  = false
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
@@ -80,6 +81,7 @@ function love.keypressed(key) -- key bindings
 			if hostBox.text ~= '' then 
 				externalip = http.request('http://myip.dnsomatic.com/')
 				mmAddLobby(hostBox.text)
+				connectmsg = '' 
 			end
 			hostBox.active  = false
 
@@ -113,6 +115,7 @@ function love.keypressed(key) -- key bindings
 		end
 	elseif lobbyBox.active then
 		if key == 'escape' then
+			connectmsg = '' 
 			if sfx_button:isPlaying() then sfx_button:stop() end
 			love.audio.play(sfx_button)
 			lobbyBox.active  = false
@@ -195,7 +198,7 @@ function love.keypressed(key) -- key bindings
 		if gamestate == 1 then
 			if key == 'escape' then
 				gamestate = 0
-
+				connectmsg = '' 
 				-- reset everythin
 				numConnected = 1
 				players = {}
@@ -366,7 +369,7 @@ function menukeys(key)
 
 	if key == 'escape' then
 		connectswitch = false
-		connectmsg = nil
+		connectmsg = '' 
 		if sfx_button:isPlaying() then sfx_button:stop() end
 		love.audio.play(sfx_button)
 		if mcs == menu.screens['title'] then

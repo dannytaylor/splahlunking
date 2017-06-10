@@ -17,7 +17,7 @@ function clientUpdate(dt)
 			menu.screens['char'].currentButton =  menu.screens['char'].buttons[1]
 			menu.screens['char'].currentButton.active = true
 			connectswitch = nil
-			connectmsg = nil
+			connectmsg = ''
 		elseif client:isConnecting() then
 			connectmsg = "TRYING CONNECTION..."
 		else

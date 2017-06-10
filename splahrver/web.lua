@@ -137,7 +137,7 @@ xavante.HTTP {
 
 xavante.start(function()
 		servertime = servertime + dt
-		if servertime > 60*8 then
+		if servertime > 60*5 then
 			http.request('http://splahrver.herokuapp.com/')
 			servertime = 0
 		end

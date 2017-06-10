@@ -380,6 +380,7 @@ function menukeys(key)
 			end
 			if server then 
 				mmRemoveLobby()
+				server:destroy()
 				server = nil
 			end
 			numConnected = 1

@@ -1,4 +1,4 @@
-debug = true
+debug = false
 
 -- main.lua
 
@@ -9,7 +9,8 @@ gamera  = require 'lib/gamera'
 bump    = require 'lib/bump'		-- collisions 				https://github.com/kikito/bump.lua
 sodapop = require 'lib/sodapop'		-- sprite anim 				https://github.com/tesselode/sodapop
 sock    = require 'lib/sock'		-- networking				https://github.com/camchenry/sock.lua
-Dreamlo = require "lib/dreamlo"			-- leaderboards				
+Dreamlo = require 'lib/dreamlo'		-- leaderboards				
+wapi	= require 'lib/webapi'
 
 function loadrequire(module)
 	local function requiref(module)

@@ -39,6 +39,7 @@ löve libs used:
 - [sock](https://github.com/camchenry/sock.lua) (networking)
 - [bitser](https://github.com/gvx/bitser) (serialization)
 - [dreamlo.lua](https://github.com/LucyLucyy97/Dreamlo-Lua) (leaderboard)
+- [wapi](https://github.com/ulydev/wapi) (wake lobby server)
 
 other:
 - [dreamlo](http://dreamlo.com/) (leaderboard)

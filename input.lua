@@ -218,7 +218,7 @@ function love.keypressed(key) -- key bindings
 					client = nil
 				end
 				if server then 
-					mmRemoveLobby()
+					if hostBox.text ~= '' then mmRemoveLobby() end
 					server:destroy()
 					server = nil
 				end
@@ -382,7 +382,7 @@ function menukeys(key)
 				client:disconnect()
 			end
 			if server then 
-				mmRemoveLobby()
+				if hostBox.text ~= '' then mmRemoveLobby() end
 				server:destroy()
 				server = nil
 			end

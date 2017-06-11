@@ -8,6 +8,14 @@ else
 end
 externalip = ''
 connectmsg = '' 
+http.TIMEOUT = 8
+
+-- to wake mm server
+request = wapi.request({
+	method = "GET",
+	url = "mmServer"
+	})
+
 
 function mmGetList()
     connectmsg = 'FETCHING LOBBIES...' 
@@ -22,9 +30,11 @@ function mmAddLobby(name)
 end
 
 function mmRemoveLobby()
+	http.TIMEOUT = 0.5
 	lobby = false
 	lobbytimer = 0
-	return http.request(mmServer .. 'r?secret='..dreamlo_secret..'&ip='..externalip .. '&' .. mmdebug)
+	http.request(mmServer .. 'r?secret='..dreamlo_secret..'&ip='..externalip .. '&' .. mmdebug)
+	http.TIMEOUT = 10
 end
 
 

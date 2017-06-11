@@ -62,6 +62,7 @@ end
 
 
 function love.update(dt)
+	wapi.update()
 	if client then clientUpdate(dt) end
 	if server then 
 		serverUpdate(dt)

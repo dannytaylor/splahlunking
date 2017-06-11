@@ -13,12 +13,15 @@ tickRate     = 1/60
 gametime     = 0
 fid          = 1
 followtimer  = 0
+mmawake 	 = false
 
 
 Dreamlo.setSecretCode(dreamlo_secret)
 Dreamlo.setPublicCode('593513e8758d1503445e8fbf')
 
 function init()
+	wakeServer() -- wake heroku dyno
+
 	windowW, windowH = viewW*windowScale, viewH*windowScale
 	love.window.setMode(windowW, windowH, {msaa = 0})
 	love.window.setTitle('SPLAHLUNKING')

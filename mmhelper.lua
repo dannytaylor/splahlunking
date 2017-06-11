@@ -11,10 +11,23 @@ connectmsg = ''
 http.TIMEOUT = 8
 
 -- to wake mm server
-request = wapi.request({
-	method = "GET",
-	url = "mmServer"
-	})
+wakenum = 0
+function wakeServer()
+	wakenum = wakenum + 1
+	print('wake attempt #'..wakenum)
+	mmwake = wapi.request({
+		method = "GET",
+		url = mmServer
+		}, function(body,headers,code)
+			if code == 200 then
+				print('wake success')
+				mmawake = true 
+			elseif wakenum < 3 then 
+				wakeServer()
+			end
+		end
+	)
+end
 
 
 function mmGetList()
@@ -26,20 +39,21 @@ function mmAddLobby(name)
 	lobby = true
 	lobbytimer = 0
     connectmsg = 'STARTING LOBBY...' 
-	return http.request(mmServer .. 'a?secret='..dreamlo_secret..'&name='..name.. '&ip='..externalip .. '&num=' .. numConnected .. '&' .. mmdebug)
+	if name ~= '' then return http.request(mmServer .. 'a?secret='..dreamlo_secret..'&name='..name.. '&ip='..externalip .. '&num=' .. numConnected .. '&' .. mmdebug)
+	else return false end
 end
 
 function mmRemoveLobby()
 	http.TIMEOUT = 0.5
 	lobby = false
 	lobbytimer = 0
-	http.request(mmServer .. 'r?secret='..dreamlo_secret..'&ip='..externalip .. '&' .. mmdebug)
+	if hostBox.text ~= '' then http.request(mmServer .. 'r?secret='..dreamlo_secret..'&ip='..externalip .. '&' .. mmdebug) end
 	http.TIMEOUT = 10
 end
 
 
 function lobbyUpdate(dt)
-	if lobby then
+	if lobby and hostBox.text ~= '' then
 		lobbytimer = lobbytimer + dt
 		if lobbytimer > 60 then
 			mmAddLobby(hostBox.text)

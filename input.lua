@@ -77,17 +77,25 @@ function love.keypressed(key) -- key bindings
 		elseif key == 'return' then
 			if sfx_buttonClick:isPlaying() then sfx_buttonClick:stop() end
 			love.audio.play(sfx_buttonClick)
-
-			if hostBox.text ~= '' then 
+			if mmawake and hostBox.text ~= '' then
 				externalip = http.request('http://myip.dnsomatic.com/')
 				mmAddLobby(hostBox.text)
 				connectmsg = '' 
-			end
-			hostBox.active  = false
 
-			initServer()
-			initMap()
-			menu.currentScreen = menu.screens['char']
+				hostBox.active  = false
+
+				initServer()
+				initMap()
+				menu.currentScreen = menu.screens['char']
+			elseif not mmawake and hostBox.text ~= '' then
+				hostBox.active  = false
+				connectmsg = 'SERVER ERROR.RETRY\n OR HOST UNLISTED' 
+			elseif hostBox.text == '' then
+				hostBox.active  = false
+				initServer()
+				initMap()
+				menu.currentScreen = menu.screens['char']
+			end
 
 		elseif key == "backspace" then
 			local byteoffset = utf8.offset(hostBox.text, -1)

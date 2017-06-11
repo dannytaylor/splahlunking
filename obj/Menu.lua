@@ -40,7 +40,9 @@ function Menu:draw()
 	end
 
 	if self.currentScreen == self.screens['multi'] then 
+		love.graphics.setColor(157,157,157)
 		love.graphics.print(connectmsg, 32, 4)
+		love.graphics.setColor(255,255,255)
 		if hostBox.active then
 			love.graphics.draw(hostBox.bg, hostBox.x, hostBox.y)
 			love.graphics.print(hostBox.text, hostBox.tx, hostBox.ty)
@@ -179,14 +181,18 @@ function Menu:ss_multi()
 
 			connectmsg = '' 
 			lobbyList = {}
-			local ll = mmGetList()
-			connectmsg = '' 
-			if ll and string.match(ll,'(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')then 
-				for line in ll:gmatch("([^\r\n]*)[\r\n]") do
-					local i = #lobbyList + 1
-					local name,ip,num = string.match(line, '(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')
-					lobbyList[i] = {name=name,ip=ip,num=num}
-				end 
+			if mmawake then
+				local ll = mmGetList()
+				connectmsg = '' 
+				if ll and string.match(ll,'(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')then 
+					for line in ll:gmatch("([^\r\n]*)[\r\n]") do
+						local i = #lobbyList + 1
+						local name,ip,num = string.match(line, '(%w+)|(%w*.*%d*.*%d*.*%d*)|(%d+)')
+						lobbyList[i] = {name=name,ip=ip,num=num}
+					end 
+				end
+			else
+				connectmsg = '' 
 			end
 			lobbyBox.active = true
 			if #lobbyList == 0 then

@@ -56,10 +56,15 @@ function Menu:draw()
 					sy = sy+1
 				end
 				love.graphics.setColor(255,255,255)
-			else 
+			else
 				love.graphics.print('NO LOBBIES FOUND-',	lobbyBox.tx,lobbyBox.ty)
-				-- love.graphics.print('CONNECT VIA IP',	lobbyBox.tx,lobbyBox.ty+12)
-				-- love.graphics.print('FROM CLIPBOARD',	lobbyBox.tx,lobbyBox.ty+20)
+				love.graphics.print('TRY AGAIN OR',	lobbyBox.tx,lobbyBox.ty+12)
+				love.graphics.print('CONNECT VIA IP',	lobbyBox.tx,lobbyBox.ty+20)
+				if #lobbyList==0 then 
+					love.graphics.setColor(157, 157, 157)
+					love.graphics.rectangle('fill', lobbyBox.x+36+26,  lobbyBox.y+49, 25, 8)
+					love.graphics.setColor(255,255,255)
+				end
 			end
 			if lobbyBox.ipbutton and not ipBox.active then
 				love.graphics.rectangle('line', lobbyBox.x+36,  lobbyBox.y+50, 24, 7)

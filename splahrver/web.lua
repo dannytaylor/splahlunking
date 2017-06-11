@@ -11,7 +11,6 @@ ltimeout = 60*2
 lobbystring = ''
 
 dt = 0.1
-servertime = 0
 
 function updatelobbystring()
 	lobbystring = ''
@@ -130,17 +129,12 @@ xavante.HTTP {
 			match = ".",
 			with = xavante.filehandler,
 			params = { baseDir = "static/" }
-		}
+		},
     }
   }
 }
 
 xavante.start(function()
-		servertime = servertime + dt
-		if servertime > 60*5 then
-			http.request('http://splahrver.herokuapp.com/')
-			servertime = 0
-		end
 		local lnum = #lobbies
 		if lnum>0 then 
 			for i=lnum,1,-1 do

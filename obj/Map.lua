@@ -10,7 +10,7 @@ waterLevel            = 10
 startMaxTreasure      = 120
 startMaxLargeTreasure = 16
 startMaxBreaths       = 16
-if debug then startMaxPU = 25
+if debug then startMaxPU = 4
 else startMaxPU = 4 end
 
 maxAttempts           = 50000

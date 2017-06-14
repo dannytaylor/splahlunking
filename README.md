@@ -11,7 +11,7 @@ see [devlog](https://xhg.itch.io/splahlunking/devlog) for specific changelogs. I
 
 map is randomly generated with higher value treasures weighted lower on the map. breath bubbles are more likely to spawn lower. player stats are speed, lung capacity (breathrate), strength (how treasure weight effects speed), and equipment quality (how quickly it breaks). powerups increase your speed, reduce your breathing rate, or increase your treasure bounties and revert when they run out. all powerups increase your vision (except in space).
 
-the lobby list is using heroku which shouldn't break or go down, but connecting directly by IP should still work if it does go down. uses UDP on port 22122 for multiplayer. full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric (first character can be '@'). 
+the lobby list is using heroku which shouldn't break or go down, but connecting directly by IP should still work if it does go down. host needs to forward UDP on port 22122. full leaderboards viewable on [dreamlo](http://dreamlo.com/lb/593513e8758d1503445e8fbf/pipe). entered names are alphanumeric (first character can be '@'). 
 
 there are some color consistency issues and readability issues I know, poor initial planning. I think fixing this up would be more trouble than it's worth at this point. I've tried making new music, but I'm not very good at music so it probably won't get changed.
 
@@ -39,7 +39,7 @@ löve libs used:
 - [sock](https://github.com/camchenry/sock.lua) (networking)
 - [bitser](https://github.com/gvx/bitser) (serialization)
 - [dreamlo.lua](https://github.com/LucyLucyy97/Dreamlo-Lua) (leaderboard)
-- [wapi](https://github.com/ulydev/wapi) (wake lobby server)
+- [wapi](https://github.com/ulydev/wapi) (async http)
 
 other:
 - [dreamlo](http://dreamlo.com/) (leaderboard)
@@ -50,6 +50,17 @@ other:
 ___
 
 special thanks to devin for the feedback and playtesting with me
+
+___
+
+bugs:
+- rare map generation bug freezes the game (sorry, requires force close)
+- http requests are not asynchronous so they will freeze the game if you have laggy internet
+- crash on trying to start second server instance (you shouldn't be doing this but w/e)
+
+missing features:
+- keep track of #victories per player across multiple games
+- good music
 
 
 

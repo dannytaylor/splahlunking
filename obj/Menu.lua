@@ -91,6 +91,7 @@ function Menu:draw()
 			local lbi = 1
 			for i = lbtop, math.min(lbtop+4,#leaderboard) do
 				if i == lbindex then love.graphics.setColor(224, 111, 139)
+				elseif i == 1 then  love.graphics.setColor(247, 226, 107)
 				else love.graphics.setColor(255,255,255) end
 				love.graphics.print(leaderboard[i].score,11,31+(lbi-1)*8)
 				love.graphics.print(leaderboard[i].name,38,31+(lbi-1)*8)

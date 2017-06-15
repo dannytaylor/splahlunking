@@ -62,7 +62,7 @@ function clientUpdate(dt)
 		client = nil
 	end
 
-	if connectCounter > 4 then
+	if connectCounter > 4.2 then
 		client:disconnectNow()
 		connectCounter = 0
 		connectswitch = false

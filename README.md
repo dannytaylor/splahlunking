@@ -57,15 +57,8 @@ bugs:
 - rare map generation bug freezes the game (sorry, requires force close)
 - http requests are not asynchronous so they will freeze the game if you have laggy internet
 - crash on trying to start second server instance (you shouldn't be doing this but w/e)
-
-missing features:
-- keep track of #victories per player across multiple games
-- good music
-- ready-up in mp
-- msg if port 22122 is closed
-<!-- - scroll leaderboard
-- text input sound
-- trying connection spinner -->
+- missing good music
+- lobby created even if port 22122 is closed
 
 
 

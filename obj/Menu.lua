@@ -196,7 +196,8 @@ function Menu:ss_multi()
 		end
 		),
 		Button('join',72,24, btq.m2,btq.m2a,function ()
-
+			connectCounter = 0
+			connectswitch = false
 			connectmsg = '' 
 			lobbyList = {}
 			if mmawake then

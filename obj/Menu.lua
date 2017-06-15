@@ -43,6 +43,9 @@ function Menu:draw()
 		love.graphics.setColor(157,157,157)
 		love.graphics.print(connectmsg, 32, 4)
 		love.graphics.setColor(255,255,255)
+		if connectmsg == "TRYING CONNECTION" then
+			spinner:draw()
+		end
 		if hostBox.active then
 			love.graphics.draw(hostBox.bg, hostBox.x, hostBox.y)
 			love.graphics.print(hostBox.text, hostBox.tx, hostBox.ty)
@@ -85,13 +88,24 @@ function Menu:draw()
 		if #leaderboard == 0 then 
 			love.graphics.print("CONNECTION FAILED",11,31)
 		else
-			love.graphics.setColor(224, 111, 139)
-			for i = 1, math.min(#leaderboard,5) do
-				love.graphics.print(leaderboard[i].score,11,31+(i-1)*8)
-				love.graphics.print(leaderboard[i].name,38,31+(i-1)*8)
-				love.graphics.print(leaderboard[i].char,92,31+(i-1)*8)
-				love.graphics.setColor(255,255,255)
+			local lbi = 1
+			for i = lbtop, math.min(lbtop+4,#leaderboard) do
+				if i == lbindex then love.graphics.setColor(224, 111, 139)
+				else love.graphics.setColor(255,255,255) end
+				love.graphics.print(leaderboard[i].score,11,31+(lbi-1)*8)
+				love.graphics.print(leaderboard[i].name,38,31+(lbi-1)*8)
+				love.graphics.print(leaderboard[i].char,92,31+(lbi-1)*8)
+				lbi = lbi + 1
 			end
+			love.graphics.setColor(255,255,255)
+
+			-- love.graphics.setColor(224, 111, 139)
+			-- for i = 1, math.min(#leaderboard,5) do
+			-- 	love.graphics.print(leaderboard[i].score,11,31+(i-1)*8)
+			-- 	love.graphics.print(leaderboard[i].name,38,31+(i-1)*8)
+			-- 	love.graphics.print(leaderboard[i].char,92,31+(i-1)*8)
+			-- 	love.graphics.setColor(255,255,255)
+			-- end
 		end
 	end
 
@@ -103,6 +117,7 @@ function Menu:update(dt)
 	if self.currentScreen == self.screens['title'] then 
 		titlebgSprite:update(dt)
 	end
+	spinner:update(dt)
 	self.currentScreen:update(dt)
 end
 
@@ -146,8 +161,10 @@ function Menu:ss_title()
 		),
 		Button('quit',80,48,btq.b3,btq.b3a,function () --actually now leaderboard button
 			self.currentScreen = self.screens['leaderboard']
-			quote = Dreamlo:getFromTo(0, 5, Dreamlo.DataTypes.PIPE)
+			quote = Dreamlo:get(Dreamlo.DataTypes.PIPE)
 			leaderboard = {}
+			lbindex = 1
+			lbtop = 1
 			if quote then for line in quote:gmatch("([^\r\n]*)[\r\n]") do
 				local i = #leaderboard + 1
 				-- local nm,sc,ch = string.match(line, '(@*%w*)|(%d+)|%d+|(%w+)')
@@ -197,6 +214,8 @@ function Menu:ss_multi()
 			lobbyBox.active = true
 			if #lobbyList == 0 then
 				lobbyBox.ipbutton = true
+			else
+				lobbyBox.ipbutton = false
 			end
 		end),
 	}

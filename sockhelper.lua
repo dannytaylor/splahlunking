@@ -19,7 +19,8 @@ function clientUpdate(dt)
 			connectswitch = nil
 			connectmsg = ''
 		elseif client:isConnecting() then
-			connectmsg = "TRYING CONNECTION..."
+			connectmsg = "TRYING CONNECTION"
+			connectCounter = connectCounter + dt
 		else
 			connectswitch = false
 			connectmsg = "FAILED. TRY AGAIN"
@@ -56,7 +57,17 @@ function clientUpdate(dt)
 		end
 	end
 
+
 	if client:isDisconnected() then
+		client = nil
+	end
+
+	if connectCounter > 4 then
+		client:disconnectNow()
+		connectCounter = 0
+		connectswitch = false
+		connectmsg = "FAILED. TRY AGAIN"
+
 		client = nil
 	end
 end
@@ -272,6 +283,7 @@ function initClient()
 	lobbyList = {}
 	ipBox.active = false
 	ipBox.text = ''
+	connectCounter = 0
 	-- end
 
 	local ipcheck = string.match(ip_join,"%d+.%d+.%d+.%d+")

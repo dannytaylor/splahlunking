@@ -9,6 +9,11 @@ function love.textinput (text)
 			t = string.upper(t)
 			if string.len(scoreBox.text) <= 11 then
 	        	scoreBox.text = scoreBox.text .. t
+				if sfx_txt:isPlaying() then sfx_txt:stop() end
+				love.audio.play(sfx_txt)
+			else
+				if sfx_txt2:isPlaying() then sfx_txt2:stop() end
+				love.audio.play(sfx_txt2)
     		end	
         end
     elseif hostBox.active then
@@ -17,6 +22,11 @@ function love.textinput (text)
 			t = string.upper(t)
 			if string.len(hostBox.text) <= 11 then
 	        	hostBox.text = hostBox.text .. t
+				if sfx_txt:isPlaying() then sfx_txt:stop() end
+				love.audio.play(sfx_txt)
+			else
+				if sfx_txt2:isPlaying() then sfx_txt2:stop() end
+				love.audio.play(sfx_txt2)
     		end	
         end
     elseif ipBox.active then
@@ -25,6 +35,11 @@ function love.textinput (text)
 			t = string.upper(t)
 			if string.len(ipBox.text) <= 14 then
 	        	ipBox.text = ipBox.text .. t
+				if sfx_txt:isPlaying() then sfx_txt:stop() end
+				love.audio.play(sfx_txt)
+			else
+				if sfx_txt2:isPlaying() then sfx_txt2:stop() end
+				love.audio.play(sfx_txt2)
     		end	
         end
     end
@@ -66,6 +81,9 @@ function love.keypressed(key) -- key bindings
 				-- remove the last UTF-8 character.
 				-- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
 				scoreBox.text = string.sub(scoreBox.text, 1, byteoffset - 1)
+
+				if sfx_txt:isPlaying() then sfx_txt:stop() end
+				love.audio.play(sfx_txt)
 			end
 		end
 	elseif hostBox.active then
@@ -100,6 +118,8 @@ function love.keypressed(key) -- key bindings
 		elseif key == "backspace" then
 			local byteoffset = utf8.offset(hostBox.text, -1)
 			if byteoffset then hostBox.text = string.sub(hostBox.text, 1, byteoffset - 1) end
+			if sfx_txt:isPlaying() then sfx_txt:stop() end
+			love.audio.play(sfx_txt)
 		end
 	elseif ipBox.active then
 		if key == 'escape' then
@@ -120,6 +140,8 @@ function love.keypressed(key) -- key bindings
 		elseif key == "backspace" then
 			local byteoffset = utf8.offset(ipBox.text, -1)
 			if byteoffset then ipBox.text = string.sub(ipBox.text, 1, byteoffset - 1) end
+			if sfx_txt:isPlaying() then sfx_txt:stop() end
+			love.audio.play(sfx_txt)
 		end
 	elseif lobbyBox.active then
 		if key == 'escape' then
@@ -427,10 +449,26 @@ function menukeys(key)
 			end
 		end
 	elseif key == 'up' or key == 'w' then
+		if menu.currentScreen==menu.screens['leaderboard'] then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			if lbindex > 1 then 
+				if lbtop == lbindex then lbtop = lbtop - 1 end
+				lbindex = lbindex - 1 
+			end
+		end
 	elseif key == 'down' or key == 's' then
+		if menu.currentScreen==menu.screens['leaderboard'] then
+			if sfx_button:isPlaying() then sfx_button:stop() end
+			love.audio.play(sfx_button)
+			if lbindex < #leaderboard then 
+				if lbtop < lbindex - 3 then lbtop = lbtop + 1 end
+				lbindex = lbindex + 1 
+			end
+		end
 		
 	elseif (key == 'return' or key == 'x') and  menu.currentScreen~=menu.screens['leaderboard']  then
-		if (menu.currentScreen~=menu.screens['char'] or not client) then love.audio.play(sfx_buttonClick) end
+		if menu.currentScreen~=menu.screens['char'] or not client then love.audio.play(sfx_buttonClick) end
 
 		mcs.currentButton.action()
 		if not client and mcs == menu.screens['char'] and mcs.buttonIndex ~=3 then

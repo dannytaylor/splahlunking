@@ -110,6 +110,8 @@ function initSounds()
 	sfx_dolphin     = love.audio.newSource("sfx/dolphin.ogg","static")
 	sfx_walrus      = love.audio.newSource("sfx/walrus.ogg","static")
 	sfx_squid       = love.audio.newSource("sfx/squid.ogg","static")
+	sfx_txt         = love.audio.newSource("sfx/txt1.ogg","static")
+	sfx_txt2        = love.audio.newSource("sfx/txtNot.ogg","static")
 	-- sfx_emote = {
 	-- 	love.audio.newSource("sfx/emote1.ogg","static"),
 	-- 	love.audio.newSource("sfx/emote2.ogg","static"),
@@ -164,6 +166,17 @@ function initSprites() -- and quads
 		love.graphics.newImage 'img/camp3_ani.png',
 		love.graphics.newImage 'img/camp3_ani.png'
 	}
+
+	spinnersheet = love.graphics.newImage('img/spinner.png')
+	spinner = sodapop.newAnimatedSprite(65, 15)
+	spinner:addAnimation('default', {
+		image        = spinnersheet,
+		frameWidth   = 5,
+		frameHeight  = 5,
+		frames       = {
+		  {1, 1, 8, 1, .2},
+		},
+	})
 
 
 

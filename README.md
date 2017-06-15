@@ -38,13 +38,13 @@ löve libs used:
 - [sodapop](https://github.com/tesselode/sodapop) (sprite animations)
 - [sock](https://github.com/camchenry/sock.lua) (networking)
 - [bitser](https://github.com/gvx/bitser) (serialization)
-- [dreamlo.lua](https://github.com/LucyLucyy97/Dreamlo-Lua) (leaderboard)
-- [wapi](https://github.com/ulydev/wapi) (async http)
+- [dreamlo.lua](https://github.com/LucyLucyy97/Dreamlo-Lua) (leaderboard helper)
+- [wapi](https://github.com/ulydev/wapi) (async http requests)
 
 other:
 - [dreamlo](http://dreamlo.com/) (leaderboard)
 - [cell automata method](http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels) (map gen)
-- heroku, [xavante](https://keplerproject.github.io/xavante/), and [lua buildpack](https://github.com/leafo/heroku-buildpack-lua) (lobby server)
+- [heroku](https://www.heroku.com/), [xavante](https://keplerproject.github.io/xavante/), and [lua buildpack](https://github.com/leafo/heroku-buildpack-lua) (lobby server)
 - [arne's colour palette](https://androidarts.com/palette/16pal.htm)
 
 ___
@@ -61,6 +61,11 @@ bugs:
 missing features:
 - keep track of #victories per player across multiple games
 - good music
+- ready-up in mp
+- msg if port 22122 is closed
+<!-- - scroll leaderboard
+- text input sound
+- trying connection spinner -->
 
 
 
